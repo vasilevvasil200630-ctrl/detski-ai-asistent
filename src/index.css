@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: #FDFBF7;
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(167, 243, 208, 0.35) 0px, transparent 45%),
+      radial-gradient(at 90% 15%, rgba(221, 214, 254, 0.40) 0px, transparent 45%),
+      radial-gradient(at 80% 85%, rgba(254, 240, 138, 0.32) 0px, transparent 50%),
+      radial-gradient(at 15% 85%, rgba(254, 205, 211, 0.30) 0px, transparent 45%);
+    background-attachment: fixed;
+  }
+}
+
+/* Native Dialog Top-Layer & Scroll Containment */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+dialog.ai-modal {
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
+  transition:
+    opacity 0.22s ease-out,
+    transform 0.22s ease-out,
+    overlay 0.22s ease-out allow-discrete,
+    display 0.22s ease-out allow-discrete;
+}
+
+dialog.ai-modal[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+@starting-style {
+  dialog.ai-modal[open] {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+dialog.ai-modal::backdrop {
+  background-color: rgba(15, 23, 42, 0);
+  backdrop-filter: blur(0px);
+  transition:
+    background-color 0.22s ease-out,
+    backdrop-filter 0.22s ease-out,
+    overlay 0.22s ease-out allow-discrete,
+    display 0.22s ease-out allow-discrete;
+}
+
+dialog.ai-modal[open]::backdrop {
+  background-color: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(4px);
+}
+
+@starting-style {
+  dialog.ai-modal[open]::backdrop {
+    background-color: rgba(15, 23, 42, 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+/* Print optimization for teachers */
+@media print {
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+}
