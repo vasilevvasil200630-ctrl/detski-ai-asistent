@@ -48,7 +48,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <meta name="theme-color" content="#fdfbf7" />
+        <meta name="theme-color" content="#ffffff" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -63,7 +63,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] font-sans tracking-tight bg-app-ambient selection:bg-[#c2410c]/15 selection:text-[#7c2d12] transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] font-sans tracking-tight bg-app-ambient selection:bg-[#0a4b82]/15 selection:text-[#072d4c] transition-colors duration-200">
         <AppShell>{children}</AppShell>
       </body>
     </html>

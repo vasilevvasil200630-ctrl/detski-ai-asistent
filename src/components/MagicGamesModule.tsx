@@ -13,9 +13,9 @@ const AGE_OPTIONS: { id: AgeGroup; label: string; emoji: string; desc: string }[
 ];
 
 const MOOD_OPTIONS: { id: GroupMood; label: string; colorClass: string }[] = [
-  { id: 'noisy', label: '🔊 Шумни и пренапрегнати', colorClass: 'from-rose-500 to-orange-500 border-rose-400' },
+  { id: 'noisy', label: '🔊 Шумни и пренапрегнати', colorClass: 'from-rose-500 to-indigo-500 border-rose-400' },
   { id: 'tired', label: '🥱 Уморени / Тихо време', colorClass: 'from-amber-500 to-yellow-500 border-amber-400' },
-  { id: 'distracted', label: '🦋 Разсеяни', colorClass: 'from-violet-600 to-indigo-600 border-violet-400' },
+  { id: 'distracted', label: '🦋 Разсеяни', colorClass: 'from-indigo-600 to-indigo-600 border-indigo-400' },
 ];
 
 const LOCATION_OPTIONS: { id: PlayLocation; label: string }[] = [
@@ -140,7 +140,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
   return (
     <section className="space-y-8">
-      <div className="rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-white/20">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -169,7 +169,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {AGE_OPTIONS.map((item) => (
-              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, ageGroup: item.id }))} className={`flex items-center gap-3.5 p-4 rounded-2xl border-2 text-left transition-all ${filters.ageGroup === item.id ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-emerald-600 shadow-md scale-[1.02]' : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'}`}>
+              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, ageGroup: item.id }))} className={`flex items-center gap-3.5 p-4 rounded-2xl border-2 text-left transition-all ${filters.ageGroup === item.id ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white border-emerald-600 shadow-md scale-[1.02]' : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'}`}>
                 <span className="text-3xl">{item.emoji}</span>
                 <div><div className="font-extrabold">{item.label}</div><div className={`text-xs ${filters.ageGroup === item.id ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</div></div>
               </button>
@@ -189,11 +189,11 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="p-4 rounded-2xl bg-violet-50/60 border border-violet-100">
-            <label className="flex items-center gap-2 text-sm font-extrabold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-violet-600" /> 3. Място:</label>
+          <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
+            <label className="flex items-center gap-2 text-sm font-extrabold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 3. Място:</label>
             <div className="flex flex-col gap-2">
               {LOCATION_OPTIONS.map((item) => (
-                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border-2 font-extrabold text-left ${filters.location === item.id ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
+                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border-2 font-extrabold text-left ${filters.location === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
               ))}
             </div>
           </div>
@@ -221,7 +221,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         {/* Live Structured User Prompt Preview ("Запитване за игра (User Prompt)") */}
-        <div className="rounded-2xl bg-slate-900 text-slate-100 p-5 border-2 border-violet-400/40 shadow-md space-y-3">
+        <div className="rounded-2xl bg-slate-900 text-slate-100 p-5 border-2 border-indigo-400/40 shadow-md space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-2.5">
             <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-amber-300">
               <Terminal className="w-4 h-4 text-emerald-400" />
@@ -243,17 +243,17 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         <div className="pt-2 flex justify-center">
-          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 shadow-xl transition-all flex items-center justify-center gap-3">
+          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-emerald-500 via-emerald-500 to-indigo-600 hover:from-emerald-600 hover:to-indigo-700 shadow-xl transition-all flex items-center justify-center gap-3">
             {isGenerating ? <><RefreshCw className="w-6 h-6 animate-spin text-amber-200" /> Магическата кутия съчинява 3 игри...</> : <><Wand2 className="w-6 h-6 text-amber-200 animate-bounce" /> ✨ Отвори Магическата кутия (Генерирай 3 игри)</>}
           </button>
         </div>
       </div>
 
       {isGenerating && (
-        <div className="rounded-3xl bg-white/95 border-2 border-violet-200 p-8 shadow-xl text-center space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500 to-violet-500 flex items-center justify-center text-white shadow-lg animate-bounce"><Sparkles className="w-8 h-8" /></div>
+        <div className="rounded-3xl bg-white/95 border-2 border-indigo-200 p-8 shadow-xl text-center space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center text-white shadow-lg animate-bounce"><Sparkles className="w-8 h-8" /></div>
           <h3 className="font-display text-xl font-extrabold text-slate-900">Детският AI Асистент генерира по зададения User Prompt...</h3>
-          <p className="text-sm font-bold text-violet-700">1. Заглавие • 2. Римуван стих • 3. Точни стъпки • 4. Умения по Наредба № 5 • 5. Адаптация за СОП</p>
+          <p className="text-sm font-bold text-indigo-700">1. Заглавие • 2. Римуван стих • 3. Точни стъпки • 4. Умения по Наредба № 5 • 5. Адаптация за СОП</p>
         </div>
       )}
 
@@ -309,10 +309,10 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm space-y-1">
                         <p><strong className="font-extrabold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {game.pedagogicalGoal}</p>
                       </div>
-                      <div className="p-3.5 rounded-xl bg-violet-50 border border-violet-200 text-xs sm:text-sm space-y-1">
+                      <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs sm:text-sm space-y-1">
                         <p className="flex items-start gap-1.5">
-                          <HeartHandshake className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
-                          <span><strong className="font-extrabold text-violet-950">5. Идея за адаптация за дете със СОП:</strong> {game.sopAdaptation || 'Използване на визуална карта-опора, щадящо темпо и участие в двойка с подкрепящо другарче или учител.'}</span>
+                          <HeartHandshake className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                          <span><strong className="font-extrabold text-indigo-950">5. Идея за адаптация за дете със СОП:</strong> {game.sopAdaptation || 'Използване на визуална карта-опора, щадящо темпо и участие в двойка с подкрепящо другарче или учител.'}</span>
                         </p>
                       </div>
                     </div>
@@ -343,7 +343,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       <button type="button" onClick={() => handleCopyCard(game)} className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold border-2 flex items-center justify-center gap-1.5 ${copiedId === game.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>
                         {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> 📋 Копирай</>}
                       </button>
-                      <button type="button" onClick={() => window.print()} className="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold bg-white hover:bg-violet-50 text-violet-800 border-2 border-violet-200 flex items-center justify-center gap-1.5"><Printer className="w-3.5 h-3.5" /> 🖨️ Принтирай</button>
+                      <button type="button" onClick={() => window.print()} className="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold bg-white hover:bg-indigo-50 text-indigo-800 border-2 border-indigo-200 flex items-center justify-center gap-1.5"><Printer className="w-3.5 h-3.5" /> 🖨️ Принтирай</button>
                     </div>
                   </div>
                 </article>

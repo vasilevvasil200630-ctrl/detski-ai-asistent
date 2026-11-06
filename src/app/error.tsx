@@ -30,19 +30,19 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50 shadow-sm">
           <AlertTriangle className="h-10 w-10 text-amber-600" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">Нещо се обърка</h1>
-        <p className="text-stone-600 leading-relaxed">Опитайте отново. Ако проблемът остане, презаредете страницата.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Нещо се обърка</h1>
+        <p className="text-slate-600 leading-relaxed">Опитайте отново. Ако проблемът остане, презаредете страницата.</p>
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#c2410c] px-5 py-2.5 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#9a3412] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-5 py-2.5 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
           >
             <RotateCcw className="h-4 w-4" /> Опитай отново
           </button>
           <Link
             href="/games"
-            className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-5 py-2.5 font-semibold text-stone-700 transition-colors duration-150 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c]"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
           >
             <ArrowLeft className="h-4 w-4" /> Към началото
           </Link>

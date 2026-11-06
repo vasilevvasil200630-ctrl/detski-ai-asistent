@@ -63,8 +63,8 @@ function LoginForm() {
 
   if (checkingAuth) {
     return (
-      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#fdfbf7]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#c2410c]" aria-label="Зареждане" />
+      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#ffffff]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
       </main>
     );
   }
@@ -78,7 +78,7 @@ function LoginForm() {
           Нямате профил?{" "}
           <Link
             href="/register"
-            className="font-semibold text-[#c2410c] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c]"
+            className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
           >
             Регистрирайте се безплатно
           </Link>
@@ -105,12 +105,12 @@ function LoginForm() {
           disabled={loading}
         />
 
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-stone-700">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
           <input
             type="checkbox"
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
-            className="h-4 w-4 rounded border-stone-300 accent-[#c2410c] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] focus-visible:ring-offset-2"
+            className="h-4 w-4 rounded border-slate-300 accent-[#0a4b82] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
           />
           Запомни ме
         </label>

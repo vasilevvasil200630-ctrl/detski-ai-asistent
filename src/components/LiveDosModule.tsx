@@ -234,7 +234,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   return (
     <section aria-label="Жива демонстрация: Пълна подготовка по ДОС" className="space-y-8">
       {/* Hero Banner for Module 2 */}
-      <div className="rounded-3xl bg-gradient-to-r from-violet-700 via-purple-600 to-rose-500 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-amber-300/20 blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div>
@@ -245,7 +245,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             <h2 className="font-display text-2xl sm:text-3xl font-extrabold mt-2">
               🚀 „Пълна подготовка за 10 секунди“ (Генератор по ДОС)
             </h2>
-            <p className="text-violet-100 text-sm sm:text-base mt-1 max-w-3xl">
+            <p className="text-indigo-100 text-sm sm:text-base mt-1 max-w-3xl">
               Попитайте колегите в залата за произволна тема за следващата седмица, въведете я тук и
               генерирайте едновременно план-конспект по ДОС, авторска приказка и бележка за родителите!
             </p>
@@ -261,7 +261,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       {/* Input Panel */}
       <form
         onSubmit={handleGenerate}
-        className="rounded-3xl bg-white/95 backdrop-blur-md p-6 sm:p-8 shadow-xl border-2 border-violet-100 space-y-6"
+        className="rounded-3xl bg-white/95 backdrop-blur-md p-6 sm:p-8 shadow-xl border-2 border-indigo-100 space-y-6"
       >
         {/* 1. Възрастова група */}
         <div>
@@ -280,8 +280,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                     projectorMode ? 'text-lg' : 'text-sm sm:text-base'
                   } ${
                     active
-                      ? 'bg-violet-600 text-white border-violet-600 shadow-md scale-[1.01]'
-                      : 'bg-slate-50 hover:bg-violet-50/60 text-slate-800 border-slate-200'
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-[1.01]'
+                      : 'bg-slate-50 hover:bg-indigo-50/60 text-slate-800 border-slate-200'
                   }`}
                 >
                   <span>{g.label}</span>
@@ -315,8 +315,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                     projectorMode ? 'text-lg' : 'text-sm sm:text-base'
                   } ${
                     active
-                      ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white border-violet-600 shadow-md scale-[1.01]'
-                      : 'bg-slate-50 hover:bg-violet-50/60 text-slate-800 border-slate-200'
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-600 text-white border-indigo-600 shadow-md scale-[1.01]'
+                      : 'bg-slate-50 hover:bg-indigo-50/60 text-slate-800 border-slate-200'
                   }`}
                 >
                   <span className="text-2xl shrink-0">{d.emoji}</span>
@@ -342,7 +342,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="Въведете тема на ситуацията (напр. Есен в гората, Професии, Космос, Здравословно хранене...)"
-              className={`w-full px-5 py-4 sm:py-5 rounded-2xl border-2 border-violet-300 bg-violet-50/30 font-extrabold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:bg-white shadow-inner transition-all ${
+              className={`w-full px-5 py-4 sm:py-5 rounded-2xl border-2 border-indigo-300 bg-indigo-50/30 font-extrabold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white shadow-inner transition-all ${
                 projectorMode ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
               }`}
             />
@@ -369,8 +369,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 onClick={() => setTopic(qt.topic)}
                 className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border transition-all ${
                   topic === qt.topic
-                    ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                    : 'bg-white hover:bg-violet-50 text-slate-700 border-slate-200 hover:border-violet-300'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                    : 'bg-white hover:bg-indigo-50 text-slate-700 border-slate-200 hover:border-indigo-300'
                 }`}
               >
                 {qt.label}
@@ -384,9 +384,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
           <button
             type="submit"
             disabled={isGenerating}
-            className="relative group w-full sm:w-auto sm:min-w-[480px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-rose-500 hover:from-violet-700 hover:via-purple-700 hover:to-rose-600 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-75 disabled:cursor-wait"
+            className="relative group w-full sm:w-auto sm:min-w-[480px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-indigo-600 via-indigo-600 to-rose-500 hover:from-indigo-700 hover:via-indigo-700 hover:to-rose-600 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-75 disabled:cursor-wait"
           >
-            <span className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-400 via-amber-300 to-rose-400 opacity-40 blur-md group-hover:opacity-75 animate-pulse pointer-events-none" />
+            <span className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-400 via-amber-300 to-rose-400 opacity-40 blur-md group-hover:opacity-75 animate-pulse pointer-events-none" />
             <span className="relative flex items-center justify-center gap-3">
               {isGenerating ? (
                 <>
@@ -409,22 +409,22 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
         <div
           role="status"
           aria-live="polite"
-          className="rounded-3xl bg-white/95 border-2 border-violet-200 p-8 sm:p-10 shadow-xl text-center space-y-5"
+          className="rounded-3xl bg-white/95 border-2 border-indigo-200 p-8 sm:p-10 shadow-xl text-center space-y-5"
         >
-          <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-violet-600 via-fuchsia-500 to-amber-400 flex items-center justify-center text-white shadow-lg animate-bounce">
+          <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-amber-400 flex items-center justify-center text-white shadow-lg animate-bounce">
             <Sparkles className="w-10 h-10" />
           </div>
           <h3 className="font-display text-xl sm:text-2xl font-extrabold text-slate-900">
             Подготвяме методическа разработка по тема: „{topic || 'Есен в гората'}“
           </h3>
-          <p className="text-base sm:text-lg font-bold text-violet-700 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg font-bold text-indigo-700 max-w-2xl mx-auto">
             {thinkingSteps[thinkingPhase]}
           </p>
           <div className="w-full max-w-md mx-auto h-3 rounded-full bg-slate-100 overflow-hidden p-0.5 border border-slate-200">
-            <div className="h-full rounded-full bg-gradient-to-r from-violet-600 via-rose-500 to-amber-500 animate-pulse w-5/6" />
+            <div className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-rose-500 to-amber-500 animate-pulse w-5/6" />
           </div>
           <div className="flex flex-wrap justify-center gap-2 text-xs font-bold text-slate-600">
-            <span className="px-3 py-1 rounded-full bg-violet-50 border border-violet-200">
+            <span className="px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200">
               {AGE_GROUP_LABELS[ageGroup].full}
             </span>
             <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-200">
@@ -438,7 +438,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       {!isGenerating && plan && (
         <div className="space-y-6">
           {/* Result Header & Layout Switcher */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/90 p-4 sm:p-5 rounded-2xl border border-violet-200 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/90 p-4 sm:p-5 rounded-2xl border border-indigo-200 shadow-sm">
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -465,7 +465,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                   onClick={() => setViewMode('columns')}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
                     viewMode === 'columns'
-                      ? 'bg-white text-violet-700 shadow-sm'
+                      ? 'bg-white text-indigo-700 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -477,7 +477,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                   onClick={() => setViewMode('tabs')}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
                     viewMode === 'tabs'
-                      ? 'bg-white text-violet-700 shadow-sm'
+                      ? 'bg-white text-indigo-700 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -489,7 +489,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
               >
                 <Printer className="w-4 h-4" />
                 <span>🖨️ Принтирай всичко</span>
@@ -502,7 +502,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             <div
               role="tablist"
               aria-label="Секции на разработката"
-              className="no-print grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-2 rounded-2xl border-2 border-violet-100 shadow-sm"
+              className="no-print grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-2 rounded-2xl border-2 border-indigo-100 shadow-sm"
             >
               <button
                 type="button"
@@ -525,8 +525,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 onClick={() => setActiveTab('story')}
                 className={`py-3.5 px-4 rounded-xl font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${
                   activeTab === 'story'
-                    ? 'bg-violet-600 text-white shadow-md'
-                    : 'bg-slate-50 hover:bg-violet-50 text-slate-700'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-slate-50 hover:bg-indigo-50 text-slate-700'
                 }`}
               >
                 <BookOpen className="w-5 h-5" />
@@ -566,7 +566,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 : {})}
             >
               <article className="print-card rounded-2xl bg-white border-2 border-emerald-200 shadow-lg overflow-hidden">
-                <div className="p-5 sm:p-6 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between gap-3">
+                <div className="p-5 sm:p-6 bg-gradient-to-r from-emerald-600 to-emerald-600 text-white flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <ClipboardList className="w-6 h-6" />
@@ -685,14 +685,14 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 ? ({ hidden: 'until-found' } as unknown as React.HTMLAttributes<HTMLDivElement>)
                 : {})}
             >
-              <article className="print-card rounded-2xl bg-white border-2 border-violet-200 shadow-lg overflow-hidden">
-                <div className="p-5 sm:p-6 bg-gradient-to-r from-violet-600 to-purple-600 text-white flex items-center justify-between gap-3">
+              <article className="print-card rounded-2xl bg-white border-2 border-indigo-200 shadow-lg overflow-hidden">
+                <div className="p-5 sm:p-6 bg-gradient-to-r from-indigo-600 to-indigo-600 text-white flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <BookOpen className="w-6 h-6" />
                     </div>
                     <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-violet-100">
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-100">
                         Секция 2 • Художествен текст
                       </span>
                       <h4 className="font-display text-lg sm:text-xl font-extrabold">
@@ -731,14 +731,14 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 </div>
 
                 <div className={`p-5 sm:p-6 space-y-5 ${projectorMode ? 'text-base' : 'text-sm'}`}>
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-200">
-                    <div className="text-xs font-extrabold uppercase tracking-wider text-violet-700">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-50 border border-indigo-200">
+                    <div className="text-xs font-extrabold uppercase tracking-wider text-indigo-700">
                       Заглавие на приказката:
                     </div>
                     <h5 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
                       „{plan.story.title}“
                     </h5>
-                    <p className="text-xs font-bold text-violet-800 mt-1">
+                    <p className="text-xs font-bold text-indigo-800 mt-1">
                       🌟 Главен герой: {plan.story.hero}
                     </p>
                   </div>
@@ -746,7 +746,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                   {/* Story Paragraphs */}
                   <div className="space-y-3.5 text-slate-800 leading-relaxed bg-amber-50/40 p-4 rounded-2xl border border-amber-200/70">
                     {plan.story.paragraphs.map((para, idx) => (
-                      <p key={idx} className="first-letter:text-xl first-letter:font-extrabold first-letter:text-violet-700">
+                      <p key={idx} className="first-letter:text-xl first-letter:font-extrabold first-letter:text-indigo-700">
                         {para}
                       </p>
                     ))}
@@ -756,15 +756,15 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                   </div>
 
                   {/* 3 Questions for pedagogical conversation */}
-                  <div className="p-4 rounded-2xl bg-violet-50/70 border border-violet-200 space-y-2.5">
-                    <h5 className="font-extrabold text-violet-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                      <HelpCircle className="w-4 h-4 text-violet-600" />
+                  <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2.5">
+                    <h5 className="font-extrabold text-indigo-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                      <HelpCircle className="w-4 h-4 text-indigo-600" />
                       <span>3 въпроса за беседа след прочитането:</span>
                     </h5>
                     <ol className="space-y-2">
                       {plan.story.discussionQuestions.map((q, idx) => (
                         <li key={idx} className="flex items-start gap-2.5 text-slate-800 font-semibold">
-                          <span className="w-5 h-5 rounded-full bg-violet-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
                           <span>{q}</span>
@@ -784,7 +784,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 : {})}
             >
               <article className="print-card rounded-2xl bg-white border-2 border-rose-200 shadow-lg overflow-hidden">
-                <div className="p-5 sm:p-6 bg-gradient-to-r from-rose-500 to-orange-500 text-white flex items-center justify-between gap-3">
+                <div className="p-5 sm:p-6 bg-gradient-to-r from-rose-500 to-indigo-500 text-white flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <HeartHandshake className="w-6 h-6" />
