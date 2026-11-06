@@ -54,7 +54,11 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
   // QR Modal State
   const [isQrOpen, setIsQrOpen] = useState(false);
   const [qrMode, setQrMode] = useState<'cheatsheet' | 'custom_url'>('custom_url');
-  const [customUrl, setCustomUrl] = useState('https://detski-ai-asistent.vercel.app');
+  const [customUrl, setCustomUrl] = useState(
+    typeof window !== 'undefined' && window.location.origin.startsWith('http')
+      ? window.location.origin + window.location.pathname
+      : 'https://vasilevvasil200630-ctrl.github.io/detski-ai-asistent/'
+  );
   const [qrSvgMarkup, setQrSvgMarkup] = useState<string>('');
   const qrDialogRef = useRef<HTMLDialogElement>(null);
   const qrTitleId = useId();
