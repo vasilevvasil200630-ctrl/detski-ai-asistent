@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Zap,
@@ -19,18 +21,19 @@ import {
 } from 'lucide-react';
 import {
   AgeGroup,
-  AISettings,
   EducationalDirection,
   GeneratedLessonPlan,
 } from '../types';
 import {
   AGE_GROUP_LABELS,
+  AiSource,
   DIRECTION_LABELS,
   generateLessonPreparation,
 } from '../services/aiEngine';
 
 interface LiveDosModuleProps {
-  aiSettings: AISettings;
+  /** Групата на влезлия учител (по подразбиране III група) */
+  defaultAgeGroup?: AgeGroup;
   onTimeSaved: (minutes: number) => void;
   projectorMode: boolean;
 }
@@ -63,11 +66,15 @@ const QUICK_TOPICS: { label: string; topic: string; direction?: EducationalDirec
 ];
 
 export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
-  aiSettings,
+  defaultAgeGroup,
   onTimeSaved,
   projectorMode,
 }) => {
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('3');
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>(defaultAgeGroup ?? '3');
+  const [source, setSource] = useState<AiSource | null>(null);
+  useEffect(() => {
+    if (defaultAgeGroup) setAgeGroup(defaultAgeGroup);
+  }, [defaultAgeGroup]);
   const [direction, setDirection] = useState<EducationalDirection>('world');
   const [topic, setTopic] = useState<string>('Есен в гората');
 
@@ -126,11 +133,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
     }, 750);
 
     try {
-      const result = await generateLessonPreparation(
-        { ageGroup, direction, topic: targetTopic },
-        aiSettings
-      );
-      setPlan(result);
+      const result = await generateLessonPreparation({ ageGroup, direction, topic: targetTopic });
+      setPlan(result.plan);
+      setSource(result.source);
       onTimeSaved(45);
     } finally {
       clearInterval(interval);
@@ -231,7 +236,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       {/* Hero Banner for Module 2 */}
       <div className="rounded-3xl bg-gradient-to-r from-violet-700 via-purple-600 to-rose-500 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-amber-300/20 blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm">
               <Zap className="w-3.5 h-3.5 text-amber-300" />
@@ -379,7 +384,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
           <button
             type="submit"
             disabled={isGenerating}
-            className="relative group w-full sm:w-auto min-w-[320px] sm:min-w-[480px] py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-rose-500 hover:from-violet-700 hover:via-purple-700 hover:to-rose-600 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-75 disabled:cursor-wait"
+            className="relative group w-full sm:w-auto sm:min-w-[480px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-rose-500 hover:from-violet-700 hover:via-purple-700 hover:to-rose-600 shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-75 disabled:cursor-wait"
           >
             <span className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-400 via-amber-300 to-rose-400 opacity-40 blur-md group-hover:opacity-75 animate-pulse pointer-events-none" />
             <span className="relative flex items-center justify-center gap-3">
@@ -439,6 +444,11 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 <span className="px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                   ✅ Готова пълна разработка
                 </span>
+                {source && (
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                    {source === 'ai' ? '✨ Gemini AI' : '🛡️ Демо двигател'}
+                  </span>
+                )}
                 <span className="text-xs font-bold text-slate-500">
                   {plan.ageGroupLabel} • {plan.directionLabel}
                 </span>

@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+/* Структурата е копирана от МатураПлюс (src/app/globals.css): токени на :root, @theme inline,
+   щадящ зрението режим, повърхности, бутони и фон. Разлика: топла палитра за детска градина
+   (тиква/теракота + листно зелено + слънчев акцент) вместо сапфир + изумруд. */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "../app/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../components/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../lib/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../services/**/*.{js,ts,jsx,tsx,mdx}";
+
+:root {
+  /* Топъл кремав фон и деликатни повърхности */
+  --background: #fdfbf7;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --surface-subtle: #faf7f2;
+  --surface-muted: #f5f0e8;
+  --border: #ece4d8;
+
+  /* Основен бранд: топла тиква/теракота */
+  --brand-primary: #c2410c;
+  --brand-primary-dark: #9a3412;
+  --brand-primary-light: #ea580c;
+  --brand-primary-soft: #fff4eb;
+
+  /* Втори бранд: листно зелено (растеж, природа) */
+  --brand-leaf: #15803d;
+  --brand-leaf-dark: #166534;
+  --brand-leaf-light: #16a34a;
+  --brand-leaf-soft: #effaf2;
+
+  /* Слънчев акцент (звезди, награди, CTA за вход) */
+  --brand-sun: #f59e0b;
+
+  --primary: #c2410c;
+  --primary-foreground: #ffffff;
+  --accent-rose: #e11d48;
+  --accent-amber: #d97706;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-dark: var(--brand-primary-dark);
+  --color-brand-primary-light: var(--brand-primary-light);
+  --color-brand-primary-soft: var(--brand-primary-soft);
+
+  --color-brand-leaf: var(--brand-leaf);
+  --color-brand-leaf-dark: var(--brand-leaf-dark);
+  --color-brand-leaf-light: var(--brand-leaf-light);
+  --color-brand-leaf-soft: var(--brand-leaf-soft);
+
+  --color-brand-sun: var(--brand-sun);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Пастелните палитри от досегашния детски сайт (ползват се в модулите) */
+  --color-mint-50: #f0fdf7;
+  --color-mint-100: #dcfce9;
+  --color-mint-200: #bbf7d5;
+  --color-mint-500: #10b981;
+  --color-mint-600: #059669;
+  --color-lavender-50: #f5f3ff;
+  --color-lavender-100: #ede9fe;
+  --color-lavender-200: #ddd6fe;
+  --color-lavender-500: #8b5cf6;
+  --color-lavender-600: #7c3aed;
+  --color-sunshine-50: #fefce8;
+  --color-sunshine-100: #fef9c3;
+  --color-sunshine-200: #fef08a;
+  --color-sunshine-500: #eab308;
+  --color-sunshine-600: #ca8a04;
+  --color-coral-50: #fff1f2;
+  --color-coral-100: #ffe4e6;
+  --color-coral-200: #fecdd3;
+  --color-coral-500: #f43f5e;
+  --color-coral-600: #e11d48;
+
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
+
+/* ============================================================ */
+/* ЩАДЯЩ ЗРЕНИЕТО РЕЖИМ (EYE-CARE) — копирано от МатураПлюс      */
+/* ============================================================ */
+html.eye-care {
+  --background: #fbf9f6;
+  --foreground: #2d3748;
+  color-scheme: light;
+  filter: sepia(0.08) brightness(0.99) contrast(0.98);
+  transition: filter 0.25s ease;
+}
+
+html.eye-care body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+html.eye-care ::selection {
+  background-color: rgba(217, 119, 6, 0.2) !important;
+  color: #78350f !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: rgba(194, 65, 12, 0.15);
+  color: #7c2d12;
+}
+
+/* Повърхности (Linear/Stripe стил) — копирано от МатураПлюс */
+.surface-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.02);
+}
+
+.surface-card-hover {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.surface-card-hover:hover {
+  border-color: rgba(194, 65, 12, 0.35);
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.03);
+}
+
+/* Фина лента за превъртане */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 162, 158, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 162, 158, 0.7);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Без 300ms забавяне при докосване (мобилни) */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea,
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Фон на приложението — като bg-shield-ambient в МатураПлюс, но с топло слънчево осветяване */
+.bg-app-ambient {
+  background-color: #fdfbf7;
+  background-image:
+    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(234, 88, 12, 0.06), transparent 65%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(22, 163, 74, 0.04), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* Главен CTA бутон — плътна теракота (по модела на .btn-shield-cta) */
+.btn-brand-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: var(--brand-primary);
+  color: #fffaf5;
+  border: 1px solid var(--brand-primary-dark);
+  box-shadow: 0 1px 2px rgba(124, 45, 18, 0.12);
+  letter-spacing: -0.01em;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+.btn-brand-cta:hover {
+  background-color: var(--brand-primary-dark);
+}
+.btn-brand-cta:active {
+  background-color: #7c2d12;
+}
+
+/* Второстепенен бутон */
+.btn-brand-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(194, 65, 12, 0.2);
+  color: #292524;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-brand-secondary:hover {
+  background-color: var(--brand-primary-soft);
+  border-color: rgba(194, 65, 12, 0.45);
+  color: var(--brand-primary);
+}
+
+/* ============================================================ */
+/* Модални прозорци и печат — от досегашния детски сайт           */
+/* ============================================================ */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+dialog.ai-modal {
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
+  transition:
+    opacity 0.22s ease-out,
+    transform 0.22s ease-out,
+    overlay 0.22s ease-out allow-discrete,
+    display 0.22s ease-out allow-discrete;
+}
+
+dialog.ai-modal[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+@starting-style {
+  dialog.ai-modal[open] {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+dialog.ai-modal::backdrop {
+  background-color: rgba(15, 23, 42, 0);
+  backdrop-filter: blur(0px);
+  transition:
+    background-color 0.22s ease-out,
+    backdrop-filter 0.22s ease-out,
+    overlay 0.22s ease-out allow-discrete,
+    display 0.22s ease-out allow-discrete;
+}
+
+dialog.ai-modal[open]::backdrop {
+  background-color: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(4px);
+}
+
+@starting-style {
+  dialog.ai-modal[open]::backdrop {
+    background-color: rgba(15, 23, 42, 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+/* Режим „Проектор“ — по-едър текст за прожекция пред залата */
+html.projector-mode {
+  font-size: 112.5%;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+  }
+  .no-print,
+  [data-app-sidebar],
+  [data-app-topbar],
+  [data-mobile-nav] {
+    display: none !important;
+  }
+  .print-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+}

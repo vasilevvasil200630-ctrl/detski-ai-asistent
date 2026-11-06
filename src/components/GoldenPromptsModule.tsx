@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useId, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import {
@@ -16,12 +18,11 @@ import {
   Download,
   Users,
 } from 'lucide-react';
-import { AgeGroup, AISettings, GoldenPromptItem, PromptCategory } from '../types';
+import { AgeGroup, GoldenPromptItem, PromptCategory } from '../types';
 import { AGE_GROUP_LABELS } from '../services/aiEngine';
 import { GOLDEN_PROMPTS, PROMPT_CATEGORIES } from '../services/goldenPromptsData';
 
 interface GoldenPromptsModuleProps {
-  aiSettings: AISettings;
   onTimeSaved: (minutes: number) => void;
   projectorMode: boolean;
 }
@@ -54,11 +55,11 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
   // QR Modal State
   const [isQrOpen, setIsQrOpen] = useState(false);
   const [qrMode, setQrMode] = useState<'cheatsheet' | 'custom_url'>('custom_url');
-  const [customUrl, setCustomUrl] = useState(
-    typeof window !== 'undefined' && window.location.origin.startsWith('http')
-      ? window.location.origin + window.location.pathname
-      : 'https://vasilevvasil200630-ctrl.github.io/detski-ai-asistent/'
-  );
+  const [customUrl, setCustomUrl] = useState('https://vasilevvasil200630-ctrl.github.io/detski-ai-asistent/');
+  // Адресът на сайта се взима в браузъра (при сървърното рендериране window липсва)
+  useEffect(() => {
+    if (window.location.origin.startsWith('http')) setCustomUrl(window.location.origin + '/prompts');
+  }, []);
   const [qrSvgMarkup, setQrSvgMarkup] = useState<string>('');
   const qrDialogRef = useRef<HTMLDialogElement>(null);
   const qrTitleId = useId();
@@ -233,7 +234,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       {/* Hero Banner */}
       <div className="rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-56 h-56 rounded-full bg-white/15 blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
           <div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white/25 text-white backdrop-blur-sm">
               <BookMarked className="w-3.5 h-3.5" />
@@ -316,7 +317,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
 
       {/* Filter Bar: Age Group + Prompt Categories */}
       <div className="rounded-3xl bg-white/95 p-5 sm:p-6 border-2 border-violet-100 shadow-md space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2 text-sm font-extrabold text-slate-800">
             <Users className="w-5 h-5 text-violet-600" />
             <span>Автоматично адаптирай всички промптове за група:</span>

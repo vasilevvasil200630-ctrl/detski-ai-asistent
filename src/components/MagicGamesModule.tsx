@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
-import { AgeGroup, AISettings, GameFilterState, GeneratedGame, GroupMood, Kindergarten, PlayDuration, PlayLocation, PlayResources, TeacherProfile } from '../types';
-import { AGE_GROUP_LABELS, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
+import { AgeGroup, GameFilterState, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
+import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
 
 const AGE_OPTIONS: { id: AgeGroup; label: string; emoji: string; desc: string }[] = [
   { id: '1', label: '1-ва група (3-4 г.)', emoji: '🐣', desc: 'Подражание и лесни образи' },
@@ -37,26 +39,27 @@ const RESOURCE_OPTIONS: { id: PlayResources; label: string }[] = [
 ];
 
 interface MagicGamesModuleProps {
-  aiSettings: AISettings;
   onTimeSaved: (m: number) => void;
   projectorMode: boolean;
-  activeTeacher: TeacherProfile;
-  activeKindergarten: Kindergarten;
-  onSaveGameToBank: (game: GeneratedGame, filters: GameFilterState) => void;
+  /** null за гост — генераторът работи, но споделянето в банката иска профил */
+  activeTeacher: SessionTeacher | null;
+  /** Връща true, ако играта е записана в банката */
+  onSaveGameToBank: (game: GeneratedGame, filters: GameFilterState) => Promise<boolean>;
   onOpenHub: () => void;
+  onRequireLogin: () => void;
 }
 
 export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
-  aiSettings,
   onTimeSaved,
   projectorMode,
   activeTeacher,
-  activeKindergarten,
   onSaveGameToBank,
   onOpenHub,
+  onRequireLogin,
 }) => {
+  const kgName = activeTeacher?.kindergarten?.name ?? 'вашата детска градина';
   const [filters, setFilters] = useState<GameFilterState>({
-    ageGroup: activeTeacher.ageGroup,
+    ageGroup: activeTeacher?.ageGroup ?? '2',
     mood: 'noisy',
     location: 'classroom',
     duration: '15',
@@ -69,10 +72,12 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   const [copiedUserPrompt, setCopiedUserPrompt] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [savedBankIds, setSavedBankIds] = useState<Record<string, boolean>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [source, setSource] = useState<AiSource | null>(null);
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, ageGroup: activeTeacher.ageGroup }));
-  }, [activeTeacher.id, activeTeacher.ageGroup]);
+    if (activeTeacher) setFilters((prev) => ({ ...prev, ageGroup: activeTeacher.ageGroup }));
+  }, [activeTeacher?.id, activeTeacher?.ageGroup]);
 
   const liveUserPromptText = buildStructuredGameUserPrompt(filters);
 
@@ -85,8 +90,9 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await generateKindergartenGames(filters, aiSettings);
-      setGames(res);
+      const res = await generateKindergartenGames(filters);
+      setGames(res.games);
+      setSource(res.source);
       onTimeSaved(30);
     } finally {
       setIsGenerating(false);
@@ -106,10 +112,18 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
     setTimeout(() => setCopiedId(null), 2500);
   };
 
-  const handleShareToBank = (g: GeneratedGame) => {
-    if (savedBankIds[g.id]) return;
-    onSaveGameToBank(g, filters);
-    setSavedBankIds((prev) => ({ ...prev, [g.id]: true }));
+  const handleShareToBank = async (g: GeneratedGame) => {
+    if (savedBankIds[g.id] || savingId) return;
+    if (!activeTeacher) {
+      onRequireLogin();
+      return;
+    }
+    setSavingId(g.id);
+    try {
+      if (await onSaveGameToBank(g, filters)) setSavedBankIds((prev) => ({ ...prev, [g.id]: true }));
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const handleSpeakRhyme = (g: GeneratedGame) => {
@@ -126,11 +140,11 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
   return (
     <section className="space-y-8">
-      <div className="rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 sm:p-8 text-white shadow-lg flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-white/20">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            Активен профил: {activeTeacher.avatar} {activeTeacher.name} ({activeTeacher.groupName})
+            {activeTeacher ? <>Активен профил: {activeTeacher.avatar} {activeTeacher.name}{activeTeacher.groupName ? ` (${activeTeacher.groupName})` : ''}</> : 'Режим „Гост“ • влезте, за да споделяте игри с колегите'}
           </span>
           <h2 className="font-display text-2xl sm:text-3xl font-extrabold mt-2">
             🎲 „Магическа кутия с игри“ (AI Генератор за 30 сек)
@@ -139,7 +153,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             Генерирайте 3 ситуационни игри със заглавие, римуван стих за старт, точни стъпки (1, 2, 3), умения по Наредба № 5 и идея за адаптация за дете със СОП!
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs font-bold bg-black/15 p-3.5 rounded-2xl shrink-0">
+        <div className="flex flex-wrap gap-2 text-xs font-bold bg-black/15 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
           <span className="px-2.5 py-1 rounded-lg bg-white/20">{AGE_GROUP_LABELS[filters.ageGroup].short}</span>
           <span className="px-2.5 py-1 rounded-lg bg-white/20">{MOOD_LABELS[filters.mood].emoji} {MOOD_LABELS[filters.mood].label}</span>
           <span className="px-2.5 py-1 rounded-lg bg-white/20">{LOCATION_LABELS[filters.location].emoji} {LOCATION_LABELS[filters.location].label}</span>
@@ -151,7 +165,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         <div>
           <label className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-800 mb-3">
             <Users className="w-5 h-5 text-emerald-600" />
-            <span>1. Възрастова група (автоматично синхронизирана с {activeTeacher.name}):</span>
+            <span>1. Възрастова група{activeTeacher ? ` (автоматично синхронизирана с ${activeTeacher.name})` : ''}:</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {AGE_OPTIONS.map((item) => (
@@ -229,7 +243,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         <div className="pt-2 flex justify-center">
-          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto min-w-[320px] sm:min-w-[460px] py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 shadow-xl transition-all flex items-center justify-center gap-3">
+          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 shadow-xl transition-all flex items-center justify-center gap-3">
             {isGenerating ? <><RefreshCw className="w-6 h-6 animate-spin text-amber-200" /> Магическата кутия съчинява 3 игри...</> : <><Wand2 className="w-6 h-6 text-amber-200 animate-bounce" /> ✨ Отвори Магическата кутия (Генерирай 3 игри)</>}
           </button>
         </div>
@@ -248,7 +262,8 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50 border border-indigo-200 px-5 py-3.5 rounded-2xl">
             <div className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-600" />
-              <span>Харесва ли ви някоя игра? Запазете я в колективната банка на <strong>{activeKindergarten.name}</strong> за всички колеги!</span>
+              <span>Харесва ли ви някоя игра? Запазете я в колективната банка на <strong>{kgName}</strong> за всички колеги!</span>
+              {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-black ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? '✨ Генерирано от Gemini AI' : '🛡️ Вграден демо двигател'}</span>}
             </div>
             <button type="button" onClick={onOpenHub} className="text-xs font-extrabold text-indigo-700 hover:text-indigo-900 underline">
               Отвори Учителския хъб →
@@ -315,12 +330,12 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       {isSaved ? (
                         <>
                           <Check className="w-4 h-4" />
-                          <span>Споделено в Банката на {activeKindergarten.name}!</span>
+                          <span>Споделено в Банката на {kgName}!</span>
                         </>
                       ) : (
                         <>
                           <Share2 className="w-4 h-4" />
-                          <span>💾 Сподели в Банката на ДГ ({activeTeacher.name.split(' ')[1] || activeTeacher.name})</span>
+                          <span>{savingId === game.id ? 'Записване…' : activeTeacher ? `💾 Сподели в Банката на ДГ (${activeTeacher.name.split(' ')[1] || activeTeacher.name})` : '🔐 Влез, за да споделиш в Банката на ДГ'}</span>
                         </>
                       )}
                     </button>

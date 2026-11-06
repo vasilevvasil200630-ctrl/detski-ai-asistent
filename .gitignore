@@ -1,6 +1,29 @@
-node_modules/
-dist/
-.vercel/
-.env
-.env.local
+# По модела на .gitignore в МатураПлюс
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
 *.log
+
+# env files
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma (генерираният клиент се създава при npm install)
+/src/generated
