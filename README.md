@@ -49,8 +49,14 @@ npm run dev                  # http://localhost:3000
 
 ## Deploy (Vercel)
 
-1. Supabase проект → копирай Transaction pooler адреса (порт 6543) в `DATABASE_URL`.
-2. Локално с `DIRECT_URL` (порт 5432): `npm run db:migrate:deploy`.
-3. Vercel → Import на GitHub репото → Environment Variables: `DATABASE_URL`, `SESSION_SECRET`,
-   `GEMINI_API_KEY` (+ по желание `UPSTASH_REDIS_REST_URL` / `_TOKEN`).
-4. Всеки push се публикува автоматично; GitHub Actions пуска build и проверка на типовете.
+Проектът във Vercel е `detski-ai-asistent-s56y`, свързан с GitHub репото.
+
+- Качване: `git push vercel` — качва текущия клон със същото име; `main` → production,
+  всеки друг клон → preview адрес.
+- База: Neon Postgres (Vercel → Storage), която сама добавя `DATABASE_URL` и
+  `DATABASE_URL_UNPOOLED`.
+- Миграциите се пускат на Vercel при всеки build (`npm run vercel-build` →
+  `prisma migrate deploy` през директната връзка `DATABASE_URL_UNPOOLED`).
+- Environment Variables: `SESSION_SECRET` (зададен), `GEMINI_API_KEY` (без него — демо
+  двигател), по желание `UPSTASH_REDIS_REST_URL` / `_TOKEN`.
+- GitHub Actions пуска build и проверка на типовете.

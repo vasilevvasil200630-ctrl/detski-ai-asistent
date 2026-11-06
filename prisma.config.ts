@@ -16,6 +16,7 @@ export default defineConfig({
     // Само за Prisma CLI (migrate status/deploy/diff). Supabase pooler-ът в transaction режим
     // (порт 6543) не поддържа миграции — CLI-то просто виси. DIRECT_URL е директната връзка
     // или session pooler-ът (порт 5432). Самият сайт винаги ползва DATABASE_URL (src/lib/prisma.ts).
-    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
+    // Neon през Vercel дава директната връзка като DATABASE_URL_UNPOOLED.
+    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL_UNPOOLED"] || process.env["DATABASE_URL"],
   },
 });
