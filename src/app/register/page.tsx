@@ -20,8 +20,8 @@ const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
 ];
 
 const chip = (active: boolean) =>
-  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] ${
-    active ? "border-[#c2410c] bg-[#fff4eb] text-[#9a3412]" : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
+    active ? "border-[#0a4b82] bg-[#eef5fb] text-[#083861]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 
 export default function RegisterPage() {
@@ -97,7 +97,7 @@ export default function RegisterPage() {
           Вече имате профил?{" "}
           <Link
             href="/login"
-            className="font-semibold text-[#c2410c] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c]"
+            className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
           >
             Вход
           </Link>
@@ -112,7 +112,7 @@ export default function RegisterPage() {
           <TextField label="Имейл" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="petrova@abv.bg" autoComplete="email" required />
           <PasswordField label="Парола" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" hint="Поне 8 символа." required />
           <fieldset>
-            <legend className="mb-1.5 block text-sm font-medium text-stone-800">Аватар</legend>
+            <legend className="mb-1.5 block text-sm font-medium text-slate-800">Аватар</legend>
             <div className="flex flex-wrap gap-2">
               {AVATARS.map((a) => (
                 <button key={a} type="button" onClick={() => setAvatar(a)} aria-pressed={avatar === a} className={`${chip(avatar === a)} text-xl leading-none`}>
@@ -139,14 +139,14 @@ export default function RegisterPage() {
             <>
               <TextField label="Име на детската градина" value={kgName} onChange={(e) => setKgName(e.target.value)} placeholder="ДГ „Слънце“" required />
               <TextField label="Град" value={kgCity} onChange={(e) => setKgCity(e.target.value)} placeholder="София" />
-              <p className="text-xs leading-relaxed text-stone-500">След регистрацията ще получите код, с който колегите ви се присъединяват към същата градина.</p>
+              <p className="text-xs leading-relaxed text-slate-500">След регистрацията ще получите код, с който колегите ви се присъединяват към същата градина.</p>
             </>
           ) : (
             <TextField label="Код на градината (от колега)" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} placeholder="ДГ-7K4P2M" required />
           )}
 
           <fieldset>
-            <legend className="mb-1.5 block text-sm font-medium text-stone-800">Вашата група</legend>
+            <legend className="mb-1.5 block text-sm font-medium text-slate-800">Вашата група</legend>
             <div className="grid grid-cols-2 gap-2">
               {AGE_GROUPS.map((g) => (
                 <button key={g.id} type="button" onClick={() => setAgeGroup(g.id)} aria-pressed={ageGroup === g.id} className={chip(ageGroup === g.id)}>
@@ -162,7 +162,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-700 transition-colors duration-150 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c]"
+              className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
             >
               Назад
             </button>

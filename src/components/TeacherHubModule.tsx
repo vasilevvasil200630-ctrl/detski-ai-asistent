@@ -117,7 +117,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
   return (
     <section aria-label="Учителски хъб и Колективна банка на детската градина" className="space-y-8">
       {/* Заглавна карта */}
-      <div className="rounded-3xl bg-gradient-to-r from-orange-700 via-orange-600 to-amber-500 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-white/20">
             <Building2 className="w-3.5 h-3.5 text-amber-200" />
@@ -126,14 +126,14 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
           <h2 className="font-display text-2xl sm:text-3xl font-extrabold mt-2">
             🏛️ Учителски хъб{kg ? `: ${kg.name}${kg.city ? ` (${kg.city})` : ''}` : ''}
           </h2>
-          <p className="text-orange-50 text-sm sm:text-base mt-1 max-w-3xl">
+          <p className="text-indigo-50 text-sm sm:text-base mt-1 max-w-3xl">
             {kg?.motto ? `„${kg.motto}“ — ` : ''}Споделяйте любимите AI игри в общата банка на екипа — всички колеги от градината ги виждат веднага.
           </p>
         </div>
 
         {kg ? (
           <div className="shrink-0 rounded-2xl bg-white/15 p-4 space-y-2 min-w-[240px]">
-            <div className="text-xs font-extrabold uppercase tracking-wide text-orange-50 flex items-center gap-1.5">
+            <div className="text-xs font-extrabold uppercase tracking-wide text-indigo-50 flex items-center gap-1.5">
               <KeyRound className="w-3.5 h-3.5" /> Код за колеги
             </div>
             <div className="flex items-center gap-2">
@@ -141,19 +141,19 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-orange-800 transition-colors duration-150 hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-indigo-800 transition-colors duration-150 hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 {copiedCode ? <><Check className="w-3.5 h-3.5" /> Копиран</> : <><Copy className="w-3.5 h-3.5" /> Копирай</>}
               </button>
             </div>
-            <p className="text-xs text-orange-50">Колегите въвеждат кода при регистрация и влизат в същата банка.</p>
+            <p className="text-xs text-indigo-50">Колегите въвеждат кода при регистрация и влизат в същата банка.</p>
           </div>
         ) : !teacher ? (
           <div className="flex flex-wrap gap-2.5 shrink-0">
-            <Link href="/register" className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-white text-orange-900 hover:bg-orange-50 shadow-md transition-colors">
+            <Link href="/register" className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-white text-indigo-900 hover:bg-indigo-50 shadow-md transition-colors">
               <Building2 className="w-4 h-4" /> Регистрирай градината си
             </Link>
-            <Link href="/login?callbackUrl=/hub" className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-orange-900/30 text-white hover:bg-orange-900/40 transition-colors">
+            <Link href="/login?callbackUrl=/hub" className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-indigo-900/30 text-white hover:bg-indigo-900/40 transition-colors">
               <LogIn className="w-4 h-4" /> Вход
             </Link>
           </div>
@@ -168,13 +168,13 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
 
       {/* Учителски екип */}
       {teacher && (
-        <div className="rounded-3xl bg-white/95 p-6 sm:p-7 border border-stone-200 shadow-sm space-y-5">
-          <div className="pb-4 border-b border-stone-100">
-            <h3 className="font-display text-lg sm:text-xl font-extrabold text-stone-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-orange-700" />
+        <div className="rounded-3xl bg-white/95 p-6 sm:p-7 border border-slate-200 shadow-sm space-y-5">
+          <div className="pb-4 border-b border-slate-100">
+            <h3 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <Users className="w-5 h-5 text-indigo-700" />
               <span>Учителски екип{kg ? ` на ${kg.name}` : ''} ({team.length})</span>
             </h3>
-            <p className="text-xs sm:text-sm text-stone-600">Всеки колега влиза със собствен профил — AI генераторът се настройва за неговата група.</p>
+            <p className="text-xs sm:text-sm text-slate-600">Всеки колега влиза със собствен профил — AI генераторът се настройва за неговата група.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {team.map((member) => {
@@ -183,19 +183,19 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                 <div
                   key={member.id}
                   className={`p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 ${
-                    isMe ? 'bg-orange-50/70 border-orange-300 ring-2 ring-orange-500/15' : 'bg-stone-50/70 border-stone-200'
+                    isMe ? 'bg-indigo-50/70 border-indigo-300 ring-2 ring-indigo-500/15' : 'bg-slate-50/70 border-slate-200'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="text-3xl w-12 h-12 rounded-2xl bg-white shadow-sm border border-stone-100 flex items-center justify-center">{member.avatar}</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold ${isMe ? 'bg-orange-700 text-white' : 'bg-stone-200 text-stone-800'}`}>
+                    <span className="text-3xl w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center">{member.avatar}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold ${isMe ? 'bg-indigo-700 text-white' : 'bg-slate-200 text-slate-800'}`}>
                       {isMe ? '✓ Това сте вие' : member.kgRole === 'ADMIN' ? '⭐ Администратор' : AGE_GROUP_LABELS[member.ageGroup]?.short ?? ''}
                     </span>
                   </div>
                   <div>
-                    <div className="font-display font-extrabold text-stone-900 text-base">{member.name}</div>
-                    {member.groupName && <div className="text-xs font-bold text-orange-800 mt-0.5">{member.groupName}</div>}
-                    <div className="text-[11px] text-stone-500 mt-0.5">{member.jobTitle}</div>
+                    <div className="font-display font-extrabold text-slate-900 text-base">{member.name}</div>
+                    {member.groupName && <div className="text-xs font-bold text-indigo-800 mt-0.5">{member.groupName}</div>}
+                    <div className="text-[11px] text-slate-500 mt-0.5">{member.jobTitle}</div>
                   </div>
                 </div>
               );
@@ -206,14 +206,14 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
 
       {/* Колективна банка */}
       <div className="space-y-5">
-        <div className="rounded-3xl bg-white/95 p-5 sm:p-6 border border-stone-200 shadow-sm space-y-4">
+        <div className="rounded-3xl bg-white/95 p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div>
-              <h3 className="font-display text-xl sm:text-2xl font-extrabold text-stone-900 flex items-center gap-2">
+              <h3 className="font-display text-xl sm:text-2xl font-extrabold text-slate-900 flex items-center gap-2">
                 <Award className="w-6 h-6 text-amber-500" />
                 <span>Споделена колективна банка за идеи ({filteredBank.length})</span>
               </h3>
-              <p className="text-xs sm:text-sm text-stone-600">
+              <p className="text-xs sm:text-sm text-slate-600">
                 Всички колеги от детската градина виждат споделените игри, могат да ги филтрират по възрастови групи и да ги ползват веднага!
               </p>
             </div>
@@ -232,7 +232,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
               <button
                 type="button"
                 onClick={onNavigateToGenerator}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-orange-700 hover:bg-orange-800 text-white shadow-sm transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-indigo-700 hover:bg-indigo-800 text-white shadow-sm transition-colors"
               >
                 <Sparkles className="w-4 h-4 text-amber-200" />
                 <span>Генерирай нова с AI</span>
@@ -258,12 +258,12 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
           )}
 
           {/* Филтри: възраст + обхват + търсене */}
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pt-2 border-t border-stone-100">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pt-2 border-t border-slate-100">
             <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setAgeFilter('all')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${ageFilter === 'all' ? 'bg-stone-900 text-white border-stone-900' : 'bg-stone-50 text-stone-700 border-stone-200'}`}
+                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${ageFilter === 'all' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-700 border-slate-200'}`}
               >
                 Всички групи
               </button>
@@ -272,7 +272,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                   key={ag}
                   type="button"
                   onClick={() => setAgeFilter(ag)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${ageFilter === ag ? 'bg-orange-700 text-white border-orange-700' : 'bg-stone-50 text-stone-700 border-stone-200'}`}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border ${ageFilter === ag ? 'bg-indigo-700 text-white border-indigo-700' : 'bg-slate-50 text-slate-700 border-slate-200'}`}
                 >
                   {AGE_GROUP_LABELS[ag].short}
                 </button>
@@ -281,34 +281,34 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
 
             <div className="flex flex-wrap items-center gap-2">
               {teacher && (
-                <div className="inline-flex rounded-xl bg-stone-100 p-1 border border-stone-200">
-                  <button type="button" onClick={() => onScopeChange('kg')} className={`px-3 py-1 rounded-lg text-xs font-extrabold ${scope === 'kg' ? 'bg-white text-orange-800 shadow-sm' : 'text-stone-600'}`}>
+                <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                  <button type="button" onClick={() => onScopeChange('kg')} className={`px-3 py-1 rounded-lg text-xs font-extrabold ${scope === 'kg' ? 'bg-white text-indigo-800 shadow-sm' : 'text-slate-600'}`}>
                     🏫 Само {kg?.name ?? 'моята градина'}
                   </button>
-                  <button type="button" onClick={() => onScopeChange('all')} className={`px-3 py-1 rounded-lg text-xs font-extrabold ${scope === 'all' ? 'bg-white text-orange-800 shadow-sm' : 'text-stone-600'}`}>
+                  <button type="button" onClick={() => onScopeChange('all')} className={`px-3 py-1 rounded-lg text-xs font-extrabold ${scope === 'all' ? 'bg-white text-indigo-800 shadow-sm' : 'text-slate-600'}`}>
                     🌍 Всички градини
                   </button>
                 </div>
               )}
 
               <div className="relative">
-                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Търси игра или учител..."
                   aria-label="Търси игра или учител"
-                  className="pl-9 pr-3 py-1.5 rounded-xl border border-stone-200 text-xs font-bold text-stone-800 focus:outline-none focus:border-orange-600"
+                  className="pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-600"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {loading && <p className="text-center text-sm font-semibold text-stone-500">Зареждане на банката…</p>}
+        {loading && <p className="text-center text-sm font-semibold text-slate-500">Зареждане на банката…</p>}
         {!loading && filteredBank.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-stone-300 bg-white/70 p-8 text-center text-sm text-stone-600">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center text-sm text-slate-600">
             Още няма споделени игри. Генерирайте игра в „Магическа кутия“ и натиснете „💾 Сподели в Банката на ДГ“.
           </div>
         )}
@@ -316,15 +316,15 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
         {/* Shared Games Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredBank.map((item) => (
-            <article key={item.id} className="print-card rounded-2xl bg-white border-2 border-slate-200 hover:border-orange-300 shadow-lg flex flex-col justify-between overflow-hidden">
+            <article key={item.id} className="print-card rounded-2xl bg-white border-2 border-slate-200 hover:border-indigo-300 shadow-lg flex flex-col justify-between overflow-hidden">
               <div>
                 {/* Author Header */}
-                <div className="px-5 py-3.5 bg-gradient-to-r from-orange-50/90 via-purple-50/60 to-emerald-50/70 border-b border-slate-100 flex items-center justify-between gap-2">
+                <div className="px-5 py-3.5 bg-gradient-to-r from-indigo-50/90 via-indigo-50/60 to-emerald-50/70 border-b border-slate-100 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5">
                     <span className="text-2xl w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center">{item.authorAvatar}</span>
                     <div>
                       <div className="text-xs sm:text-sm font-extrabold text-slate-900">{item.authorName}</div>
-                      <div className="text-[11px] font-bold text-orange-700">{item.authorGroupName} • {item.kindergartenName}</div>
+                      <div className="text-[11px] font-bold text-indigo-700">{item.authorGroupName} • {item.kindergartenName}</div>
                     </div>
                   </div>
                   <span className="text-[11px] font-bold text-slate-500 bg-white px-2.5 py-1 rounded-full border border-slate-200">
@@ -371,7 +371,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                     <ol className="space-y-1.5">
                       {item.game.steps.map((s, i) => (
                         <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700">
-                          <span className="w-5 h-5 rounded-md bg-orange-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                          <span className="w-5 h-5 rounded-md bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                           <span>{s}</span>
                         </li>
                       ))}
@@ -381,7 +381,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                   {/* Goal & SOP Adaptation */}
                   <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs sm:text-sm space-y-1.5">
                     <p><strong className="font-extrabold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {item.game.pedagogicalGoal}</p>
-                    <p className="text-purple-900 bg-purple-50/90 p-2.5 rounded-lg border border-purple-200">
+                    <p className="text-indigo-900 bg-indigo-50/90 p-2.5 rounded-lg border border-indigo-200">
                       <strong className="font-extrabold">5. Идея за адаптация за дете със СОП:</strong>{' '}
                       {item.game.sopAdaptation || 'Осигурете визуална карта-опора, предвидим сигнал и участие в двойка с подкрепящо другарче или учител.'}
                     </p>
@@ -416,7 +416,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="py-2 px-3 rounded-xl text-xs font-extrabold bg-white hover:bg-orange-50 text-orange-800 border-2 border-orange-200 flex items-center gap-1"
+                    className="py-2 px-3 rounded-xl text-xs font-extrabold bg-white hover:bg-indigo-50 text-indigo-800 border-2 border-indigo-200 flex items-center gap-1"
                   >
                     <Printer className="w-3.5 h-3.5" /> Принтирай
                   </button>

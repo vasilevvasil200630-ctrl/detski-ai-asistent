@@ -18,8 +18,8 @@ const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
 ];
 
 const chip = (active: boolean) =>
-  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] ${
-    active ? "border-[#c2410c] bg-[#fff4eb] text-[#9a3412]" : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
+    active ? "border-[#0a4b82] bg-[#eef5fb] text-[#083861]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 
 export default function ProfilePage() {
@@ -69,7 +69,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#c2410c]" aria-label="Зареждане" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
       </main>
     );
   }
@@ -77,11 +77,11 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <main className="mx-auto w-full max-w-xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">Моят профил</h1>
-        <p className="mt-3 leading-relaxed text-stone-600">Влезте, за да редактирате профила си и групата, за която AI генераторът се настройва.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Моят профил</h1>
+        <p className="mt-3 leading-relaxed text-slate-600">Влезте, за да редактирате профила си и групата, за която AI генераторът се настройва.</p>
         <Link
           href="/login?callbackUrl=/profile"
-          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#c2410c] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#9a3412] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] focus-visible:ring-offset-2"
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
         >
           Вход
         </Link>
@@ -91,16 +91,16 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
-      <h1 className="text-2xl font-bold tracking-tight text-stone-900">Моят профил</h1>
-      <p className="mt-1 text-sm leading-relaxed text-stone-600">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Моят профил</h1>
+      <p className="mt-1 text-sm leading-relaxed text-slate-600">
         {user.email} • {user.kindergarten?.name ?? "без детска градина"}
       </p>
 
-      <form onSubmit={save} className="mt-6 space-y-5 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <form onSubmit={save} className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <TextField label="Име" value={name} onChange={(e) => setName(e.target.value)} required />
         <TextField label="Длъжност" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Старши учител" />
         <fieldset>
-          <legend className="mb-1.5 block text-sm font-medium text-stone-800">Аватар</legend>
+          <legend className="mb-1.5 block text-sm font-medium text-slate-800">Аватар</legend>
           <div className="flex flex-wrap gap-2">
             {AVATARS.map((a) => (
               <button key={a} type="button" onClick={() => setAvatar(a)} aria-pressed={avatar === a} className={`${chip(avatar === a)} text-xl leading-none`}>
@@ -110,7 +110,7 @@ export default function ProfilePage() {
           </div>
         </fieldset>
         <fieldset>
-          <legend className="mb-1.5 block text-sm font-medium text-stone-800">Група (AI генераторът се настройва за нея)</legend>
+          <legend className="mb-1.5 block text-sm font-medium text-slate-800">Група (AI генераторът се настройва за нея)</legend>
           <div className="grid grid-cols-2 gap-2">
             {AGE_GROUPS.map((g) => (
               <button key={g.id} type="button" onClick={() => setAgeGroup(g.id)} aria-pressed={ageGroup === g.id} className={chip(ageGroup === g.id)}>

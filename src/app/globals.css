@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
-/* Структурата е копирана от МатураПлюс (src/app/globals.css): токени на :root, @theme inline,
-   щадящ зрението режим, повърхности, бутони и фон. Разлика: топла палитра за детска градина
-   (тиква/теракота + листно зелено + слънчев акцент) вместо сапфир + изумруд. */
+/* Структурата и цветовете са копирани от МатураПлюс (src/app/globals.css): токени на :root,
+   @theme inline, щадящ зрението режим, повърхности, бутони и фон. Сапфир + изумруд + slate. */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -12,31 +11,31 @@
 @source "../services/**/*.{js,ts,jsx,tsx,mdx}";
 
 :root {
-  /* Топъл кремав фон и деликатни повърхности */
-  --background: #fdfbf7;
-  --foreground: #1c1917;
+  /* Чисто бял фон и деликатни сиви повърхности (както в МатураПлюс) */
+  --background: #ffffff;
+  --foreground: #09090b;
   --card: #ffffff;
-  --card-foreground: #1c1917;
-  --surface-subtle: #faf7f2;
-  --surface-muted: #f5f0e8;
-  --border: #ece4d8;
+  --card-foreground: #09090b;
+  --surface-subtle: #f8fafc;
+  --surface-muted: #f1f5f9;
+  --border: #e2e8f0;
 
-  /* Основен бранд: топла тиква/теракота */
-  --brand-primary: #c2410c;
-  --brand-primary-dark: #9a3412;
-  --brand-primary-light: #ea580c;
-  --brand-primary-soft: #fff4eb;
+  /* Основен бранд: сапфирено синьо на МатураПлюс */
+  --brand-primary: #0a4b82;
+  --brand-primary-dark: #083861;
+  --brand-primary-light: #0e5e9e;
+  --brand-primary-soft: #eef5fb;
 
-  /* Втори бранд: листно зелено (растеж, природа) */
-  --brand-leaf: #15803d;
-  --brand-leaf-dark: #166534;
-  --brand-leaf-light: #16a34a;
-  --brand-leaf-soft: #effaf2;
+  /* Втори бранд: изумрудено зелено на МатураПлюс */
+  --brand-leaf: #1ea858;
+  --brand-leaf-dark: #168a46;
+  --brand-leaf-light: #28be67;
+  --brand-leaf-soft: #edf9f2;
 
-  /* Слънчев акцент (звезди, награди, CTA за вход) */
+  /* Слънчев акцент (капакът на кутията в логото, награди) */
   --brand-sun: #f59e0b;
 
-  --primary: #c2410c;
+  --primary: #0a4b82;
   --primary-foreground: #ffffff;
   --accent-rose: #e11d48;
   --accent-amber: #d97706;
@@ -63,17 +62,41 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
 
-  /* Пастелните палитри от досегашния детски сайт (ползват се в модулите) */
-  --color-mint-50: #f0fdf7;
-  --color-mint-100: #dcfce9;
-  --color-mint-200: #bbf7d5;
-  --color-mint-500: #10b981;
-  --color-mint-600: #059669;
-  --color-lavender-50: #f5f3ff;
-  --color-lavender-100: #ede9fe;
-  --color-lavender-200: #ddd6fe;
-  --color-lavender-500: #8b5cf6;
-  --color-lavender-600: #7c3aed;
+  /* Както в МатураПлюс: indigo-* сочи към сапфира, emerald-* към изумруда */
+  --color-indigo-50: #eef5fb;
+  --color-indigo-100: #d8e8f6;
+  --color-indigo-200: #b5d5ef;
+  --color-indigo-300: #86bbe4;
+  --color-indigo-400: #499cd5;
+  --color-indigo-500: #2083c4;
+  --color-indigo-600: #0a4b82;
+  --color-indigo-700: #083d6b;
+  --color-indigo-800: #07345b;
+  --color-indigo-900: #072d4c;
+  --color-indigo-950: #041d33;
+  --color-emerald-50: #eefbf4;
+  --color-emerald-100: #d8f5e4;
+  --color-emerald-200: #b5eccb;
+  --color-emerald-300: #82deaa;
+  --color-emerald-400: #48c983;
+  --color-emerald-500: #23ad63;
+  --color-emerald-600: #1ea858;
+  --color-emerald-700: #168546;
+  --color-emerald-800: #15693a;
+  --color-emerald-900: #135631;
+  --color-emerald-950: #06301a;
+
+  /* Пастелните палитри на модулите, приведени към сапфир/изумруд; слънце и корал остават за децата */
+  --color-mint-50: #eefbf4;
+  --color-mint-100: #d8f5e4;
+  --color-mint-200: #b5eccb;
+  --color-mint-500: #23ad63;
+  --color-mint-600: #1ea858;
+  --color-lavender-50: #eef5fb;
+  --color-lavender-100: #d8e8f6;
+  --color-lavender-200: #b5d5ef;
+  --color-lavender-500: #2083c4;
+  --color-lavender-600: #0a4b82;
   --color-sunshine-50: #fefce8;
   --color-sunshine-100: #fef9c3;
   --color-sunshine-200: #fef08a;
@@ -145,8 +168,8 @@ body {
 }
 
 ::selection {
-  background-color: rgba(194, 65, 12, 0.15);
-  color: #7c2d12;
+  background-color: rgba(10, 75, 130, 0.15);
+  color: #072d4c;
 }
 
 /* Повърхности (Linear/Stripe стил) — копирано от МатураПлюс */
@@ -161,7 +184,7 @@ body {
 }
 
 .surface-card-hover:hover {
-  border-color: rgba(194, 65, 12, 0.35);
+  border-color: rgba(10, 75, 130, 0.35);
   box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.03);
 }
 
@@ -202,9 +225,9 @@ textarea,
 
 /* Фон на приложението — като bg-shield-ambient в МатураПлюс, но с топло слънчево осветяване */
 .bg-app-ambient {
-  background-color: #fdfbf7;
+  background-color: #ffffff;
   background-image:
-    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(234, 88, 12, 0.06), transparent 65%),
+    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(10, 75, 130, 0.06), transparent 65%),
     radial-gradient(ellipse 60% 40% at 100% 100%, rgba(22, 163, 74, 0.04), transparent 70%);
   background-attachment: fixed;
 }
@@ -216,9 +239,9 @@ textarea,
   justify-content: center;
   gap: 0.375rem;
   background-color: var(--brand-primary);
-  color: #fffaf5;
+  color: #ffffff;
   border: 1px solid var(--brand-primary-dark);
-  box-shadow: 0 1px 2px rgba(124, 45, 18, 0.12);
+  box-shadow: 0 1px 2px rgba(8, 56, 97, 0.12);
   letter-spacing: -0.01em;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
@@ -226,7 +249,7 @@ textarea,
   background-color: var(--brand-primary-dark);
 }
 .btn-brand-cta:active {
-  background-color: #7c2d12;
+  background-color: #072d4c;
 }
 
 /* Второстепенен бутон */
@@ -236,13 +259,13 @@ textarea,
   justify-content: center;
   gap: 0.375rem;
   background-color: #ffffff;
-  border: 1px solid rgba(194, 65, 12, 0.2);
+  border: 1px solid rgba(10, 75, 130, 0.2);
   color: #292524;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-brand-secondary:hover {
   background-color: var(--brand-primary-soft);
-  border-color: rgba(194, 65, 12, 0.45);
+  border-color: rgba(10, 75, 130, 0.45);
   color: var(--brand-primary);
 }
 

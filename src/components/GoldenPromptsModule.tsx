@@ -232,7 +232,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
   return (
     <section aria-label="Библиотека със златни промптове и QR код за залата" className="space-y-8">
       {/* Hero Banner */}
-      <div className="rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-56 h-56 rounded-full bg-white/15 blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
           <div>
@@ -291,8 +291,8 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
               Задайте професионална роля: детски психолог, логопед, музикален педагог или методист.
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-violet-50 border border-violet-200">
-            <div className="text-xs font-black uppercase text-violet-800">Стъпка 2: КОНТЕКСТ</div>
+          <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <div className="text-xs font-black uppercase text-indigo-800">Стъпка 2: КОНТЕКСТ</div>
             <div className="font-extrabold text-slate-900 mt-1">„За 3-та група (5-6 г.)...“</div>
             <p className="text-xs text-slate-600 mt-1">
               Посочете възрастовата група, настроението на децата и наличните материали.
@@ -316,10 +316,10 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       </div>
 
       {/* Filter Bar: Age Group + Prompt Categories */}
-      <div className="rounded-3xl bg-white/95 p-5 sm:p-6 border-2 border-violet-100 shadow-md space-y-5">
+      <div className="rounded-3xl bg-white/95 p-5 sm:p-6 border-2 border-indigo-100 shadow-md space-y-5">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2 text-sm font-extrabold text-slate-800">
-            <Users className="w-5 h-5 text-violet-600" />
+            <Users className="w-5 h-5 text-indigo-600" />
             <span>Автоматично адаптирай всички промптове за група:</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -330,8 +330,8 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                 onClick={() => setSelectedAge(ab.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold border-2 transition-all ${
                   selectedAge === ab.id
-                    ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                    : 'bg-slate-50 hover:bg-violet-50 text-slate-700 border-slate-200'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                    : 'bg-slate-50 hover:bg-indigo-50 text-slate-700 border-slate-200'
                 }`}
               >
                 {ab.label}
@@ -350,7 +350,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold border-2 transition-all flex items-center gap-1.5 ${
                   active
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-500 shadow-sm'
+                    ? 'bg-gradient-to-r from-amber-500 to-indigo-500 text-white border-amber-500 shadow-sm'
                     : 'bg-slate-50 hover:bg-amber-50 text-slate-700 border-slate-200'
                 }`}
               >
@@ -380,7 +380,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
               <div className="p-5 sm:p-6 space-y-4">
                 {/* Header */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-violet-100 text-violet-900 border border-violet-200">
+                  <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-900 border border-indigo-200">
                     {item.categoryLabel}
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -412,7 +412,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                     onChange={(e) =>
                       setCustomInputs((prev) => ({ ...prev, [item.id]: e.target.value }))
                     }
-                    className="w-full px-3.5 py-2 rounded-lg border border-amber-300 bg-white text-sm font-bold text-slate-900 focus:outline-none focus:border-violet-500"
+                    className="w-full px-3.5 py-2 rounded-lg border border-amber-300 bg-white text-sm font-bold text-slate-900 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
@@ -434,7 +434,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
 
                 {/* Simulated AI Result Preview when clicked */}
                 {isExpanded && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/70 to-white border-2 border-emerald-300 space-y-3 animate-fadeIn">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 via-emerald-50/70 to-white border-2 border-emerald-300 space-y-3 animate-fadeIn">
                     <div className="flex items-center justify-between gap-2">
                       <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-emerald-800">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -495,7 +495,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                   type="button"
                   disabled={isLoading}
                   onClick={() => handleSimulatePrompt(item)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-70"
+                  className="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-indigo-600 to-indigo-600 hover:from-indigo-700 hover:to-indigo-700 text-white shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-70"
                 >
                   {isLoading ? (
                     <>

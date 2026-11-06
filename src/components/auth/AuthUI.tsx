@@ -30,7 +30,7 @@ export function AuthShell({
 }) {
   return (
     <main
-      className="relative flex min-h-[calc(100vh-4rem)] w-full items-start justify-center bg-[#fdfbf7] px-4 py-10 [--auth-grid:rgb(194_65_12/0.06)] sm:items-center sm:py-16 dark:bg-slate-950 dark:[--auth-grid:rgb(148_163_184/0.07)]"
+      className="relative flex min-h-[calc(100vh-4rem)] w-full items-start justify-center bg-[#fbfbfd] px-4 py-10 [--auth-grid:rgb(10_75_130/0.06)] sm:items-center sm:py-16 dark:bg-slate-950 dark:[--auth-grid:rgb(148_163_184/0.07)]"
       style={GRID_STYLE}
     >
       <div className="w-full max-w-md">
@@ -67,7 +67,7 @@ export function OrDivider({ label = "или продължи с имейл" }: {
 /* -------------------------------------------------------------------------- */
 
 const INPUT_CLASS =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-150 ease-in-out hover:border-slate-400 focus-visible:border-[#c2410c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c]/20 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-rose-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus-visible:border-sky-500";
+  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-150 ease-in-out hover:border-slate-400 focus-visible:border-[#0a4b82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]/20 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-rose-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus-visible:border-sky-500";
 
 type FieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "id"> & { label: string; error?: string | null };
 
@@ -110,7 +110,7 @@ export function PasswordField({ label, error, hint, ...input }: FieldProps & { h
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Скрий паролата" : "Покажи паролата"}
           aria-pressed={visible}
-          className="absolute inset-y-0 right-1 my-1 grid w-10 cursor-pointer place-items-center rounded-lg text-slate-500 transition-colors duration-150 ease-in-out hover:bg-slate-100 hover:text-slate-800 active:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c2410c] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          className="absolute inset-y-0 right-1 my-1 grid w-10 cursor-pointer place-items-center rounded-lg text-slate-500 transition-colors duration-150 ease-in-out hover:bg-slate-100 hover:text-slate-800 active:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         >
           {visible ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
         </button>
@@ -172,7 +172,7 @@ export function Stepper({ steps, current }: { steps: string[]; current: number }
                 done
                   ? "bg-emerald-500 text-white"
                   : active
-                    ? "bg-[#c2410c] text-white dark:bg-sky-600"
+                    ? "bg-[#0a4b82] text-white dark:bg-sky-600"
                     : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
               }`}
             >
