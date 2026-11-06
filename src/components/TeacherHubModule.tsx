@@ -437,9 +437,13 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                     </ol>
                   </div>
 
-                  {/* Goal */}
-                  <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs sm:text-sm space-y-1">
-                    <p><strong className="font-extrabold text-emerald-950">💡 Развивани умения:</strong> {item.game.pedagogicalGoal}</p>
+                  {/* Goal & SOP Adaptation */}
+                  <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs sm:text-sm space-y-1.5">
+                    <p><strong className="font-extrabold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {item.game.pedagogicalGoal}</p>
+                    <p className="text-violet-900 bg-violet-50/90 p-2.5 rounded-lg border border-violet-200">
+                      <strong className="font-extrabold">5. Идея за адаптация за дете със СОП:</strong>{' '}
+                      {item.game.sopAdaptation || 'Осигурете визуална карта-опора, предвидим сигнал и участие в двойка с подкрепящо другарче или учител.'}
+                    </p>
                     <p className="text-xs text-slate-600 italic"><strong>Колегиален съвет:</strong> {item.game.teacherTip}</p>
                   </div>
                 </div>

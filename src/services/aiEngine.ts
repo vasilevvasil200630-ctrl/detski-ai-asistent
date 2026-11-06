@@ -44,6 +44,31 @@ export const DIRECTION_LABELS: Record<EducationalDirection, { label: string; sho
 
 let gameVar = 0;
 
+export function buildStructuredGameUserPrompt(filters: GameFilterState): string {
+  const ageInfo = AGE_GROUP_LABELS[filters.ageGroup];
+  const moodInfo = MOOD_LABELS[filters.mood];
+  const locInfo = LOCATION_LABELS[filters.location];
+  const durInfo = DURATION_LABELS[filters.duration];
+  const resInfo = RESOURCE_LABELS[filters.resources];
+  const kw = filters.customTheme?.trim();
+
+  return [
+    'Моля, създай ситуационна игра за детската градина със следните параметри:',
+    `- Възрастова група: ${ageInfo.short}`,
+    `- Настроение на децата: ${moodInfo.label}`,
+    `- Място: ${locInfo.label}`,
+    `- Времетраене: ${durInfo.label}ути`,
+    `- Налични материали: ${resInfo.label}`,
+    ...(kw ? [`- Допълнителна тема: ${kw}`] : []),
+    'Форматирай отговора с:',
+    '1. Заглавие на играта',
+    '2. Римуван стих за старт',
+    '3. Точни стъпки за играта (1, 2, 3)',
+    '4. Развивани умения по Наредба № 5',
+    '5. Идея за адаптация за дете със СОП',
+  ].join('\n');
+}
+
 async function callLLM(prompt: string, settings: AISettings): Promise<string> {
   if (settings.provider === 'gemini') {
     const model = settings.model || 'gemini-2.5-flash';
@@ -79,10 +104,12 @@ export async function generateKindergartenGames(filters: GameFilterState, settin
 
   if (settings.mode === 'api' && settings.apiKey.trim().length > 10) {
     try {
-      const prompt = `Ти си експертен български педагог в детска градина. Генерирай 3 игри на БЪЛГАРСКИ ЕЗИК за:
-Група: ${ageInfo.full}, Настроение: ${moodInfo.label}, Място: ${locInfo.label}, Време: ${durInfo.label}, Ресурси: ${resInfo.label}${kw ? `, Тема: ${kw}` : ''}.
-Върни САМО валиден JSON масив от 3 обекта със следната структура:
-[{"id":"g1","title":"Име","subtitle":"Подзаглавие","tags":["Таг1","Таг2"],"badgeColor":"mint","rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Стих 1","Стих 2","Стих 3","Стих 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения","teacherTip":"Съвет към учителя"}]`;
+      const userPrompt = buildStructuredGameUserPrompt(filters);
+      const prompt = `Ти си експертен български педагог в детска градина (Наредба № 5).
+${userPrompt}
+
+Генерирай 3 игри на БЪЛГАРСКИ ЕЗИК и върни САМО валиден JSON масив от 3 обекта със следната структура:
+[{"id":"g1","title":"1. Заглавие на играта","subtitle":"Подзаглавие","tags":["Таг1","Таг2"],"badgeColor":"mint","rhymeTitle":"📜 2. Римуван стих за старт:","rhymeLines":["Стих 1","Стих 2","Стих 3","Стих 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"4. Развивани умения по Наредба № 5","sopAdaptation":"5. Идея за адаптация за дете със СОП","teacherTip":"Съвет към учителя"}]`;
       const raw = await callLLM(prompt, settings);
       const match = raw.match(/\[[\s\S]*\]/);
       if (match) {
@@ -168,7 +195,8 @@ export async function generateKindergartenGames(filters: GameFilterState, settin
         `Децата изпълняват плавни движения с ${resInfo.toolName}${kw ? ` като герои от „${kw}“` : ''}.`,
         `При тайния сигнал на учителя всички замръзват в усмихната поза и правят 3 спокойни вдишвания (${durInfo.pacingHint}).`,
       ],
-      pedagogicalGoal: `Развива самоконтрола, емоционалната саморегулация и ${moodInfo.goalFocus}.`,
+      pedagogicalGoal: `По Наредба № 5 (ДОС): Самоутвърждаване и общуване с околните, волеви самоконтрол, емоционална саморегулация и ${moodInfo.goalFocus}.`,
+      sopAdaptation: 'Осигурете визуална карта-символ за сигнала „Тишина/Стоп“ и позволете на детето със СОП да участва от своето спокойно място или заедно с подкрепящ възрастен/другарче без задължителна смяна на позата.',
       teacherTip: 'Намалете постепенно силата на гласа си на последния стих – децата инстинктивно притихват и се фокусират.',
     },
     {
@@ -189,7 +217,8 @@ export async function generateKindergartenGames(filters: GameFilterState, settin
         `Учителят описва с 3 жокера предмет или герой${kw ? ` от темата „${kw}“` : ''}, а децата отгатват първо с жест, после с дума.`,
         `Всяко дете, което отгатне, избира следващия участник чрез ${resInfo.toolName} (${durInfo.pacingHint}).`,
       ],
-      pedagogicalGoal: 'Обогатяване на активния речник, асоциативното мислене, въображението и умението за изслушване докрай.',
+      pedagogicalGoal: 'По Наредба № 5 (ДОС – БЕЛ и Околен свят): Възприемане, свързана реч, обогатяване на активния речник, асоциативно мислене и изслушване на събеседник.',
+      sopAdaptation: 'Предложете избор между 2 нагледни картинки (визуална опора), така че детето със СОП да може да посочи верния отговор с жест, поглед или кратка дума, и го включете като „Пазител на жокерите“.',
       teacherTip: 'Подайте първия лесен жокер на по-срамежливите деца, за да повишите тяхната увереност.',
     },
     {
@@ -201,7 +230,8 @@ export async function generateKindergartenGames(filters: GameFilterState, settin
       rhymeTitle: '📜 Римуван сигнал за начало на играта:',
       rhymeLines: r3.rhyme,
       steps: r3.steps,
-      pedagogicalGoal: `Развитие на моториката, емпатията, работата по двойки и позитивния микроклимат в групата чрез ${resInfo.toolName}.`,
+      pedagogicalGoal: `По Наредба № 5 (ДОС – Физическа култура и Социална среда): Обща и фина моторика, координиране на движенията в партньорство, емпатия и позитивно общуване чрез ${resInfo.toolName}.`,
+      sopAdaptation: 'Сдвоете детето със СОП с спокойно и емпатично другарче („ментор“) или с учителя, опростете движенията до 1–2 бавни жеста от седнало положение и избягвайте силни внезапни звукови стимули.',
       teacherTip: 'Приключете с общ тих поздрав с длани, за да запазите спокойния тон за следващия режимен момент.',
     },
   ];

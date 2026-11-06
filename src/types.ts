@@ -75,6 +75,7 @@ export interface GeneratedGame {
   rhymeLines: string[];
   steps: string[];
   pedagogicalGoal: string;
+  sopAdaptation?: string;
   teacherTip: string;
 }
 
