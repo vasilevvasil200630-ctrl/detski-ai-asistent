@@ -20,8 +20,8 @@ if (!platformKey) {
     "[gemini-client] GEMINI_API_KEY не е конфигуриран — AI маршрутите връщат демо резултати.",
   );
 } else {
-  const preview = `${platformKey.slice(0, 6)}...${platformKey.slice(-4)} (len ${platformKey.length})`;
-  console.info(`[gemini-client] Platform GEMINI_API_KEY зареден: ${preview}`);
+  // Без части от ключа в логовете — само че е зареден и каква е дължината му
+  console.info(`[gemini-client] Platform GEMINI_API_KEY зареден (len ${platformKey.length})`);
 }
 
 export type ResolvedClient = {
