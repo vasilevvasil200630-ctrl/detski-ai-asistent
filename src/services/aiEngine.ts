@@ -1,4 +1,6 @@
 import { AgeGroup, AISettings, EducationalDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
+import { buildDemoGames, DemoContext } from './demoGames';
+import { extractJson, normalizeGames, normalizeLessonPlan } from './aiValidation';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -42,7 +44,6 @@ export const DIRECTION_LABELS: Record<EducationalDirection, { label: string; sho
   construct: { label: 'Конструиране и технологии', shortLabel: 'Конструиране и технологии', emoji: '🧱', coresByAge: { '1': 'Конструиране и моделиране с модулни елементи', '2': 'Конструиране и моделиране • Обработване на материали', '3': 'Конструиране по условие и собствен замисъл • Работа с хартия и природни материали', '4': 'Проектиране и пространствено конструиране • Свързване на елементи' } },
 };
 
-let gameVar = 0;
 
 export function buildStructuredGameUserPrompt(filters: GameFilterState): string {
   const ageInfo = AGE_GROUP_LABELS[filters.ageGroup];
@@ -69,203 +70,148 @@ export function buildStructuredGameUserPrompt(filters: GameFilterState): string 
   ].join('\n');
 }
 
+/** Максимално време за чакане на реалния AI, преди да минем на демо режим (важно при жива демонстрация). */
+const AI_TIMEOUT_MS = 25000;
+
 async function callLLM(prompt: string, settings: AISettings): Promise<string> {
-  if (settings.provider === 'gemini') {
-    const model = settings.model || 'gemini-2.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(settings.apiKey.trim())}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7 } }),
-    });
-    if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
-    const data = await res.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  } else {
-    const model = settings.model || 'gpt-4o-mini';
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${settings.apiKey.trim()}` },
-      body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.7 }),
-    });
-    if (!res.ok) throw new Error(`OpenAI HTTP ${res.status}`);
-    const data = await res.json();
-    return data?.choices?.[0]?.message?.content || '';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+  try {
+    if (settings.provider === 'gemini') {
+      const model = settings.model || 'gemini-2.5-flash';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.apiKey.trim() },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.8, responseMimeType: 'application/json' },
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
+      const data = await res.json();
+      return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } else {
+      const model = settings.model || 'gpt-4o-mini';
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${settings.apiKey.trim()}` },
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.8 }),
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`OpenAI HTTP ${res.status}`);
+      const data = await res.json();
+      return data?.choices?.[0]?.message?.content || '';
+    }
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-export async function generateKindergartenGames(filters: GameFilterState, settings: AISettings): Promise<GeneratedGame[]> {
+function isApiMode(settings: AISettings): boolean {
+  return settings.mode === 'api' && settings.apiKey.trim().length > 10;
+}
+
+function buildDemoContext(filters: GameFilterState): DemoContext {
   const ageInfo = AGE_GROUP_LABELS[filters.ageGroup];
   const moodInfo = MOOD_LABELS[filters.mood];
   const locInfo = LOCATION_LABELS[filters.location];
   const durInfo = DURATION_LABELS[filters.duration];
   const resInfo = RESOURCE_LABELS[filters.resources];
-  const kw = filters.customTheme?.trim();
+  return {
+    ageGroup: filters.ageGroup,
+    ageShort: ageInfo.short,
+    ageRange: ageInfo.ageRange,
+    mood: filters.mood,
+    moodTag: moodInfo.tag,
+    moodGoalFocus: moodInfo.goalFocus,
+    locLabel: locInfo.label,
+    spatialHint: locInfo.spatialHint,
+    isYard: filters.location === 'yard',
+    durLabel: durInfo.label,
+    pacingHint: durInfo.pacingHint,
+    resources: filters.resources,
+    resLabel: resInfo.label,
+    toolName: resInfo.toolName,
+    kw: filters.customTheme?.trim() || undefined,
+  };
+}
 
-  if (settings.mode === 'api' && settings.apiKey.trim().length > 10) {
+export async function generateKindergartenGames(filters: GameFilterState, settings: AISettings): Promise<GeneratedGame[]> {
+  const demoGames = buildDemoGames(buildDemoContext(filters));
+
+  if (isApiMode(settings)) {
     try {
       const userPrompt = buildStructuredGameUserPrompt(filters);
       const prompt = `Ти си експертен български педагог в детска градина (Наредба № 5).
 ${userPrompt}
 
-Генерирай 3 игри на БЪЛГАРСКИ ЕЗИК и върни САМО валиден JSON масив от 3 обекта със следната структура:
-[{"id":"g1","title":"1. Заглавие на играта","subtitle":"Подзаглавие","tags":["Таг1","Таг2"],"badgeColor":"mint","rhymeTitle":"📜 2. Римуван стих за старт:","rhymeLines":["Стих 1","Стих 2","Стих 3","Стих 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"4. Развивани умения по Наредба № 5","sopAdaptation":"5. Идея за адаптация за дете със СОП","teacherTip":"Съвет към учителя"}]`;
+Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението, 2) дидактична/словесна с гатанка, 3) екипна игра с наличните материали.
+Римуваният стих да е 4 реда, наистина римуван и подходящ за възрастта. Стъпките да са 3–4, конкретни и изпълними на посоченото място.
+Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
+[{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения по Наредба № 5","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
       const raw = await callLLM(prompt, settings);
-      const match = raw.match(/\[[\s\S]*\]/);
-      if (match) {
-        const parsed = JSON.parse(match[0]) as GeneratedGame[];
-        const colors: GeneratedGame['badgeColor'][] = ['mint', 'lavender', 'coral'];
-        return parsed.slice(0, 3).map((g, i) => ({ ...g, id: `ai-g-${Date.now()}-${i}`, badgeColor: colors[i % 3] }));
-      }
+      return normalizeGames(extractJson(raw), demoGames);
     } catch (e) {
       console.warn('Fallback to Smart Demo Engine:', e);
+      return demoGames;
     }
   }
 
   await new Promise((r) => setTimeout(r, 1700));
-  const v = gameVar++;
-
-  const g1Rhyme = filters.mood === 'noisy'
-    ? ['Вятърко лудуваше, скачаше без спир,', 'ала чу вълшебен звън и настъпи мир!', 'Свий крилца, замръзни тук като малък гном,', 'тишината нежна влиза в нашия уютен дом!']
-    : filters.mood === 'tired'
-    ? ['Прозява се мечето в горския креват,', 'протяга си лапичките към целия свят!', 'Докосни небето синьо, плесни два пъти с ръце,', 'усмивка подари ми от своето сърце!']
-    : ['Ушичките наострям като горски зайо бял,', 'очите ми внимават – всеки знак съм разпознал!', 'Когато чуя тайната парола на деня,', 'превръщам се във фокус-шампион на мига!'];
-
-  const resGame3Map: Record<PlayResources, { title: string; rhyme: string[]; steps: string[] }> = {
-    none: {
-      title: kw ? `Огледални приятели: „${kw}“` : 'Вълшебните огледала на приятелството',
-      rhyme: ['Огледалце светло, чудно, виж ме колко съм послушен!', 'Щом ти махна със ръчичка – ставаш весела звездичка,', 'щом приклекна на килима – тишина вълшебна има,', 'две дечица в синхрон строен пазят мира наш спокоен!'],
-      steps: [
-        `Децата застават по двойки едно срещу друго ${locInfo.spatialHint} („Магьосник“ и „Огледало“).`,
-        `„Магьосникът“ показва плавно движение${kw ? ` по темата „${kw}“` : ''}, а „Огледалото“ го повтаря в пълна тишина.`,
-        `При сигнал „Смяна на огледалата!“ децата разменят ролите си с усмивка (${durInfo.pacingHint}).`,
-      ],
-    },
-    balls: {
-      title: kw ? `Пътуващата топка: „${kw}“` : 'Тайната на шепнещата топка',
-      rhyme: ['Топчицата шарена се търкаля тихо тук,', 'от ръчичка на ръчичка – без да чуеш нито звук!', 'Който топката прегърне, с топла дума ще отвърне,', 'слушай внимателно сега – ред е на твоята мечта!'],
-      steps: [
-        `Децата сядат в кръг ${locInfo.spatialHint}. Учителят пуска цветната топка плавно по пода към избрано дете.`,
-        `Детето, което улови топката, казва с нежен глас дума или асоциация${kw ? ` по темата „${kw}“` : ' за добро дело или любимо животно'}.`,
-        `След това търкаля топката към следващо дете, което седи спокойно и внимава (${durInfo.pacingHint}).`,
-      ],
-    },
-    music: {
-      title: kw ? `Музикални статуи: „${kw}“` : 'Танцуващи ноти и замръзнали звездички',
-      rhyme: ['Музиката зазвучава – всеки нежно се люлее,', 'щом мелодията спре – никой вече не шава и не пее!', 'Покажи ми чудна поза като приказен герой,', 'най-внимателният тук печели похвала в нашия строй!'],
-      steps: [
-        `Учителят пуска мелодия или задава ритъм със звънче ${locInfo.spatialHint}.`,
-        `Децата се движат пластично в ритъма на музиката${kw ? `, пресъздавайки образи от „${kw}“` : ''}.`,
-        `Когато музиката спре, всички замръзват в красива поза до следващия музикален сигнал (${durInfo.pacingHint}).`,
-      ],
-    },
-    paper_pencils: {
-      title: kw ? `Рисувана загадка: „${kw}“` : 'Магическият лист и танцуващият молив',
-      rhyme: ['Моливчето шарено по листа леко стъпва,', 'точица след точица картинката покълва!', 'Слушай моя тих сигнал – спри, недей да бързаш ти,', 'с приятеля до теб с усмивка чудото довърши!'],
-      steps: [
-        `Всяко дете получава лист и цветен молив ${locInfo.spatialHint}.`,
-        `По гласова инструкция на учителя децата рисуват със затворени очи кръгче, а после го превръщат в ${kw ? `образ от „${kw}“` : 'усмихнато слънчице'}.`,
-        `Накрая подреждат рисунките в обща „Пътека на приятелството“ (${durInfo.pacingHint}).`,
-      ],
-    },
-    hoops_ribbons: {
-      title: kw ? `Цветни острови: „${kw}“` : 'Вълшебните островчета и шарените дъги',
-      rhyme: ['Лентички и обръчи шарени блестят,', 'като цветни острови в нашия чуден свят!', 'Слушай кой цвят викам аз с усмивка и любов,', 'в обръча застани с приятел верен и готов!'],
-      steps: [
-        `Учителят разполага цветни обръчи и ленти ${locInfo.spatialHint}.`,
-        `Децата се движат плавно около обръчите${kw ? ` като откриватели на „${kw}“` : ''}, развявайки лентичките.`,
-        `При назоваване на цвят от учителя децата се подреждат около съответния обръч и си подават ръце (${durInfo.pacingHint}).`,
-      ],
-    },
-  };
-
-  const r3 = resGame3Map[filters.resources];
-
-  return [
-    {
-      id: `g1-${Date.now()}-${v}`,
-      title: kw ? `Вълшебният сигнал: „${kw}“` : filters.mood === 'noisy' ? 'Кралят на тишината и перцето на съня' : filters.mood === 'tired' ? 'Събуди мечока с усмивка и лъч' : 'Чуй вълшебния код на капитана',
-      subtitle: `Бърза регулираща игра за ${ageInfo.short} (${moodInfo.tag})`,
-      tags: ['Подвижно-регулираща', moodInfo.tag, ageInfo.ageRange, locInfo.label],
-      badgeColor: 'mint',
-      rhymeTitle: '📜 Римуван стих / закачка за старт:',
-      rhymeLines: g1Rhyme,
-      steps: [
-        `Децата се събират ${locInfo.spatialHint}, а учителят прочита четиристишието с артистичен глас.`,
-        `Децата изпълняват плавни движения с ${resInfo.toolName}${kw ? ` като герои от „${kw}“` : ''}.`,
-        `При тайния сигнал на учителя всички замръзват в усмихната поза и правят 3 спокойни вдишвания (${durInfo.pacingHint}).`,
-      ],
-      pedagogicalGoal: `По Наредба № 5 (ДОС): Самоутвърждаване и общуване с околните, волеви самоконтрол, емоционална саморегулация и ${moodInfo.goalFocus}.`,
-      sopAdaptation: 'Осигурете визуална карта-символ за сигнала „Тишина/Стоп“ и позволете на детето със СОП да участва от своето спокойно място или заедно с подкрепящ възрастен/другарче без задължителна смяна на позата.',
-      teacherTip: 'Намалете постепенно силата на гласа си на последния стих – децата инстинктивно притихват и се фокусират.',
-    },
-    {
-      id: `g2-${Date.now()}-${v}`,
-      title: kw ? `Мисия „${kw}“: Загадките на мъдрата сова` : 'Чудната торбичка на горските приятели',
-      subtitle: `Дидактична и словесна игра в ${locInfo.label.toLowerCase()}`,
-      tags: ['Дидактична игра', 'Реч и мислене', durInfo.label, resInfo.label],
-      badgeColor: 'lavender',
-      rhymeTitle: '📜 Гатанка за привличане на вниманието:',
-      rhymeLines: [
-        'Чук-чук-чук, кой ли се крие в кутията тук?',
-        'Дали е мече пухкаво, или пък зайче с мек кожух?',
-        'Ослушай се добре, отгатвай смело с мен,',
-        'че чака ни вълшебен и усмихнат детски ден!',
-      ],
-      steps: [
-        `Децата сядат в полукръг ${locInfo.spatialHint}. Учителят влиза в ролята на „Пазител на загадките“.`,
-        `Учителят описва с 3 жокера предмет или герой${kw ? ` от темата „${kw}“` : ''}, а децата отгатват първо с жест, после с дума.`,
-        `Всяко дете, което отгатне, избира следващия участник чрез ${resInfo.toolName} (${durInfo.pacingHint}).`,
-      ],
-      pedagogicalGoal: 'По Наредба № 5 (ДОС – БЕЛ и Околен свят): Възприемане, свързана реч, обогатяване на активния речник, асоциативно мислене и изслушване на събеседник.',
-      sopAdaptation: 'Предложете избор между 2 нагледни картинки (визуална опора), така че детето със СОП да може да посочи верния отговор с жест, поглед или кратка дума, и го включете като „Пазител на жокерите“.',
-      teacherTip: 'Подайте първия лесен жокер на по-срамежливите деца, за да повишите тяхната увереност.',
-    },
-    {
-      id: `g3-${Date.now()}-${v}`,
-      title: r3.title,
-      subtitle: `Екипна игра за синхрон и добро настроение (${resInfo.label})`,
-      tags: ['Екипност и емпатия', resInfo.label, locInfo.label, ageInfo.ageRange],
-      badgeColor: 'coral',
-      rhymeTitle: '📜 Римуван сигнал за начало на играта:',
-      rhymeLines: r3.rhyme,
-      steps: r3.steps,
-      pedagogicalGoal: `По Наредба № 5 (ДОС – Физическа култура и Социална среда): Обща и фина моторика, координиране на движенията в партньорство, емпатия и позитивно общуване чрез ${resInfo.toolName}.`,
-      sopAdaptation: 'Сдвоете детето със СОП с спокойно и емпатично другарче („ментор“) или с учителя, опростете движенията до 1–2 бавни жеста от седнало положение и избягвайте силни внезапни звукови стимули.',
-      teacherTip: 'Приключете с общ тих поздрав с длани, за да запазите спокойния тон за следващия режимен момент.',
-    },
-  ];
+  return demoGames;
 }
 
-export async function generateLessonPreparation(params: { ageGroup: AgeGroup; direction: EducationalDirection; topic: string }, settings: AISettings): Promise<GeneratedLessonPlan> {
-  const topic = params.topic.trim() || 'Есен в гората';
-  const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
-  const dirInfo = DIRECTION_LABELS[params.direction];
-  const core = dirInfo.coresByAge[params.ageGroup];
+type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string };
 
-  if (settings.mode === 'api' && settings.apiKey.trim().length > 10) {
+export async function generateLessonPreparation(params: LessonParams, settings: AISettings): Promise<GeneratedLessonPlan> {
+  const demoPlan = buildDemoLessonPlan(params);
+
+  if (isApiMode(settings)) {
     try {
-      const prompt = `Ти си методист по предучилищно образование в България (Наредба № 5 - ДОС). Създай разработка на БЪЛГАРСКИ за ${ageInfo.full}, направление ${dirInfo.label}, тема "${topic}". Върни САМО валиден JSON с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+      const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
+      const dirInfo = DIRECTION_LABELS[params.direction];
+      const prompt = `Ти си методист по предучилищно образование в България (Наредба № 5 - ДОС). Създай разработка на БЪЛГАРСКИ за ${ageInfo.full}, направление ${dirInfo.label}, образователно ядро „${demoPlan.educationalCore}“, тема "${demoPlan.topic}", продължителност ${ageInfo.dosDuration}. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
       const raw = await callLLM(prompt, settings);
-      const match = raw.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]) as GeneratedLessonPlan;
+      return normalizeLessonPlan(extractJson(raw), demoPlan);
     } catch (e) {
       console.warn('Fallback to Smart Demo Engine:', e);
+      return demoPlan;
     }
   }
 
   await new Promise((r) => setTimeout(r, 1800));
+  return demoPlan;
+}
+
+/** Герой на приказката според ключови думи в темата (демо режим). */
+const STORY_HEROES: { keys: string[]; hero: string }[] = [
+  { keys: ['есен', 'гора', 'листа'], hero: 'таралежчето Бодливко и златното листо Листчо' },
+  { keys: ['зим', 'сняг', 'снеж'], hero: 'снежко Бялчо и снежинката Искрица' },
+  { keys: ['пролет', 'цвет', 'мартени'], hero: 'кокичето Белчо и пчеличката Жужа' },
+  { keys: ['лят', 'море', 'слънц'], hero: 'слънчевото лъчице Златко и рибката Вълничка' },
+  { keys: ['коледа', 'нова година', 'дядо мраз'], hero: 'малкото джудже Звънчо от работилницата на Дядо Коледа' },
+  { keys: ['великден', 'яйц'], hero: 'шареното яйце Писанка и зайчето Скокльо' },
+  { keys: ['космос', 'планет', 'звезд'], hero: 'малкият астронавт Звезделин и комета Светулка' },
+  { keys: ['професи', 'занаят'], hero: 'любопитното момченце Марти и вълшебната шапка на майсторите' },
+  { keys: ['здрав', 'хран', 'плод', 'зеленчу', 'витамин'], hero: 'капитан Морковчо и дружината на Витамините' },
+  { keys: ['живот', 'зоопарк', 'ферм'], hero: 'мъдрата сова Совка и малкото лисиче Хитрушко' },
+  { keys: ['семейств', 'дом', 'мама', 'баба'], hero: 'мечето Бъди и неговото голямо мечешко семейство' },
+  { keys: ['транспорт', 'превоз', 'пътя', 'светофар'], hero: 'автобусчето Бибиш и светофарчо Мигачко' },
+  { keys: ['вода', 'дъжд', 'река'], hero: 'капчицата Капчо и облачето Пухчо' },
+  { keys: ['българ', 'родин', 'трибагрени'], hero: 'щъркелът Бенко, който обиколи цяла България' },
+];
+
+function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
+  const topic = params.topic.trim() || 'Есен в гората';
+  const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
+  const dirInfo = DIRECTION_LABELS[params.direction];
+  const core = dirInfo.coresByAge[params.ageGroup];
   const t = topic.toLowerCase();
 
-  const hero = t.includes('есен') || t.includes('гора')
-    ? 'таралежчето Бодливко и златното листо Листчо'
-    : t.includes('космос') || t.includes('планет')
-    ? 'малкият астронавт Звезделин и комета Светулка'
-    : t.includes('професи')
-    ? 'любопитното момченце Марти и вълшебната шапка на майсторите'
-    : t.includes('здрав') || t.includes('хран')
-    ? 'капитан Морковчо и дружината на Витамините'
-    : `любознателното катериче Руменчо – откривателят на „${topic}“`;
+  const hero = STORY_HEROES.find((h) => h.keys.some((k) => t.includes(k)))?.hero
+    ?? `любознателното катериче Руменчо – откривателят на „${topic}“`;
 
   const timings: Record<AgeGroup, [string, string, string]> = {
     '1': ['3 мин.', '9 мин.', '3 мин.'],

@@ -540,7 +540,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
               type="button"
               onClick={() => qrDialogRef.current?.close()}
               aria-label="Затвори QR прозореца"
-              autofocus
+              autoFocus
               className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
             >
               <X className="w-6 h-6" />

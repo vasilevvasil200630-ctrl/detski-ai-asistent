@@ -552,7 +552,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             <div
               data-dos-panel="plan"
               {...(viewMode === 'tabs' && activeTab !== 'plan'
-                ? ({ hidden: 'until-found' } as React.HTMLAttributes<HTMLDivElement>)
+                ? ({ hidden: 'until-found' } as unknown as React.HTMLAttributes<HTMLDivElement>)
                 : {})}
             >
               <article className="print-card rounded-2xl bg-white border-2 border-emerald-200 shadow-lg overflow-hidden">
@@ -672,7 +672,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             <div
               data-dos-panel="story"
               {...(viewMode === 'tabs' && activeTab !== 'story'
-                ? ({ hidden: 'until-found' } as React.HTMLAttributes<HTMLDivElement>)
+                ? ({ hidden: 'until-found' } as unknown as React.HTMLAttributes<HTMLDivElement>)
                 : {})}
             >
               <article className="print-card rounded-2xl bg-white border-2 border-violet-200 shadow-lg overflow-hidden">
@@ -770,7 +770,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             <div
               data-dos-panel="parents"
               {...(viewMode === 'tabs' && activeTab !== 'parents'
-                ? ({ hidden: 'until-found' } as React.HTMLAttributes<HTMLDivElement>)
+                ? ({ hidden: 'until-found' } as unknown as React.HTMLAttributes<HTMLDivElement>)
                 : {})}
             >
               <article className="print-card rounded-2xl bg-white border-2 border-rose-200 shadow-lg overflow-hidden">
