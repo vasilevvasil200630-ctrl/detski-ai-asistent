@@ -18,7 +18,7 @@
  * Ниско-нивовият callGeminiWithRetry остава за backwards compat.
  */
 
-import type { GoogleGenAI } from "@google/genai";
+import type { ThinkingLevel, GoogleGenAI } from "@google/genai";
 import { MODEL_FALLBACK, MODEL_LAST_RESORT, cleanAndParseJson } from "@/lib/gemini-client";
 
 export type GeminiCallFn<T> = (model: string) => Promise<T>;
@@ -116,6 +116,8 @@ export type GenerateSafeParams = {
   deadline?: number;
   /** Таван за едно повикване към модела при зададен deadline. */
   perCallTimeoutMs?: number;
+  /** Колко да „мисли“ моделът; LOW = бърз отговор (както в МатураПлюс). */
+  thinkingLevel?: ThinkingLevel;
 };
 
 export type GenerateSafeResult<T = unknown> = {
@@ -156,6 +158,7 @@ export async function generateSafeAIResponse<T = unknown>(
     fallbackModel = MODEL_FALLBACK,
     deadline,
     perCallTimeoutMs = 25_000,
+    thinkingLevel,
   } = params;
 
   let modelUsed = model;
@@ -174,6 +177,7 @@ export async function generateSafeAIResponse<T = unknown>(
         config: {
           ...(systemInstruction ? { systemInstruction } : {}),
           maxOutputTokens,
+          ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
           ...(isJson ? { responseMimeType: "application/json" as const } : {}),
           ...(abortSignal ? { abortSignal } : {}),
         },

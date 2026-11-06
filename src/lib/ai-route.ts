@@ -1,10 +1,16 @@
 import "server-only";
+import { ThinkingLevel } from "@google/genai";
 import { MODEL_FLASH, resolveGeminiClient } from "@/lib/gemini-client";
 import { generateSafeAIResponse } from "@/lib/gemini-retry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
-/** Vercel спира функцията след maxDuration — AI опитите приключват по-рано и минават на демо. */
-export const AI_DEADLINE_MS = 45_000;
+/**
+ * Краен срок за всички AI опити. По-кратък от изчакването в браузъра (40 s в aiEngine.ts),
+ * за да стигне отговорът (истински или демо) до учителя, преди браузърът да се откаже.
+ */
+export const AI_DEADLINE_MS = 34_000;
+/** Таван за един опит: първият модел получава почти целия срок, резервният — остатъка. */
+const PER_CALL_TIMEOUT_MS = 28_000;
 
 export function hasGeminiKey(): boolean {
   return Boolean(process.env.GEMINI_API_KEY?.trim());
@@ -28,6 +34,9 @@ export async function askGeminiJson(prompt: string, maxOutputTokens = 6000): Pro
     isJson: true,
     maxOutputTokens,
     deadline: Date.now() + AI_DEADLINE_MS,
+    perCallTimeoutMs: PER_CALL_TIMEOUT_MS,
+    // Без ограничение моделът „мисли“ над 25 s за три игри; LOW отговаря за секунди
+    thinkingLevel: ThinkingLevel.LOW,
   });
   return parsed ?? rawText;
 }
