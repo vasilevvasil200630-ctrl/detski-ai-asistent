@@ -100,10 +100,16 @@ export interface GeneratedLessonPlan {
   parentNote: { viberHeader: string; summaryMessage: string; highlights: string[]; homeGameTitle: string; homeGameDescription: string; closingWarmth: string };
 }
 
-export type AIProvider = 'gemini' | 'openai';
-export interface AISettings {
-  mode: 'demo' | 'api';
-  provider: AIProvider;
-  apiKey: string;
-  model: string;
+
+/** Влезлият учител (от /api/auth/me). */
+export interface SessionTeacher {
+  id: string;
+  email: string;
+  name: string;
+  avatar: string;
+  jobTitle: string;
+  ageGroup: AgeGroup;
+  groupName: string;
+  kgRole: 'ADMIN' | 'TEACHER';
+  kindergarten: { id: string; name: string; city: string; motto: string; joinCode: string } | null;
 }

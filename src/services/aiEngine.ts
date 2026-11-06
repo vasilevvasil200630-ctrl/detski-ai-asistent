@@ -1,6 +1,5 @@
-import { AgeGroup, AISettings, EducationalDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
+import { AgeGroup, EducationalDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
 import { buildDemoGames, DemoContext } from './demoGames';
-import { extractJson, normalizeGames, normalizeLessonPlan } from './aiValidation';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -70,50 +69,7 @@ export function buildStructuredGameUserPrompt(filters: GameFilterState): string 
   ].join('\n');
 }
 
-/** Максимално време за чакане на реалния AI, преди да минем на демо режим (важно при жива демонстрация). */
-const AI_TIMEOUT_MS = 25000;
-
-async function callLLM(prompt: string, settings: AISettings): Promise<string> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
-  try {
-    if (settings.provider === 'gemini') {
-      const model = settings.model || 'gemini-2.5-flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': settings.apiKey.trim() },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, responseMimeType: 'application/json' },
-        }),
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } else {
-      const model = settings.model || 'gpt-4o-mini';
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${settings.apiKey.trim()}` },
-        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.8 }),
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(`OpenAI HTTP ${res.status}`);
-      const data = await res.json();
-      return data?.choices?.[0]?.message?.content || '';
-    }
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function isApiMode(settings: AISettings): boolean {
-  return settings.mode === 'api' && settings.apiKey.trim().length > 10;
-}
-
-function buildDemoContext(filters: GameFilterState): DemoContext {
+export function buildDemoContext(filters: GameFilterState): DemoContext {
   const ageInfo = AGE_GROUP_LABELS[filters.ageGroup];
   const moodInfo = MOOD_LABELS[filters.mood];
   const locInfo = LOCATION_LABELS[filters.location];
@@ -138,51 +94,80 @@ function buildDemoContext(filters: GameFilterState): DemoContext {
   };
 }
 
-export async function generateKindergartenGames(filters: GameFilterState, settings: AISettings): Promise<GeneratedGame[]> {
-  const demoGames = buildDemoGames(buildDemoContext(filters));
-
-  if (isApiMode(settings)) {
-    try {
-      const userPrompt = buildStructuredGameUserPrompt(filters);
-      const prompt = `Ти си експертен български педагог в детска градина (Наредба № 5).
-${userPrompt}
+/** Пълният промпт за 3 игри — вика се от сървъра (/api/ai/games). */
+export function buildGamesAiPrompt(filters: GameFilterState): string {
+  return `Ти си експертен български педагог в детска градина (Наредба № 5).
+${buildStructuredGameUserPrompt(filters)}
 
 Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението, 2) дидактична/словесна с гатанка, 3) екипна игра с наличните материали.
 Римуваният стих да е 4 реда, наистина римуван и подходящ за възрастта. Стъпките да са 3–4, конкретни и изпълними на посоченото място.
 Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
 [{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения по Наредба № 5","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
-      const raw = await callLLM(prompt, settings);
-      return normalizeGames(extractJson(raw), demoGames);
-    } catch (e) {
-      console.warn('Fallback to Smart Demo Engine:', e);
-      return demoGames;
-    }
-  }
-
-  await new Promise((r) => setTimeout(r, 1700));
-  return demoGames;
 }
 
-type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string };
+export type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string };
 
-export async function generateLessonPreparation(params: LessonParams, settings: AISettings): Promise<GeneratedLessonPlan> {
-  const demoPlan = buildDemoLessonPlan(params);
+/** Пълният промпт за ДОС разработка — вика се от сървъра (/api/ai/lesson). */
+export function buildLessonAiPrompt(params: LessonParams, demoPlan: GeneratedLessonPlan): string {
+  const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
+  const dirInfo = DIRECTION_LABELS[params.direction];
+  return `Ти си методист по предучилищно образование в България (Наредба № 5 - ДОС). Създай разработка на БЪЛГАРСКИ за ${ageInfo.full}, направление ${dirInfo.label}, образователно ядро „${demoPlan.educationalCore}“, тема "${demoPlan.topic}", продължителност ${ageInfo.dosDuration}. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+}
 
-  if (isApiMode(settings)) {
-    try {
-      const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
-      const dirInfo = DIRECTION_LABELS[params.direction];
-      const prompt = `Ти си методист по предучилищно образование в България (Наредба № 5 - ДОС). Създай разработка на БЪЛГАРСКИ за ${ageInfo.full}, направление ${dirInfo.label}, образователно ядро „${demoPlan.educationalCore}“, тема "${demoPlan.topic}", продължителност ${ageInfo.dosDuration}. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
-      const raw = await callLLM(prompt, settings);
-      return normalizeLessonPlan(extractJson(raw), demoPlan);
-    } catch (e) {
-      console.warn('Fallback to Smart Demo Engine:', e);
-      return demoPlan;
-    }
+/** Откъде е дошъл резултатът — показва се в интерфейса. */
+export type AiSource = 'ai' | 'demo';
+
+/** Минимално време на анимацията „AI мисли“, за да не премигва при бърз демо отговор. */
+const MIN_ANIMATION_MS = 1200;
+/** Таван за чакане от браузъра; сървърът има собствен краен срок (gemini-retry). */
+const CLIENT_TIMEOUT_MS = 40000;
+
+async function postJson<T>(url: string, body: unknown): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), CLIENT_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()) as T;
+  } finally {
+    clearTimeout(timer);
   }
+}
 
-  await new Promise((r) => setTimeout(r, 1800));
-  return demoPlan;
+async function withMinDuration<T>(work: Promise<T>): Promise<T> {
+  const [result] = await Promise.all([work, new Promise((r) => setTimeout(r, MIN_ANIMATION_MS))]);
+  return result;
+}
+
+/**
+ * Генерира 3 игри през сървъра (Gemini с ключ на сървъра, както в МатураПлюс).
+ * Без връзка или при грешка — вграденият демо двигател в браузъра.
+ */
+export async function generateKindergartenGames(filters: GameFilterState): Promise<{ games: GeneratedGame[]; source: AiSource }> {
+  return withMinDuration(
+    postJson<{ games: GeneratedGame[]; source: AiSource }>('/api/ai/games', filters)
+      .then((data) => (Array.isArray(data.games) && data.games.length ? data : Promise.reject(new Error('empty'))))
+      .catch((e) => {
+        console.warn('Fallback to Smart Demo Engine (client):', e);
+        return { games: buildDemoGames(buildDemoContext(filters)), source: 'demo' as const };
+      }),
+  );
+}
+
+export async function generateLessonPreparation(params: LessonParams): Promise<{ plan: GeneratedLessonPlan; source: AiSource }> {
+  return withMinDuration(
+    postJson<{ plan: GeneratedLessonPlan; source: AiSource }>('/api/ai/lesson', params)
+      .then((data) => (data.plan?.stages ? data : Promise.reject(new Error('empty'))))
+      .catch((e) => {
+        console.warn('Fallback to Smart Demo Engine (client):', e);
+        return { plan: buildDemoLessonPlan(params), source: 'demo' as const };
+      }),
+  );
 }
 
 /** Герой на приказката според ключови думи в темата (демо режим). */
@@ -203,7 +188,7 @@ const STORY_HEROES: { keys: string[]; hero: string }[] = [
   { keys: ['българ', 'родин', 'трибагрени'], hero: 'щъркелът Бенко, който обиколи цяла България' },
 ];
 
-function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
+export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
   const topic = params.topic.trim() || 'Есен в гората';
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
   const dirInfo = DIRECTION_LABELS[params.direction];

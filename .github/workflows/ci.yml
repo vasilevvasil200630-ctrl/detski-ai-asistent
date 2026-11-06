@@ -1,0 +1,38 @@
+name: CI
+
+# Копирано от МатураПлюс (.github/workflows/ci.yml): build и проверка на типовете при всеки push.
+# Самият deploy прави Vercel (GitHub интеграция) — GitHub Pages не поддържа API маршрути.
+
+on:
+  push:
+    branches: [main, nextjs-foundation]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Typecheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build (Next.js)
+        run: npm run build
+        env:
+          # Placeholder — не се използва в build, само за да не гърмят проверките.
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          SESSION_SECRET: placeholder-placeholder-placeholder-32
