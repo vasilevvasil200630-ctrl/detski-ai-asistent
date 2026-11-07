@@ -70,7 +70,8 @@ export function buildStructuredGameUserPrompt(filters: GameFilterState): string 
     `- Място: ${locInfo.label}`,
     `- Времетраене: ${durInfo.label}ути`,
     `- Налични материали: ${resInfo.label}`,
-    ...(kw ? [`- Допълнителна тема: ${kw}`] : []),
+    ...(filters.direction && filters.direction !== 'mixed' ? [`- Образователно направление: ${directionName(filters.direction)}`] : []),
+    ...(kw ? [`- Тема, която групата е взела: ${kw}`] : []),
     'Форматирай отговора с:',
     '1. Заглавие на играта',
     '2. Римуван стих за старт',
@@ -102,6 +103,7 @@ export function buildDemoContext(filters: GameFilterState): DemoContext {
     resLabel: resInfo.label,
     toolName: resInfo.toolName,
     kw: filters.customTheme?.trim() || undefined,
+    direction: filters.direction && filters.direction !== 'mixed' ? filters.direction : undefined,
   };
 }
 
@@ -112,11 +114,30 @@ ${naredba5PromptRules(filters.ageGroup)}
 
 ${buildStructuredGameUserPrompt(filters)}
 
-Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението (Физическа култура), 2) дидактична/словесна с гатанка (БЕЛ, Математика или Околен свят), 3) екипна игра с наличните материали.
+${gamesTaskLine(filters)}
 Римуваният стих да е 4 реда, наистина римуван и подходящ за възрастта. Стъпките да са 3–4, конкретни и изпълними на посоченото място.
 Полето "pedagogicalGoal" ЗАПОЧВА с направлението и ядрото с точните им имена, напр. „Физическа култура (ядро „Игрова двигателна дейност“); Околен свят (ядро „Самоутвърждаване и общуване с околните“): …“, а след двоеточието — конкретните умения.
 Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
 [{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения по Наредба № 5","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
+}
+
+function directionName(d: LessonDirection): string {
+  return d === 'bdp' ? `${BDP.label} (интегрирано в „Околен свят“, ядро „Социална и здравословна среда“)` : DIRECTION_STANDARDS[d].label;
+}
+
+/** Каква тройка игри да създаде моделът: по направление или смесени (според настроението). */
+function gamesTaskLine(filters: GameFilterState): string {
+  const kw = filters.customTheme?.trim();
+  const topicRule = kw ? ` Всички игри затвърждават темата „${kw}“, която групата е взела.` : '';
+  if (!filters.direction || filters.direction === 'mixed') {
+    return `Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението (Физическа култура), 2) дидактична/словесна с гатанка (БЕЛ, Математика или Околен свят), 3) екипна игра с наличните материали.${topicRule}`;
+  }
+  if (filters.direction === 'bdp') {
+    return `${bdpPromptRules(filters.ageGroup)}
+Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК по безопасност на движението по пътищата за тази група (светофар, пешеходна пътека, пешеходци и шофьори, опасни места) — дидактична, ролева и подвижна.${topicRule}`;
+  }
+  const dir = DIRECTION_STANDARDS[filters.direction];
+  return `Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК в направление „${dir.label}“ (приложение № ${dir.appendix} към чл. 28) — всяка по различно ядро от: ${dir.cores.map((c) => `„${c}“`).join(', ')}. Игрите водят към очакваните резултати по това приложение за тази група и са различни по вид (дидактична, подвижна, творческа).${topicRule}`;
 }
 
 /** core — официалното образователно ядро; без него AI избира най-подходящото за темата. */

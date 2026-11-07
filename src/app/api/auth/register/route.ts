@@ -4,11 +4,32 @@ import { RegisterSchema } from "@/lib/auth/schemas";
 import { hashPassword } from "@/lib/auth/password";
 import { createSession, passwordVersion } from "@/lib/auth/session";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { generateJoinCode, normalizeJoinCode } from "@/lib/auth/utils";
+import { normalizeJoinCode } from "@/lib/auth/utils";
+import { KG } from "@/config/kindergarten";
 
 // По модела на МатураПлюс (src/app/api/auth/register/route.ts): лимит по IP, Zod, bcrypt,
 // транзакция и обработка на P2002 (едновременна регистрация със същия имейл).
-// Добавено: създаване на детска градина или присъединяване към нея с код.
+// Облакът е само на ДГ „Пролет“: всеки нов профил влиза в нея. Първият профил става
+// администратор без код; след това регистрацията изисква кода на градината.
+
+/** Градината (създава се от миграция 3_dg_prolet; тук — резервно, ако я няма). */
+async function ensureKindergarten() {
+  const existing = await prisma.kindergarten.findUnique({ where: { id: KG.id } });
+  if (existing) return existing;
+  const { generateJoinCode } = await import("@/lib/auth/utils");
+  return prisma.kindergarten.upsert({
+    where: { id: KG.id },
+    update: {},
+    create: { id: KG.id, name: KG.name, city: KG.village, joinCode: generateJoinCode() },
+  });
+}
+
+/** Нужен ли е код: не — само докато в градината няма нито един учител. */
+export async function GET() {
+  const kg = await ensureKindergarten();
+  const members = await prisma.user.count({ where: { kindergartenId: kg.id } });
+  return NextResponse.json({ needsCode: members > 0 });
+}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -17,22 +38,14 @@ export async function POST(request: Request) {
   const rate = await checkRateLimit(`register:${ip}`, 30);
   if (!rate.allowed) {
     return NextResponse.json(
-      { error: `Твърде много опити за регистрация. Опитай пак след ${rate.resetInSeconds} секунди.` },
+      { error: `Твърде много опити за регистрация. Опитайте пак след ${rate.resetInSeconds} секунди.` },
       { status: 429 },
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Невалидно тяло на заявката." }, { status: 400 });
-  }
-
-  const parsed = RegisterSchema.safeParse(body);
+  const parsed = RegisterSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    const firstError = parsed.error.errors[0]?.message ?? "Моля, провери въведените данни.";
-    return NextResponse.json({ error: firstError }, { status: 400 });
+    return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Моля, проверете въведените данни." }, { status: 400 });
   }
   const data = parsed.data;
 
@@ -41,73 +54,47 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Профил с този имейл вече съществува." }, { status: 409 });
   }
 
-  let kindergartenId: string;
-  let kgRole: "ADMIN" | "TEACHER" = "TEACHER";
-
-  if (data.mode === "join") {
-    const kg = await prisma.kindergarten.findUnique({ where: { joinCode: normalizeJoinCode(data.joinCode ?? "") } });
-    if (!kg) {
-      return NextResponse.json(
-        { error: "Няма детска градина с този код. Провери го при колегата, който те е поканил." },
-        { status: 404 },
-      );
-    }
-    kindergartenId = kg.id;
-  } else {
-    let joinCode: string | null = null;
-    for (let attempt = 0; attempt < 10 && !joinCode; attempt++) {
-      const candidate = generateJoinCode();
-      const clash = await prisma.kindergarten.findUnique({ where: { joinCode: candidate } });
-      if (!clash) joinCode = candidate;
-    }
-    if (!joinCode) {
-      return NextResponse.json({ error: "Временен проблем. Моля, опитай отново." }, { status: 503 });
-    }
-    kindergartenId = "";
-    kgRole = "ADMIN";
-    // Градината се създава в транзакцията по-долу заедно с профила
-    data.joinCode = joinCode;
-  }
-
+  const kg = await ensureKindergarten();
   const passwordHash = await hashPassword(data.password);
 
   let user;
   try {
     user = await prisma.$transaction(async (tx) => {
-      if (data.mode === "create") {
-        const kg = await tx.kindergarten.create({
-          data: {
-            name: data.kgName!,
-            city: data.kgCity ?? "",
-            motto: data.kgMotto ?? "",
-            joinCode: data.joinCode!,
-          },
-        });
-        kindergartenId = kg.id;
+      // Проверката е в транзакцията: двама „първи“ едновременно не стават и двамата администратори
+      const members = await tx.user.count({ where: { kindergartenId: kg.id } });
+      const isFirst = members === 0;
+      if (!isFirst && normalizeJoinCode(data.joinCode ?? "") !== kg.joinCode) {
+        throw new Error("BAD_CODE");
       }
       return tx.user.create({
         data: {
           email: data.email,
           passwordHash,
           name: data.name,
-          jobTitle: data.jobTitle || "Учител",
+          jobTitle: data.jobTitle || (isFirst ? "Директор" : "Учител"),
           avatar: data.avatar || "👩‍🏫",
           ageGroup: data.ageGroup,
           groupName: data.groupName ?? "",
-          kgRole,
-          kindergartenId,
+          kgRole: isFirst ? "ADMIN" : "TEACHER",
+          kindergartenId: kg.id,
         },
       });
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "BAD_CODE") {
+      return NextResponse.json(
+        { error: `Кодът не е верен. Поискайте кода на ${KG.name} от администратора на облака.` },
+        { status: 403 },
+      );
+    }
     if ((error as { code?: string } | null)?.code === "P2002") {
       return NextResponse.json({ error: "Профил с този имейл вече съществува." }, { status: 409 });
     }
     console.error("[auth] register failed:", error instanceof Error ? error.message : error);
-    return NextResponse.json({ error: "Регистрацията не успя. Моля, опитай отново след малко." }, { status: 500 });
+    return NextResponse.json({ error: "Регистрацията не успя. Моля, опитайте отново след малко." }, { status: 500 });
   }
 
   await createSession({ userId: user.id, email: user.email, name: user.name, pv: passwordVersion(user.passwordHash) });
 
-  return NextResponse.json({ ok: true, redirectUrl: "/hub" }, { status: 201 });
+  return NextResponse.json({ ok: true, redirectUrl: "/", admin: user.kgRole === "ADMIN" }, { status: 201 });
 }

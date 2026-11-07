@@ -5,13 +5,13 @@ import "server-only";
  *
  * Във Vercel → Settings → Environment Variables:
  * - RESEND_API_KEY — без него писма не се изпращат (линкът за нова парола се вижда само в логовете локално)
- * - EMAIL_FROM="Детски асистент <noreply@вашият-домейн>" — подател от верифициран домейн
+ * - EMAIL_FROM="ДГ „Пролет“ <noreply@вашият-домейн>" — подател от верифициран домейн
  * - RESEND_DOMAIN_VERIFIED="true" — след като домейнът е потвърден в Resend
  * - ADMIN_NOTIFICATION_EMAIL — къде идва обратната връзка
  * - NEXT_PUBLIC_SUPPORT_EMAIL — публичният адрес за помощ
  */
 export const EMAIL_CONFIG = {
-  from: process.env.EMAIL_FROM || "Детски асистент <onboarding@resend.dev>",
+  from: process.env.EMAIL_FROM || "ДГ „Пролет“ — учителски облак <onboarding@resend.dev>",
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "vasilevvasil200630@gmail.com",
   adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL || "vasilevvasil200630@gmail.com",
 } as const;

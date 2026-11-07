@@ -10,6 +10,12 @@ import { SiteFooter } from "./home/SiteFooter";
 import { FeedbackWidget } from "./FeedbackWidget";
 import { PwaProvider } from "./pwa/PwaProvider";
 import { useMe } from "@/lib/client/useMe";
+import { GuestShell } from "./home/GuestShell";
+import { SignInGate } from "./home/SignInGate";
+import { Loader2 } from "lucide-react";
+
+/** Страниците, които посетител без профил вижда. Всичко друго е зад вход (облакът е затворен). */
+const PUBLIC_PATHS = ["/", "/login", "/register", "/forgot-password", "/reset-password", "/privacy", "/terms"];
 
 // Копирано от МатураПлюс (src/components/AppShell.tsx): сгъваем страничен панел (запомня се),
 // горна лента, мобилна долна навигация и известия. Без синхронизацията на кеша на ученика.
@@ -49,11 +55,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Началната страница за посетители е самостоятелен сайт — без страничното меню на приложението
-  if (pathname === "/" && (loading || !user)) {
+  // Докато не знаем дали има вход — без рамка, за да не премигва менюто
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <Loader2 className="h-7 w-7 animate-spin text-slate-400" aria-label="Зареждане" />
+      </div>
+    );
+  }
+
+  // Посетител: само страницата на градината, входът и правните страници; останалото е заключено
+  if (!user) {
+    const isPublic = PUBLIC_PATHS.includes(pathname);
     return (
       <>
-        {children}
+        <GuestShell footer={pathname === "/" ? "full" : "compact"}>{isPublic ? children : <SignInGate path={pathname} />}</GuestShell>
         <Toaster />
         <FeedbackWidget />
         <PwaProvider />

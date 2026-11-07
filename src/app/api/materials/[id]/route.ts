@@ -4,6 +4,21 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { AUTH_REQUIRED } from "@/lib/teacher";
 import { MATERIAL_INCLUDE, toSavedMaterial } from "@/lib/materials";
+import { findVisibleMaterial } from "@/lib/material-access";
+
+/** Един материал — свой или споделен в моята градина (за изгледа за печат). */
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
+  const { id } = await params;
+  const visible = await findVisibleMaterial(id, session.userId, { anyKindergartenGames: true });
+  if (!visible) return NextResponse.json({ error: "Материалът не е намерен." }, { status: 404 });
+  const [row, like] = await Promise.all([
+    prisma.material.findUniqueOrThrow({ where: { id }, include: MATERIAL_INCLUDE }),
+    prisma.materialLike.findUnique({ where: { userId_materialId: { userId: session.userId, materialId: id } } }),
+  ]);
+  return NextResponse.json({ material: toSavedMaterial(row, session.userId, new Set(like ? [id] : [])) });
+}
 
 const PatchBody = z.object({
   shared: z.boolean().optional(),

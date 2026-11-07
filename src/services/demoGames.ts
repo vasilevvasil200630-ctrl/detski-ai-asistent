@@ -1,4 +1,5 @@
-import { AgeGroup, GeneratedGame, GroupMood, PlayResources } from '../types';
+import { AgeGroup, GeneratedGame, GroupMood, LessonDirection, PlayResources } from '../types';
+import { buildDirectionGames } from './directionGames';
 
 /**
  * Вграден демо генератор на ситуационни игри (работи без API ключ и без интернет).
@@ -27,6 +28,8 @@ export interface DemoContext {
   resLabel: string;
   toolName: string;
   kw?: string;
+  /** Избрано направление — тогава трите игри са от него (directionGames.ts) */
+  direction?: LessonDirection;
 }
 
 interface DemoTemplate {
@@ -498,6 +501,7 @@ function build(t: DemoTemplate, c: DemoContext, meta: { id: string; subtitle: st
 }
 
 export function buildDemoGames(c: DemoContext): GeneratedGame[] {
+  if (c.direction) return buildDirectionGames(c, c.direction);
   const v = rotation++;
   const stamp = Date.now();
   const moodPool = MOOD_GAMES[c.mood];

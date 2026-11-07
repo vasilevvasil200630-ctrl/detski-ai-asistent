@@ -89,9 +89,9 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
         >
           {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
-        <Link href="/" className="flex items-center gap-2.5 md:hidden group" aria-label="Детски асистент — Начало">
+        <Link href="/" className="flex items-center gap-2.5 md:hidden group" aria-label="ДГ „Пролет“ — Начало">
           <LogoIcon className="h-8 w-8 shrink-0" />
-          <LogoWordmark className="hidden text-base sm:inline" />
+          <LogoWordmark className="hidden text-base sm:inline-flex" withVillage />
         </Link>
       </div>
 

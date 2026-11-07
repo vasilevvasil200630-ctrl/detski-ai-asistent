@@ -1,4 +1,5 @@
 import React from "react";
+import { KG } from "@/config/kindergarten";
 
 // Същата структура като Logo.tsx в МатураПлюс (LogoIcon + текстова марка с два цвята),
 // но с емблема за детската градина: вълшебна кутия с излитаща звезда.
@@ -46,11 +47,15 @@ export default React.memo(function Logo({ className = "h-9 w-auto", showText = t
   );
 });
 
-export function LogoWordmark({ className = "text-base" }: { className?: string }) {
+/** Марката на облака: „ДГ „Пролет““ и по желание селото на втори ред. */
+export function LogoWordmark({ className = "text-base", withVillage = false }: { className?: string; withVillage?: boolean }) {
   return (
-    <span className={`whitespace-nowrap font-sans font-bold tracking-tight ${className}`}>
-      <span className="text-[#0a4b82]">Детски</span>
-      <span className="text-[#1ea858]"> асистент</span>
+    <span className={`inline-flex flex-col leading-tight ${className}`}>
+      <span className="whitespace-nowrap font-sans font-bold tracking-tight">
+        <span className="text-[#0a4b82]">ДГ</span>
+        <span className="text-[#1ea858]"> „Пролет“</span>
+      </span>
+      {withVillage && <span className="whitespace-nowrap text-[0.7em] font-medium text-slate-500">{KG.village}</span>}
     </span>
   );
 }

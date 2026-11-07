@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { normalizeGames } from "@/services/aiValidation";
 import { HOLIDAYS } from "@/services/holidays";
+import { isPrintable } from "@/services/printables";
 import type { AgeGroup, LessonDirection, MaterialKind, SavedMaterial } from "@/types";
 
 export const MATERIAL_INCLUDE = {
@@ -88,10 +89,13 @@ export function sanitizeContent(kind: MaterialKind, content: unknown): { ok: tru
   const obj = content && typeof content === "object" && !Array.isArray(content) ? (content as Record<string, unknown>) : null;
   if (!obj) return { ok: false, error: "Липсва съдържание." };
 
-  // Ръчно написан текст — за всеки вид
+  // Ръчно написан текст — за всеки вид. Материалите за печат пазят и структурата си (за /print/[id]).
   if (typeof obj.text === "string") {
     const text = obj.text.trim();
     if (text.length < 3) return { ok: false, error: "Текстът е твърде кратък." };
+    if (kind === "MATERIAL" && isPrintable(obj.printable)) {
+      return { ok: true, value: { text, printable: JSON.parse(JSON.stringify(obj.printable)) } };
+    }
     return { ok: true, value: { text } };
   }
 
