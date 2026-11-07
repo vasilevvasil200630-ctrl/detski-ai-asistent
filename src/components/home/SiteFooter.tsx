@@ -1,31 +1,39 @@
+"use client";
+
 import Link from "next/link";
 import { LogoIcon, LogoWordmark } from "@/components/Logo";
+import { openFeedback } from "@/components/FeedbackWidget";
 
 const LINKS = [
   { title: "Инструменти", items: [["/games", "Магическа кутия с игри"], ["/dos", "ДОС план-конспект"], ["/prompts", "Златни промптове"]] },
   { title: "Детската градина", items: [["/hub", "Учителски хъб"], ["/library", "Моята библиотека"], ["/holidays", "Празници"]] },
-  { title: "Справочник", items: [["/naredba5", "Наредба № 5 и „Златно ключе“"], ["/login", "Вход"], ["/register", "Регистрация"]] },
+  { title: "Справочник", items: [["/naredba5", "Наредба № 5 и „Златно ключе“"], ["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
 ] as const;
 
-/** Долната част на сайта: навигация и нормативна основа. */
+const FEEDBACK_BUTTON = "cursor-pointer text-left hover:text-slate-800 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
+
+/** Долната част на сайта: навигация, нормативна основа, правни страници и обратна връзка. */
 export function SiteFooter({ compact = false }: { compact?: boolean }) {
   const year = new Date().getFullYear();
   if (compact) {
     return (
-      <footer className="border-t border-slate-200 px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8">
+      <footer className="no-print border-t border-slate-200 px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <span>© {year} Детски асистент · Съобразено с Наредба № 5 за предучилищното образование</span>
           <nav aria-label="Връзки в долната част" className="flex flex-wrap gap-4">
             <Link href="/naredba5" className="hover:text-slate-800">Наредба № 5</Link>
-            <Link href="/holidays" className="hover:text-slate-800">Празници</Link>
-            <Link href="/library" className="hover:text-slate-800">Библиотека</Link>
+            <Link href="/privacy" className="hover:text-slate-800">Поверителност</Link>
+            <Link href="/terms" className="hover:text-slate-800">Условия</Link>
+            <button type="button" onClick={openFeedback} className={FEEDBACK_BUTTON}>
+              Обратна връзка
+            </button>
           </nav>
         </div>
       </footer>
     );
   }
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="no-print border-t border-slate-200 bg-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.3fr_repeat(3,1fr)]">
         <div>
           <Link href="/" className="flex items-center gap-2.5">
@@ -52,7 +60,12 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         ))}
       </div>
       <div className="border-t border-slate-100">
-        <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-slate-500 sm:px-6">© {year} Детски асистент</p>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-500 sm:px-6">
+          <span>© {year} Детски асистент</span>
+          <button type="button" onClick={openFeedback} className={FEEDBACK_BUTTON}>
+            Обратна връзка
+          </button>
+        </div>
       </div>
     </footer>
   );

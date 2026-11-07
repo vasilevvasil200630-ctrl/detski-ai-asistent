@@ -32,6 +32,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Нещо се обърка</h1>
         <p className="text-slate-600 leading-relaxed">Опитайте отново. Ако проблемът остане, презаредете страницата.</p>
+        {error?.digest && <p className="font-mono text-xs text-slate-500">Код на грешката: {error.digest}</p>}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
@@ -41,7 +42,7 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
             <RotateCcw className="h-4 w-4" /> Опитай отново
           </button>
           <Link
-            href="/games"
+            href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
           >
             <ArrowLeft className="h-4 w-4" /> Към началото

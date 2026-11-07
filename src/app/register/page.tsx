@@ -170,6 +170,17 @@ export default function RegisterPage() {
               Създай профил
             </PrimaryButton>
           </div>
+          <p className="text-xs leading-relaxed text-slate-500">
+            Със създаването на профила приемате{" "}
+            <Link href="/terms" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+              условията за ползване
+            </Link>{" "}
+            и{" "}
+            <Link href="/privacy" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+              политиката за поверителност
+            </Link>
+            .
+          </p>
         </form>
       )}
     </AuthShell>

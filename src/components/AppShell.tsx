@@ -7,6 +7,8 @@ import { AppTopBar } from "./AppTopBar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { Toaster } from "./Toaster";
 import { SiteFooter } from "./home/SiteFooter";
+import { FeedbackWidget } from "./FeedbackWidget";
+import { PwaProvider } from "./pwa/PwaProvider";
 import { useMe } from "@/lib/client/useMe";
 
 // Копирано от МатураПлюс (src/components/AppShell.tsx): сгъваем страничен панел (запомня се),
@@ -53,6 +55,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <>
         {children}
         <Toaster />
+        <FeedbackWidget />
+        <PwaProvider />
       </>
     );
   }
@@ -78,6 +82,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <MobileBottomNav />
       <Toaster />
+      <FeedbackWidget />
+      <PwaProvider />
     </div>
   );
 }

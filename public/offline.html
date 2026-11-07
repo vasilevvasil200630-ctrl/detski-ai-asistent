@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Няма връзка · Детски асистент</title>
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f8fafc; color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    main { max-width: 440px; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 32px 28px; }
+    img { width: 48px; height: 48px; }
+    h1 { margin-top: 20px; font-size: 22px; line-height: 1.3; }
+    p { margin-top: 10px; font-size: 15px; line-height: 1.6; color: #475569; }
+    ul { margin-top: 14px; padding-left: 20px; font-size: 14px; line-height: 1.7; color: #475569; }
+    button {
+      margin-top: 24px; width: 100%; padding: 12px 20px; border: 0; border-radius: 10px;
+      background: #0a4b82; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    button:hover { background: #083861; }
+    button:focus-visible { outline: 2px solid #0a4b82; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icon-192.svg" alt="" width="48" height="48">
+    <h1>Няма връзка с интернет</h1>
+    <p>Тази страница още не е отваряна на устройството, затова не е запазена за работа без интернет.</p>
+    <ul>
+      <li>Страниците, които вече сте отваряли, се показват и без връзка.</li>
+      <li>Генерирането на игри и план-конспекти и общата библиотека изискват интернет.</li>
+    </ul>
+    <button type="button" onclick="location.reload()">Опитай отново</button>
+  </main>
+</body>
+</html>

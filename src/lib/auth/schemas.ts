@@ -47,5 +47,21 @@ export const ProfileUpdateSchema = z.object({
   groupName: z.string().trim().max(80).optional(),
 });
 
+const NewPassword = z.string().min(8, "Паролата трябва да е поне 8 символа.").max(128, "Паролата е твърде дълга.");
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Моля, въведете валиден имейл адрес."),
+});
+
+export const ResetPasswordSchema = z.object({
+  token: z.string().min(10, "Линкът е невалиден.").max(200, "Линкът е невалиден."),
+  password: NewPassword,
+});
+
+export const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Въведете сегашната си парола."),
+  newPassword: NewPassword,
+});
+
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;

@@ -8,6 +8,8 @@ import { invalidateMe } from "@/lib/client/me";
 import { toast } from "@/components/Toaster";
 import { FormError, PrimaryButton, TextField } from "@/components/auth/AuthUI";
 import type { AgeGroup } from "@/types";
+import { ChangePasswordSection } from "@/components/profile/ChangePasswordSection";
+import { DeleteAccountSection } from "@/components/profile/DeleteAccountSection";
 
 const AVATARS = ["👩‍🏫", "👨‍🏫", "👩‍🎨", "🦸‍♀️", "🧚‍♀️", "👩‍🔬", "🌟", "🦉"];
 const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
@@ -125,6 +127,9 @@ export default function ProfilePage() {
           Запази промените
         </PrimaryButton>
       </form>
+
+      <ChangePasswordSection />
+      <DeleteAccountSection isAdmin={user.kgRole === "ADMIN"} />
     </main>
   );
 }
