@@ -17,6 +17,8 @@ import {
   Mail,
   UserPlus,
   Printer,
+  Cloud,
+  NotebookPen,
   type LucideIcon,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
@@ -51,6 +53,8 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "ДЕТСКАТА ГРАДИНА",
     items: [
+      { href: "/cloud", label: "Общ облак", icon: Cloud },
+      { href: "/notebook", label: "Моят бележник", icon: NotebookPen },
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
       { href: "/library", label: "Моята библиотека", icon: Library },
       { href: "/holidays", label: "Празници", icon: CalendarHeart },

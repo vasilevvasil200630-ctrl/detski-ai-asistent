@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarHeart, Dices, FileText, KeyRound, Loader2, Printer } from "lucide-react";
+import { ArrowRight, CalendarClock, CalendarHeart, Cloud, CloudUpload, Dices, Download, FileText, KeyRound, Loader2, NotebookPen, Printer } from "lucide-react";
 import type { SavedMaterial, SessionTeacher } from "@/types";
 import { fetchMaterials } from "@/lib/client/materials";
+import { cloudDownloadUrl, listCloudFiles } from "@/lib/client/cloud";
+import { listNotes } from "@/lib/client/notes";
+import { folderLabel, formatBytes, type CloudFileItem } from "@/lib/cloud/folders";
+import type { NoteItem } from "@/lib/notes-shared";
+import { dueInfo, upcomingTasks } from "@/components/notebook/noteDates";
 import { AGE_SHORT, KIND_LABELS } from "@/services/materialText";
 import { upcomingHoliday } from "@/services/holidays";
 import { AGE_GROUP_STANDARDS, DIRECTION_ORDER, DIRECTION_STANDARDS, situationRangeLabel } from "@/services/naredba5";
@@ -40,6 +45,8 @@ function MaterialRows({ items, empty, showAuthor }: { items: SavedMaterial[]; em
 export function Dashboard({ user }: { user: SessionTeacher }) {
   const [mine, setMine] = useState<SavedMaterial[] | null>(null);
   const [shared, setShared] = useState<SavedMaterial[] | null>(null);
+  const [cloud, setCloud] = useState<CloudFileItem[] | null>(null);
+  const [tasks, setTasks] = useState<NoteItem[] | null>(null);
   const holiday = upcomingHoliday();
   const group = user.ageGroup;
   const std = AGE_GROUP_STANDARDS[group];
@@ -50,10 +57,17 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
     if (user.kindergarten) {
       void fetchMaterials({ scope: "shared" }).then((r) => setShared((r?.materials ?? []).filter((m) => !m.mine).slice(0, 5)));
     } else setShared([]);
+    if (user.kindergarten) {
+      listCloudFiles({ scope: "all" })
+        .then((r) => setCloud(r.files.filter((f) => f.shared).slice(0, 5)))
+        .catch(() => setCloud([]));
+    } else setCloud([]);
+    void listNotes().then((n) => setTasks(upcomingTasks(n ?? []).slice(0, 4)));
   }, [user.kindergarten]);
 
   const actions = [
     { href: "/games", label: "Нови игри", icon: Dices },
+    { href: "/cloud", label: "Общ облак", icon: Cloud },
     { href: "/materials", label: "Материали за печат", icon: Printer },
     { href: "/dos", label: "План-конспект", icon: FileText },
     { href: "/holidays", label: "Празници", icon: CalendarHeart },
@@ -86,7 +100,47 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
+          <section aria-labelledby="dash-cloud" className="rounded-2xl border border-slate-200 bg-white">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <h2 id="dash-cloud" className="font-semibold text-slate-900">Ново в общия облак</h2>
+              <Link href="/cloud" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                Всички файлове <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            {cloud === null ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-label="Зареждане" /></div>
+            ) : cloud.length === 0 ? (
+              <div className="flex flex-col items-start gap-3 px-5 py-6 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-slate-500">В облака още няма файлове. Качете план, табло или сценарий за колегите.</p>
+                <Link href="/cloud" className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+                  <CloudUpload className="h-4 w-4" aria-hidden /> Качи файл
+                </Link>
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {cloud.map((f) => (
+                  <li key={f.id} className="flex items-center justify-between gap-4 px-5 py-3">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-slate-900">{f.title}</span>
+                      <span className="block truncate text-xs text-slate-500">
+                        {folderLabel(f.folder)} · {formatBytes(f.size)} · {f.mine ? "Вие" : f.uploaderName} · {f.createdAt}
+                      </span>
+                    </span>
+                    <a
+                      href={cloudDownloadUrl(f.id)}
+                      download={f.fileName}
+                      aria-label={`Свали „${f.title}“`}
+                      className="shrink-0 rounded-lg border border-slate-200 p-2 text-[#0a4b82] hover:bg-slate-50"
+                    >
+                      <Download className="h-4 w-4" aria-hidden />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
           <section aria-labelledby="dash-mine" className="rounded-2xl border border-slate-200 bg-white">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 id="dash-mine" className="font-semibold text-slate-900">Последно в моята библиотека</h2>
@@ -120,7 +174,34 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
           </section>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="min-w-0 space-y-6">
+          <section aria-labelledby="dash-notes" className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 id="dash-notes" className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+              <NotebookPen className="h-4 w-4" aria-hidden /> Моят бележник
+            </h2>
+            {tasks === null ? (
+              <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-label="Зареждане" /></div>
+            ) : tasks.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-600">Няма задачи за следващите 7 дни.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {tasks.map((t) => {
+                  const due = dueInfo(t.dueDate!, false);
+                  return (
+                    <li key={t.id} className="flex items-start justify-between gap-3 text-sm">
+                      <span className="min-w-0 truncate text-slate-800">{t.title || t.body.split(/\r?\n/)[0]}</span>
+                      <span className={`inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium ${due.tone.replace("bg-white/70", "bg-slate-100")}`}>
+                        <CalendarClock className="h-3 w-3" aria-hidden /> {due.label}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <Link href="/notebook" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+              Отвори бележника <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </section>
           {user.kindergarten && (
             <section aria-labelledby="dash-code" className="rounded-2xl border border-slate-200 bg-white p-5">
               <h2 id="dash-code" className="flex items-center gap-2 text-sm font-semibold text-slate-500">
