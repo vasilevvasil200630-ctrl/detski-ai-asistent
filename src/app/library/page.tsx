@@ -44,11 +44,11 @@ export default function LibraryPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 text-white shadow-lg sm:p-8">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold sm:text-3xl">
+      <div className="border-b border-slate-200 pb-6 sm:p-8">
+        <h1 className="flex items-center gap-2 text-2xl font-bold sm:text-3xl">
           <Library className="h-7 w-7" /> Моята библиотека
         </h1>
-        <p className="mt-1 max-w-3xl text-sm text-indigo-100 sm:text-base">
+        <p className="mt-1 max-w-3xl text-sm text-slate-600 sm:text-base">
           Всичко, което сте създали или генерирали – игри, ДОС планове, приказки, промптове и собствени материали – подредено по
           възрастови групи. Всеки материал може да се сподели с колегите
           {user.kindergarten ? ` от ${user.kindergarten.name}` : ""}.
@@ -56,9 +56,9 @@ export default function LibraryPage() {
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-800 hover:bg-indigo-50"
+          className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-bold text-indigo-800 hover:bg-slate-100"
         >
-          {showForm ? "Скрий формата" : "➕ Добави собствен материал"}
+          {showForm ? "Скрий формата" : "Добави собствен материал"}
         </button>
       </div>
 

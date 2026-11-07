@@ -66,7 +66,7 @@ export function SaveMaterialBar({ material, className = "", compact = false, onS
         type="button"
         onClick={() => run(false)}
         disabled={busy !== null}
-        className={`inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-white font-bold text-indigo-800 transition-colors hover:bg-indigo-50 disabled:opacity-60 ${size}`}
+        className={`inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-white font-bold text-indigo-800 transition-colors hover:bg-slate-100 disabled:opacity-60 ${size}`}
       >
         {busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}
         Запази в моята библиотека

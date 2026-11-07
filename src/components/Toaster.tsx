@@ -59,7 +59,7 @@ export function Toaster() {
         <div
           key={t.id}
           role="status"
-          className={`pointer-events-auto flex items-start gap-2 rounded-xl border p-3 text-sm shadow-lg ${
+          className={`pointer-events-auto flex items-start gap-2 rounded-xl border p-3 text-sm shadow-sm ${
             t.kind === "success"
               ? "border-emerald-300 bg-emerald-50/95 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/20 dark:text-emerald-100"
               : t.kind === "error"

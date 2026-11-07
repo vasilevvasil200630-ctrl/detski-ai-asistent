@@ -60,13 +60,13 @@ export function AddMaterialForm({ defaultAgeGroup, defaultHoliday, canShare, onC
 
   return (
     <form onSubmit={submit} className="space-y-3 rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm sm:p-5">
-      <h3 className="text-base font-extrabold text-slate-900">Добави собствен материал</h3>
+      <h3 className="text-base font-semibold text-slate-900">Добави собствен материал</h3>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="space-y-1 text-sm font-bold text-slate-700">
           Вид
           <select value={kind} onChange={(e) => setKind(e.target.value as MaterialKind)} className={fieldClass}>
-            <option value="MATERIAL">📎 Помощен материал (стихче, гатанка, песничка, табло…)</option>
-            <option value="GAME">🎲 Игра</option>
+            <option value="MATERIAL">Помощен материал (стихче, гатанка, песничка, табло…)</option>
+            <option value="GAME">Игра</option>
           </select>
         </label>
         <label className="space-y-1 text-sm font-bold text-slate-700">
@@ -119,7 +119,7 @@ export function AddMaterialForm({ defaultAgeGroup, defaultHoliday, canShare, onC
             <option value="">— без празник —</option>
             {HOLIDAYS.map((h) => (
               <option key={h.id} value={h.id}>
-                {h.emoji} {h.name} ({h.when})
+                {h.name} ({h.when})
               </option>
             ))}
           </select>

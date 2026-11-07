@@ -79,7 +79,7 @@ export default function HubPage() {
       subtitle: `Авторска практика от ${user.name}${user.kindergarten ? ` (${user.kindergarten.name})` : ""}`,
       tags: ["Авторска игра", AGE_GROUP_LABELS[ageGroup].ageRange],
       badgeColor: "mint",
-      rhymeTitle: "📜 Римуван стих / закачка за старт:",
+      rhymeTitle: "Римуван стих / закачка за старт:",
       rhymeLines: rhymeText.split("\n").map((s) => s.trim()).filter(Boolean),
       steps: stepsText.split("\n").map((s) => s.replace(/^\s*\d+[.)]\s*/, "").trim()).filter(Boolean),
       pedagogicalGoal: goal,
@@ -124,8 +124,8 @@ export default function HubPage() {
       {user && (
         <section aria-labelledby="shared-materials-title" className="mt-10 space-y-4">
           <div>
-            <h2 id="shared-materials-title" className="text-xl font-extrabold text-slate-900">
-              📂 Споделени материали от колегите
+            <h2 id="shared-materials-title" className="text-xl font-semibold text-slate-900">
+              Споделени материали от колегите
             </h2>
             <p className="text-sm text-slate-600">
               ДОС планове, промптове и помощни материали, споделени в {user.kindergarten?.name ?? "вашата детска градина"}. Запазете

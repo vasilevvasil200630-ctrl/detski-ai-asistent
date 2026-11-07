@@ -16,7 +16,7 @@ import type { AgeGroup, GeneratedGame, GeneratedLessonPlan } from "@/types";
 
 const chip = (active: boolean) =>
   `rounded-xl border px-3 py-1.5 text-sm font-bold transition-colors ${
-    active ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-indigo-50"
+    active ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
   }`;
 
 /** Секция „Празници“: игри и материали за празниците в детската градина. */
@@ -77,11 +77,11 @@ export default function HolidaysPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 text-white shadow-lg sm:p-8">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold sm:text-3xl">
+      <div className="border-b border-slate-200 pb-6 sm:p-8">
+        <h1 className="flex items-center gap-2 text-2xl font-bold sm:text-3xl">
           <CalendarHeart className="h-7 w-7" /> Празници
         </h1>
-        <p className="mt-1 max-w-3xl text-sm text-indigo-100 sm:text-base">
+        <p className="mt-1 max-w-3xl text-sm text-slate-600 sm:text-base">
           Игри и материали за празниците в детската градина – генерирани, ваши и споделени от колегите. По Наредба № 5
           празниците, обичаите и традициите са в направление „{DIRECTION_STANDARDS.world.label}“, ядро „{HOLIDAY_CORE.core}“.
         </p>
@@ -91,15 +91,15 @@ export default function HolidaysPage() {
       <div className="flex flex-wrap gap-2" role="group" aria-label="Празник">
         {HOLIDAYS.map((h) => (
           <button key={h.id} type="button" aria-pressed={holiday.id === h.id} onClick={() => selectHoliday(h)} className={chip(holiday.id === h.id)}>
-            {h.emoji} {h.name}
+            {h.name}
           </button>
         ))}
       </div>
 
-      <section aria-labelledby="holiday-title" className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section aria-labelledby="holiday-title" className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div>
-          <h2 id="holiday-title" className="text-xl font-extrabold text-slate-900">
-            {holiday.emoji} {holiday.name} <span className="text-base font-bold text-slate-500">• {holiday.when}</span>
+          <h2 id="holiday-title" className="text-xl font-semibold text-slate-900">
+            {holiday.name} <span className="text-base font-bold text-slate-500">• {holiday.when}</span>
           </h2>
           <p className="mt-1 text-sm text-slate-700">{holiday.about}</p>
           <p className="mt-1 text-xs text-slate-500">
@@ -136,7 +136,7 @@ export default function HolidaysPage() {
 
         {source && (games || plan) && (
           <p className="text-xs font-bold text-slate-500">
-            {source === "ai" ? "✨ Генерирано от Gemini AI" : "🛡️ Генерирано от вградения демо двигател"} • {AGE_GROUP_LABELS[ageGroup].full}
+            {source === "ai" ? "Генерирано от Gemini AI" : "Генерирано от вградения демо двигател"} • {AGE_GROUP_LABELS[ageGroup].full}
           </p>
         )}
 
@@ -173,8 +173,8 @@ export default function HolidaysPage() {
       {user ? (
         <>
           <section aria-labelledby="holiday-shared" className="space-y-3">
-            <h2 id="holiday-shared" className="text-lg font-extrabold text-slate-900">
-              🤝 От колегите за „{holiday.name}“
+            <h2 id="holiday-shared" className="text-lg font-semibold text-slate-900">
+              От колегите за „{holiday.name}“
             </h2>
             <MaterialBrowser
               key={`shared-${holiday.id}`}
@@ -186,11 +186,11 @@ export default function HolidaysPage() {
           </section>
           <section aria-labelledby="holiday-mine" className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 id="holiday-mine" className="text-lg font-extrabold text-slate-900">
-                📚 Моите материали за „{holiday.name}“
+              <h2 id="holiday-mine" className="text-lg font-semibold text-slate-900">
+                Моите материали за „{holiday.name}“
               </h2>
-              <button type="button" onClick={() => setShowForm((v) => !v)} className="rounded-xl border border-indigo-200 bg-white px-3 py-1.5 text-sm font-bold text-indigo-800 hover:bg-indigo-50">
-                {showForm ? "Скрий формата" : "➕ Добави материал за празника"}
+              <button type="button" onClick={() => setShowForm((v) => !v)} className="rounded-xl border border-indigo-200 bg-white px-3 py-1.5 text-sm font-bold text-indigo-800 hover:bg-slate-100">
+                {showForm ? "Скрий формата" : "Добави материал за празника"}
               </button>
             </div>
             {showForm && (
