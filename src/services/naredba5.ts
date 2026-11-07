@@ -225,5 +225,6 @@ export function naredba5PromptRules(ageGroup: AgeGroup): string {
     ...DIRECTION_ORDER.map((d) => `- ${DIRECTION_STANDARDS[d].label}: ${DIRECTION_STANDARDS[d].cores.join('; ')}`),
     `Учебна система: ${ZLATNO_KLYUCHE.system} на ${ZLATNO_KLYUCHE.publisher} (предучилищната линия). Познавателни книжки: ${DIRECTION_ORDER.filter((d) => DIRECTION_STANDARDS[d].zlatnoBook).map((d) => `${DIRECTION_STANDARDS[d].shortLabel} — ${DIRECTION_STANDARDS[d].zlatnoBook}`).join('; ')}; физическата култура е в книгата за учителя. Кукла-водач: ${ZLATNO_KLYUCHE.guide}.`,
     'Не измисляй номера на страници или конкретни задачи от книжките — само се позовавай на съответната книжка.',
+    'Безопасност на движението по пътищата (БДП) е задължителна във всички групи, но НЕ е отделно направление: интегрира се в „Околен свят“ (ядро „Социална и здравословна среда“) и „Конструиране и технологии“ (ядро „Техника“) или в допълнителни форми, по програмите на МОН за БДП (2018).',
   ].join('\n');
 }

@@ -4,6 +4,8 @@ export type PlayLocation = 'classroom' | 'music_hall' | 'yard';
 export type PlayDuration = '5' | '15' | '30';
 export type PlayResources = 'none' | 'balls' | 'music' | 'paper_pencils' | 'hoops_ribbons';
 export type EducationalDirection = 'bel' | 'world' | 'math' | 'art' | 'music' | 'construct' | 'pe';
+/** Седемте направления по Наредба № 5 + БДП (интегрирано, по програмите на МОН). */
+export type LessonDirection = EducationalDirection | 'bdp';
 export type AppModule = 'games' | 'hub' | 'dos' | 'prompts';
 export type PromptCategory = 'all' | 'dos_planning' | 'holidays' | 'parents' | 'inclusion_emotions' | 'portfolio';
 
