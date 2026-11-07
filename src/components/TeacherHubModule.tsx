@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Building2, Users, PlusCircle, Heart, Copy, Check, Printer, Volume2, ScrollText, Target, Search, Sparkles, Award, KeyRound, LogIn } from 'lucide-react';
+import { Building2, Users, PlusCircle, Heart, Copy, Check, Printer, Volume2, ScrollText, Target, Search, Sparkles, Award, KeyRound, LogIn, Bookmark } from 'lucide-react';
 import { AgeGroup, SavedBankGame, SessionTeacher } from '../types';
 import { AGE_GROUP_LABELS } from '../services/aiEngine';
+import { copyMaterial } from '../lib/client/materials';
+import { toast } from './Toaster';
 
 export interface TeamMember {
   id: string;
@@ -46,6 +48,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
   const [ageFilter, setAgeFilter] = useState<'all' | AgeGroup>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [savedToLibrary, setSavedToLibrary] = useState<Record<string, boolean>>({});
   const [copiedCode, setCopiedCode] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
 
@@ -403,7 +406,24 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                   <span>Ползвах я ({item.likes})</span>
                 </button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Игра на колега → копие в моята библиотека (за моята група) */}
+                  {teacher && item.authorId && item.authorId !== teacher.id && (
+                    <button
+                      type="button"
+                      disabled={!!savedToLibrary[item.id]}
+                      onClick={async () => {
+                        const res = await copyMaterial(item.id);
+                        if (res) {
+                          setSavedToLibrary((prev) => ({ ...prev, [item.id]: true }));
+                          toast('Играта е запазена в твоята библиотека! 📚', 'success');
+                        }
+                      }}
+                      className="py-2 px-3 rounded-xl text-xs font-extrabold border-2 flex items-center gap-1 bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 disabled:opacity-70"
+                    >
+                      {savedToLibrary[item.id] ? <><Check className="w-3.5 h-3.5" /> В библиотеката</> : <><Bookmark className="w-3.5 h-3.5" /> Запази при мен</>}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => handleCopy(item)}

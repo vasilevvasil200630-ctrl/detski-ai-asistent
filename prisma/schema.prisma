@@ -35,6 +35,8 @@ model User {
   kindergarten   Kindergarten? @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
   bankGames      BankGame[]
   likes          BankGameLike[]
+  materials      Material[]
+  materialLikes  MaterialLike[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -51,11 +53,13 @@ model Kindergarten {
   joinCode  String     @unique
   teachers  User[]
   bankGames BankGame[]
+  materials Material[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
 
-/// Игра, споделена в колективната банка на градината.
+/// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
+/// Таблицата остава само за съхранение на старите редове; кодът ползва Material.
 model BankGame {
   id             String         @id @default(cuid())
   kindergartenId String
@@ -84,4 +88,61 @@ model BankGameLike {
 
   @@id([userId, gameId])
   @@index([gameId])
+}
+
+/// Вид на материала в библиотеката на учителя.
+enum MaterialKind {
+  /// Игра (генерирана или авторска)
+  GAME
+  /// План-конспект на педагогическа ситуация с приказка и бележка за родителите
+  LESSON
+  /// Помощен материал: стихче, гатанка, песничка, текст за табло, промпт и др.
+  MATERIAL
+}
+
+/// Всичко, което учителят създаде или генерира: пази се в профила му по възрастови групи
+/// и по желание се споделя с колегите от неговата детска градина.
+model Material {
+  id             String         @id @default(cuid())
+  authorId       String?
+  author         User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  /// Градината на автора към момента на записа — в нея се вижда, ако е споделен
+  kindergartenId String?
+  kindergarten   Kindergarten?  @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
+  kind           MaterialKind
+  title          String
+  /// Възрастова група „1“…„4“ (I–IV група)
+  ageGroup       String
+  /// Направление по Наредба № 5 (bel, math, world, art, music, construct, pe) или bdp
+  direction      String?
+  /// Образователно ядро (или тема по БДП)
+  core           String?
+  /// Празник (id от src/services/holidays.ts)
+  holiday        String?
+  /// Допълнителни данни, напр. филтрите на играта (настроение, място, материали)
+  meta           Json?
+  /// Съдържанието: GeneratedGame, GeneratedLessonPlan или { text }
+  content        Json
+  shared         Boolean        @default(false)
+  sharedAt       DateTime?
+  /// Ако е копие от материал на колега
+  copiedFromId   String?
+  likes          MaterialLike[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([authorId, ageGroup])
+  @@index([kindergartenId, shared, createdAt])
+  @@index([holiday])
+}
+
+model MaterialLike {
+  userId     String
+  materialId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([userId, materialId])
+  @@index([materialId])
 }

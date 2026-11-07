@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TeacherHubModule, type TeamMember } from "@/components/TeacherHubModule";
+import { MaterialBrowser } from "@/components/MaterialBrowser";
 import { toast } from "@/components/Toaster";
 import { useMe } from "@/lib/client/useMe";
 import { useAppStore } from "@/store/appStore";
@@ -118,6 +119,26 @@ export default function HubPage() {
         onNavigateToGenerator={() => router.push("/games")}
         projectorMode={projectorMode}
       />
+
+      {/* Всичко останало, което колегите споделят: ДОС планове, приказки, промптове, помощни материали */}
+      {user && (
+        <section aria-labelledby="shared-materials-title" className="mt-10 space-y-4">
+          <div>
+            <h2 id="shared-materials-title" className="text-xl font-extrabold text-slate-900">
+              📂 Споделени материали от колегите
+            </h2>
+            <p className="text-sm text-slate-600">
+              ДОС планове, промптове и помощни материали, споделени в {user.kindergarten?.name ?? "вашата детска градина"}. Запазете
+              всеки от тях в своята библиотека с един бутон.
+            </p>
+          </div>
+          <MaterialBrowser
+            scope="shared"
+            excludeKind="GAME"
+            emptyText="Още няма споделени материали. Генерирайте ДОС план или добавете материал в библиотеката си и го споделете."
+          />
+        </section>
+      )}
     </main>
   );
 }

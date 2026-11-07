@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { SaveMaterialBar } from './SaveMaterialBar';
 import { Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
 import { AgeGroup, GameFilterState, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
@@ -44,18 +45,17 @@ interface MagicGamesModuleProps {
   /** null за гост — генераторът работи, но споделянето в банката иска профил */
   activeTeacher: SessionTeacher | null;
   /** Връща true, ако играта е записана в банката */
-  onSaveGameToBank: (game: GeneratedGame, filters: GameFilterState) => Promise<boolean>;
+  /** @deprecated Запазването и споделянето вече е през SaveMaterialBar. */
+  onSaveGameToBank?: (game: GeneratedGame, filters: GameFilterState) => Promise<boolean>;
   onOpenHub: () => void;
-  onRequireLogin: () => void;
+  onRequireLogin?: () => void;
 }
 
 export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   onTimeSaved,
   projectorMode,
   activeTeacher,
-  onSaveGameToBank,
   onOpenHub,
-  onRequireLogin,
 }) => {
   const kgName = activeTeacher?.kindergarten?.name ?? 'вашата детска градина';
   const [filters, setFilters] = useState<GameFilterState>({
@@ -71,8 +71,6 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedUserPrompt, setCopiedUserPrompt] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
-  const [savedBankIds, setSavedBankIds] = useState<Record<string, boolean>>({});
-  const [savingId, setSavingId] = useState<string | null>(null);
   const [source, setSource] = useState<AiSource | null>(null);
 
   useEffect(() => {
@@ -110,20 +108,6 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
     try { await navigator.clipboard.writeText(text); } catch {}
     setCopiedId(g.id);
     setTimeout(() => setCopiedId(null), 2500);
-  };
-
-  const handleShareToBank = async (g: GeneratedGame) => {
-    if (savedBankIds[g.id] || savingId) return;
-    if (!activeTeacher) {
-      onRequireLogin();
-      return;
-    }
-    setSavingId(g.id);
-    try {
-      if (await onSaveGameToBank(g, filters)) setSavedBankIds((prev) => ({ ...prev, [g.id]: true }));
-    } finally {
-      setSavingId(null);
-    }
   };
 
   const handleSpeakRhyme = (g: GeneratedGame) => {
@@ -262,7 +246,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50 border border-indigo-200 px-5 py-3.5 rounded-2xl">
             <div className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-600" />
-              <span>Харесва ли ви някоя игра? Запазете я в колективната банка на <strong>{kgName}</strong> за всички колеги!</span>
+              <span>Харесва ли ви някоя игра? Запазете я в своята библиотека (по възрастови групи) или я споделете с колегите от <strong>{kgName}</strong>!</span>
               {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-black ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? '✨ Генерирано от Gemini AI' : '🛡️ Вграден демо двигател'}</span>}
             </div>
             <button type="button" onClick={onOpenHub} className="text-xs font-extrabold text-indigo-700 hover:text-indigo-900 underline">
@@ -272,7 +256,6 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {games.map((game, idx) => {
-              const isSaved = !!savedBankIds[game.id];
               return (
                 <article key={game.id} className="print-card rounded-2xl bg-white border-2 border-emerald-200 shadow-lg flex flex-col justify-between overflow-hidden">
                   <div>
@@ -318,27 +301,18 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                     </div>
                   </div>
                   <div className="no-print px-5 py-4 bg-slate-50 border-t border-slate-100 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => handleShareToBank(game)}
-                      className={`w-full py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold border-2 flex items-center justify-center gap-1.5 transition-all ${
-                        isSaved
-                          ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white border-indigo-600 shadow-sm'
-                      }`}
-                    >
-                      {isSaved ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>Споделено в Банката на {kgName}!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-4 h-4" />
-                          <span>{savingId === game.id ? 'Записване…' : activeTeacher ? `💾 Сподели в Банката на ДГ (${activeTeacher.name.split(' ')[1] || activeTeacher.name})` : '🔐 Влез, за да споделиш в Банката на ДГ'}</span>
-                        </>
-                      )}
-                    </button>
+                    {/* Запазване в библиотеката по групи и споделяне с колегите (Хъб → банка с игри) */}
+                    <SaveMaterialBar
+                      compact
+                      material={{
+                        kind: 'GAME',
+                        title: game.title,
+                        ageGroup: filters.ageGroup,
+                        holiday: null,
+                        meta: { mood: filters.mood, location: filters.location, resources: filters.resources },
+                        content: game,
+                      }}
+                    />
                     <div className="flex gap-2">
                       <button type="button" onClick={() => handleCopyCard(game)} className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold border-2 flex items-center justify-center gap-1.5 ${copiedId === game.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>
                         {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> 📋 Копирай</>}

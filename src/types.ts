@@ -121,3 +121,30 @@ export interface SessionTeacher {
   kgRole: 'ADMIN' | 'TEACHER';
   kindergarten: { id: string; name: string; city: string; motto: string; joinCode: string } | null;
 }
+
+/** Вид материал в библиотеката: игра, ДОС план или помощен материал. */
+export type MaterialKind = 'GAME' | 'LESSON' | 'MATERIAL';
+
+/** Материал от библиотеката на учителя (собствен или споделен от колега). */
+export interface SavedMaterial {
+  id: string;
+  kind: MaterialKind;
+  title: string;
+  ageGroup: AgeGroup;
+  direction: LessonDirection | null;
+  core: string | null;
+  holiday: string | null;
+  meta: Record<string, unknown> | null;
+  /** GeneratedGame, GeneratedLessonPlan или { text } */
+  content: unknown;
+  shared: boolean;
+  /** Моят ли е (мога да го споделя/изтривам) */
+  mine: boolean;
+  authorName: string;
+  authorAvatar: string;
+  authorGroupName: string;
+  createdAt: string;
+  likes: number;
+  likedByMe: boolean;
+  copiedFromId: string | null;
+}

@@ -7,6 +7,8 @@ import {
   Rocket,
   BookMarked,
   BookOpenCheck,
+  Library,
+  CalendarHeart,
   Building2,
   User as UserIcon,
   X,
@@ -46,6 +48,8 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "ДЕТСКАТА ГРАДИНА",
     items: [
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
+      { href: "/library", label: "Моята библиотека", icon: Library },
+      { href: "/holidays", label: "Празници", icon: CalendarHeart },
       { href: "/naredba5", label: "Наредба 5 и „Златно ключе“", icon: BookOpenCheck },
       { href: "/profile", label: "Моят профил", icon: UserIcon },
     ],
