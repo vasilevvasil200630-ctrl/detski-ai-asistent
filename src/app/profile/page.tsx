@@ -78,7 +78,7 @@ export default function ProfilePage() {
     return (
       <main className="mx-auto w-full max-w-xl px-4 py-16 text-center">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Моят профил</h1>
-        <p className="mt-3 leading-relaxed text-slate-600">Влезте, за да редактирате профила си и групата, за която AI генераторът се настройва.</p>
+        <p className="mt-3 leading-relaxed text-slate-600">Влезте, за да редактирате профила си и групата, за която генераторът се настройва.</p>
         <Link
           href="/login?callbackUrl=/profile"
           className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
@@ -110,7 +110,7 @@ export default function ProfilePage() {
           </div>
         </fieldset>
         <fieldset>
-          <legend className="mb-1.5 block text-sm font-medium text-slate-800">Група (AI генераторът се настройва за нея)</legend>
+          <legend className="mb-1.5 block text-sm font-medium text-slate-800">Група (генераторът се настройва за нея)</legend>
           <div className="grid grid-cols-2 gap-2">
             {AGE_GROUPS.map((g) => (
               <button key={g.id} type="button" onClick={() => setAgeGroup(g.id)} aria-pressed={ageGroup === g.id} className={chip(ageGroup === g.id)}>

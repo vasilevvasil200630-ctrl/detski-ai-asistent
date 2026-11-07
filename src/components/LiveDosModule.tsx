@@ -370,7 +370,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                     : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
-                AI избира по темата (препоръчано)
+                Автоматичен избор по темата (препоръчано)
               </button>
               {coreOptions.map((c) => (
                 <button
@@ -546,7 +546,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 </span>
                 {source && (
                   <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
-                    {source === 'ai' ? 'Gemini AI' : 'Демо двигател'}
+                    {source === 'ai' ? 'Gemini' : 'Демо режим'}
                   </span>
                 )}
                 <span className="text-xs font-bold text-slate-500">

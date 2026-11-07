@@ -207,7 +207,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       <html lang="bg">
       <head>
         <meta charset="UTF-8" />
-        <title>Златна шпаргалка с AI промптове за детски учители</title>
+        <title>Златна шпаргалка с промптове за детски учители</title>
         <style>
           body { font-family: system-ui, -apple-system, sans-serif; padding: 32px; color: #1e293b; max-width: 820px; margin: 0 auto; }
           h1 { font-size: 24px; color: #0f172a; margin-bottom: 4px; }
@@ -433,7 +433,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                     <div className="flex items-center justify-between gap-2">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        Демонстрационен AI резултат по този промпт
+                        Примерен резултат по този промпт
                       </span>
                       <button
                         type="button"
@@ -506,12 +506,12 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                   {isLoading ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>AI генерира...</span>
+                      <span>Подготвя се...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 text-amber-200" />
-                      <span>{isExpanded ? 'Скрий AI резултата' : 'Виж AI резултат'}</span>
+                      <span>{isExpanded ? 'Скрий примерния резултат' : 'Виж примерен резултат'}</span>
                     </>
                   )}
                 </button>

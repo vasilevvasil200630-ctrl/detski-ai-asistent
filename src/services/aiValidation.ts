@@ -66,7 +66,7 @@ function normalizeGame(raw: unknown, index: number): GeneratedGame | null {
     id: `ai-g-${Date.now()}-${index}`,
     title,
     subtitle: str(g.subtitle),
-    tags: tags.length ? tags : ['AI игра'],
+    tags: tags.length ? tags : ['Игра'],
     badgeColor: BADGE_COLORS[index % BADGE_COLORS.length],
     rhymeTitle: str(g.rhymeTitle) || '📜 Римуван стих за старт:',
     rhymeLines: rhymeLines.length ? rhymeLines : ['Едно, две, три – играта започни!'],

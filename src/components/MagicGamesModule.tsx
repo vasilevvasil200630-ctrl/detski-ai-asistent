@@ -127,7 +127,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       <div className="border-b border-slate-200 pb-6 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold ">
-            „Магическа кутия с игри“ (AI Генератор за 30 сек)
+            „Магическа кутия с игри“ (генератор за 30 сек)
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
             Генерирайте 3 ситуационни игри със заглавие, римуван стих за старт, точни стъпки (1, 2, 3), умения по Наредба № 5 и идея за адаптация за дете със СОП!
@@ -231,7 +231,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       {isGenerating && (
         <div className="rounded-2xl bg-white/95 border border-indigo-200 p-8 shadow-sm text-center space-y-4">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-sm"><Sparkles className="w-8 h-8" /></div>
-          <h3 className="font-display text-xl font-semibold text-slate-900">Детският AI Асистент генерира по зададения User Prompt...</h3>
+          <h3 className="font-display text-xl font-semibold text-slate-900">Детският асистент подготвя игрите по зададените параметри...</h3>
           <p className="text-sm font-bold text-indigo-700">1. Заглавие • 2. Римуван стих • 3. Точни стъпки • 4. Умения по Наредба № 5 • 5. Адаптация за СОП</p>
         </div>
       )}
@@ -242,7 +242,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             <div className="text-xs sm:text-sm font-semibold text-indigo-950 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-600" />
               <span>Харесва ли ви някоя игра? Запазете я в своята библиотека (по възрастови групи) или я споделете с колегите от <strong>{kgName}</strong>!</span>
-              {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? 'Генерирано от Gemini AI' : 'Вграден демо двигател'}</span>}
+              {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? 'Генерирано от Gemini' : 'Вграден демо режим'}</span>}
             </div>
             <button type="button" onClick={onOpenHub} className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 underline">
               Отвори Учителския хъб →

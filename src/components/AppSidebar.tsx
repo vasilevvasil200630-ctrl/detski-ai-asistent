@@ -37,7 +37,7 @@ type NavGroup = {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    title: "AI ИНСТРУМЕНТИ",
+    title: "ИНСТРУМЕНТИ",
     items: [
       { href: "/games", label: "Магическа кутия с игри", icon: Dices },
       { href: "/dos", label: "ДОС план за 10 сек", icon: Rocket },
@@ -101,7 +101,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
             <Link
               href="/games"
               className="mx-auto flex h-8 w-8 items-center justify-center transition-colors"
-              title="Детски AI — Начало"
+              title="Детски асистент — Начало"
             >
               <LogoIcon className="h-8 w-8 shrink-0" />
             </Link>
@@ -192,7 +192,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-2 text-center">
               <p className="text-xs font-semibold text-slate-800 flex items-center justify-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" />
-                {kgName ?? "Детски AI Асистент"}
+                {kgName ?? "Детски асистент"}
               </p>
               <p className="mt-0.5 text-xs text-[#166534] font-medium">
                 {isLoggedIn ? "Колективна банка на екипа" : "Влез за общата банка с игри"}
