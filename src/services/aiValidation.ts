@@ -100,7 +100,10 @@ function normalizeStage(raw: unknown): LessonStage | null {
   const teacherAction = str(s.teacherAction);
   const childrenActivity = str(s.childrenActivity);
   if (!phase || (!teacherAction && !childrenActivity)) return null;
-  return { phase, duration: str(s.duration), teacherAction, childrenActivity };
+  // Моделът понякога връща само число — допълваме мерната единица
+  const durationRaw = str(s.duration);
+  const duration = /^\d+([–-]\d+)?$/.test(durationRaw) ? `${durationRaw} мин.` : durationRaw;
+  return { phase, duration, teacherAction, childrenActivity };
 }
 
 /**

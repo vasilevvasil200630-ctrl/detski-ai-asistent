@@ -1,4 +1,4 @@
-import { AgeGroup, EducationalDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
+import { AgeGroup, EducationalDirection, LessonDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
 import { buildDemoGames, DemoContext } from './demoGames';
 import {
   AGE_GROUP_STANDARDS,
@@ -10,6 +10,7 @@ import {
   ZLATNO_KLYUCHE,
   zlatnoBookFor,
 } from './naredba5';
+import { BDP, BDP_NAREDBA5_RESULTS, BDP_THEMES, bdpPromptRules, findBdpTheme } from './bdp';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -119,10 +120,11 @@ ${buildStructuredGameUserPrompt(filters)}
 }
 
 /** core — официалното образователно ядро; без него AI избира най-подходящото за темата. */
-export type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string; core?: string };
+export type LessonParams = { ageGroup: AgeGroup; direction: LessonDirection; topic: string; core?: string };
 
 /** Пълният промпт за ДОС разработка — вика се от сървъра (/api/ai/lesson). */
 export function buildLessonAiPrompt(params: LessonParams, demoPlan: GeneratedLessonPlan): string {
+  if (params.direction === 'bdp') return buildBdpAiPrompt(params, demoPlan);
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
   const dir = DIRECTION_STANDARDS[params.direction];
   const coreLine = params.core
@@ -138,6 +140,31 @@ ${naredba5PromptRules(params.ageGroup)}
 ${book ? `Сред материалите включи ${book}, без номера на страници.` : 'За физическа култура няма познавателна книжка — материалите са уреди и пособия.'}
 Може да включиш куклата-водач ${ZLATNO_KLYUCHE.guide} от „Златно ключе“ като герой в мотивацията. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Играта за вкъщи е само по желание на семейството (чл. 32 забранява домашна работа).
 Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore (точното име на ядрото), totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3–4), organizationForm (фронтална, групова или индивидуална — може комбинация), integrativeLinks (2 връзки с други направления, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+}
+
+/** Темата по БДП: избраната от учителя, позната по текста на темата или първата за групата. */
+function resolveBdpTheme(params: LessonParams) {
+  return (
+    findBdpTheme(params.ageGroup, params.core) ??
+    findBdpTheme(params.ageGroup, params.topic) ??
+    BDP_THEMES[params.ageGroup][0]!
+  );
+}
+
+/** Промпт за ситуация по БДП — интегрирана по Наредба № 5, с тема от програмите на МОН. */
+function buildBdpAiPrompt(params: LessonParams, demoPlan: GeneratedLessonPlan): string {
+  const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
+  const theme = resolveBdpTheme(params);
+  return `Ти си методист по предучилищно образование в България.
+${naredba5PromptRules(params.ageGroup)}
+${bdpPromptRules(params.ageGroup)}
+
+Създай план-конспект на педагогическа ситуация по безопасност на движението по пътищата на БЪЛГАРСКИ за ${ageInfo.full}.
+Тема от програмата на МОН: „${theme.theme}“ (област „${theme.area}“). Очаквани резултати по програмата: ${theme.expected} Нови понятия: ${theme.concepts}.
+Темата, зададена от учителя: "${demoPlan.topic}". Продължителност ${demoPlan.totalDuration} (в рамките на ${situationRangeLabel(params.ageGroup)} по чл. 25). Ситуацията протича предимно като игра (ролеви игри „пешеходци и шофьори“, макет на улица, светофар).
+Етапите са точно три: „${ZLATNO_KLYUCHE.situationParts.join('“, „')}“ — с минути, които дават сбор ${demoPlan.totalDuration}.
+Не посочвай познавателна книжка от „Златно ключе“ — за БДП такава не е посочена. Може да включиш куклата ${ZLATNO_KLYUCHE.guide} като малък пешеходец в мотивацията. Приказката да е оригинална и да показва безопасно поведение на пътя. Играта за вкъщи е само по желание (чл. 32) и се играе с възрастен.
+Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3–4), organizationForm, integrativeLinks (2 връзки с направления по Наредба № 5, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
 }
 
 /** Откъде е дошъл резултатът — показва се в интерфейса. */
@@ -215,6 +242,44 @@ const STORY_HEROES: { keys: string[]; hero: string }[] = [
 ];
 
 export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
+  if (params.direction === 'bdp') return buildDemoBdpPlan(params);
+  return buildDemoDirectionPlan({ ...params, direction: params.direction });
+}
+
+/** Демо ситуация по БДП: интегрирана в „Околен свят“ (ядро „Социална и здравословна среда“). */
+function buildDemoBdpPlan(params: LessonParams): GeneratedLessonPlan {
+  const theme = resolveBdpTheme(params);
+  const topic = params.topic.trim() || theme.theme;
+  const base = buildDemoDirectionPlan({ ageGroup: params.ageGroup, direction: 'world', topic, core: BDP.host.core });
+  const r = BDP_NAREDBA5_RESULTS[params.ageGroup];
+  // Без познавателна книжка: за БДП „Златно ключе“ не посочва отделна
+  const { programMaterial: _omit, ...rest } = base;
+  void _omit;
+  return {
+    ...rest,
+    directionLabel: `${BDP.label} (интегрирано в „${BDP.host.direction}“)`,
+    educationalCore: `${BDP.host.core} (${BDP.host.direction}) • тема по БДП „${theme.theme}“`,
+    goals: [...BDP.goals],
+    expectedResults: {
+      knowledge: theme.expected,
+      skills: `${r.world} (Наредба № 5, приложение № ${BDP.host.appendix})`,
+      attitudes: 'Проявява внимание и отговорност към собствената безопасност и тази на другите на пътя.',
+    },
+    materials: [
+      `Макет на улица с пешеходна пътека и светофар (понятия: ${theme.concepts})`,
+      'Пътни знаци за игра и светлоотразителни жилетки',
+      `Куклата ${ZLATNO_KLYUCHE.guide} като малък пешеходец`,
+      'Детски превозни средства за ролевата игра „Пешеходци и шофьори“',
+    ],
+    organizationForm: 'Фронтална, групова и индивидуална',
+    integrativeLinks: [
+      `Конструиране и технологии (ядро „Техника“) — ${r.technika}`,
+      'Физическа култура (ядро „Игрова двигателна дейност“) — ролева игра „Пешеходци и шофьори“ на площадката',
+    ],
+  };
+}
+
+function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalDirection }): GeneratedLessonPlan {
   const topic = params.topic.trim() || 'Есен в гората';
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
   const dirInfo = DIRECTION_LABELS[params.direction];

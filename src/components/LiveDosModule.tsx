@@ -21,13 +21,12 @@ import {
 } from 'lucide-react';
 import {
   AgeGroup,
-  EducationalDirection,
+  LessonDirection,
   GeneratedLessonPlan,
 } from '../types';
 import {
   AGE_GROUP_LABELS,
   AiSource,
-  DIRECTION_LABELS,
   generateLessonPreparation,
 } from '../services/aiEngine';
 import {
@@ -38,6 +37,7 @@ import {
   situationRangeLabel,
   ZLATNO_KLYUCHE,
 } from '../services/naredba5';
+import { BDP, BDP_MIN_PER_YEAR, BDP_THEMES } from '../services/bdp';
 
 interface LiveDosModuleProps {
   /** Групата на влезлия учител (по подразбиране III група) */
@@ -54,13 +54,17 @@ const AGE_GROUPS: { id: AgeGroup; label: string; badge: string }[] = (['1', '2',
 }));
 
 // Седемте направления по чл. 28, ал. 2 (вкл. Физическа култура)
-const DIRECTIONS: { id: EducationalDirection; label: string; emoji: string }[] = DIRECTION_ORDER.map((id) => ({
-  id,
-  label: DIRECTION_STANDARDS[id].label,
-  emoji: DIRECTION_STANDARDS[id].emoji,
-}));
+const DIRECTIONS: { id: LessonDirection; label: string; emoji: string }[] = [
+  ...DIRECTION_ORDER.map((id) => ({
+    id,
+    label: DIRECTION_STANDARDS[id].label,
+    emoji: DIRECTION_STANDARDS[id].emoji,
+  })),
+  // БДП не е отделно направление по Наредба № 5 — интегрира се (програми на МОН, 2018)
+  { id: BDP.id, label: `${BDP.label} (БДП)`, emoji: BDP.emoji },
+];
 
-const QUICK_TOPICS: { label: string; topic: string; direction?: EducationalDirection }[] = [
+const QUICK_TOPICS: { label: string; topic: string; direction?: LessonDirection }[] = [
   { label: '🍂 Есен в гората', topic: 'Есен в гората' },
   { label: '🚒 Професии', topic: 'Професии и мечтатели' },
   { label: '🚀 Космос и планети', topic: 'Пътешествие в Космоса' },
@@ -81,11 +85,15 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   useEffect(() => {
     if (defaultAgeGroup) setAgeGroup(defaultAgeGroup);
   }, [defaultAgeGroup]);
-  const [direction, setDirection] = useState<EducationalDirection>('world');
+  const [direction, setDirection] = useState<LessonDirection>('world');
   // Празно = AI избира най-подходящото официално ядро за темата
   const [core, setCore] = useState<string>('');
   const [topic, setTopic] = useState<string>('Есен в гората');
-  const dirStd = DIRECTION_STANDARDS[direction];
+  const isBdp = direction === 'bdp';
+  const dirStd = direction === 'bdp' ? null : DIRECTION_STANDARDS[direction];
+  // При БДП вместо ядро се избира тема от програмата на МОН за групата
+  const coreOptions = dirStd ? dirStd.cores : BDP_THEMES[ageGroup].map((t) => t.theme);
+  const directionLabel = dirStd ? dirStd.label : BDP.label;
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [thinkingPhase, setThinkingPhase] = useState(0);
@@ -291,7 +299,11 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 <button
                   key={g.id}
                   type="button"
-                  onClick={() => setAgeGroup(g.id)}
+                  onClick={() => {
+                    setAgeGroup(g.id);
+                    // Темите по БДП са различни за всяка група
+                    if (isBdp) setCore('');
+                  }}
                   className={`py-3.5 px-4 rounded-2xl border-2 font-extrabold transition-all flex items-center justify-between ${
                     projectorMode ? 'text-lg' : 'text-sm sm:text-base'
                   } ${
@@ -348,7 +360,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
           {/* Образователно ядро по приложението към Наредба № 5 */}
           <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 space-y-3">
             <p className="text-xs font-extrabold uppercase tracking-wider text-indigo-800">
-              Образователно ядро (приложение № {dirStd.appendix} към Наредба № 5):
+              {dirStd
+                ? `Образователно ядро (приложение № ${dirStd.appendix} към Наредба № 5):`
+                : `Тема по БДП (програма на МОН за ${ageGroup}. група):`}
             </p>
             <div className="flex flex-wrap gap-2">
               <button
@@ -363,11 +377,14 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
               >
                 ✨ AI избира по темата (препоръчано)
               </button>
-              {dirStd.cores.map((c) => (
+              {coreOptions.map((c) => (
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setCore(c)}
+                  onClick={() => {
+                    setCore(c);
+                    if (isBdp) setTopic(c);
+                  }}
                   aria-pressed={core === c}
                   className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border transition-all ${
                     core === c
@@ -379,14 +396,21 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 </button>
               ))}
             </div>
-            <p className="text-xs leading-relaxed text-slate-600">
-              <strong className="text-slate-800">Минимум седмично:</strong> {dirStd.minWeekly[ageGroup]}{' '}
-              {dirStd.minWeekly[ageGroup] === 1 ? 'педагогическа ситуация' : 'педагогически ситуации'} за{' '}
-              {AGE_GROUP_STANDARDS[ageGroup].name} • <strong className="text-slate-800">„Златно ключе“:</strong>{' '}
-              {dirStd.zlatnoBook
-                ? `познавателна книжка ${dirStd.zlatnoBook} за ${ageGroup}. група`
-                : 'без отделна книжка – в книгата за учителя по всички направления'}
-            </p>
+            {dirStd ? (
+              <p className="text-xs leading-relaxed text-slate-600">
+                <strong className="text-slate-800">Минимум седмично:</strong> {dirStd.minWeekly[ageGroup]}{' '}
+                {dirStd.minWeekly[ageGroup] === 1 ? 'педагогическа ситуация' : 'педагогически ситуации'} за{' '}
+                {AGE_GROUP_STANDARDS[ageGroup].name} • <strong className="text-slate-800">„Златно ключе“:</strong>{' '}
+                {dirStd.zlatnoBook
+                  ? `познавателна книжка ${dirStd.zlatnoBook} за ${ageGroup}. група`
+                  : 'без отделна книжка – в книгата за учителя по всички направления'}
+              </p>
+            ) : (
+              <p className="text-xs leading-relaxed text-slate-600">
+                <strong className="text-slate-800">Минимум годишно:</strong> {BDP_MIN_PER_YEAR[ageGroup]} педагогически ситуации по БДП ({BDP.source}).{' '}
+                <strong className="text-slate-800">По Наредба № 5</strong> БДП не е отделно направление: интегрира се в „{BDP.host.direction}“ (ядро „{BDP.host.core}“) и в „Конструиране и технологии“ (ядро „Техника“) или в допълнителни форми (чл. 23 и чл. 26).
+              </p>
+            )}
           </div>
         </div>
 
@@ -491,7 +515,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
               {AGE_GROUP_LABELS[ageGroup].full}
             </span>
             <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-200">
-              {DIRECTION_LABELS[direction].label}
+              {directionLabel}
             </span>
           </div>
         </div>

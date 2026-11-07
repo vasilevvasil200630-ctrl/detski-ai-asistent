@@ -12,6 +12,7 @@ import {
   WEEKLY_MAX_OVER_MIN,
   ZLATNO_KLYUCHE,
 } from "@/services/naredba5";
+import { BDP, BDP_MIN_PER_YEAR, BDP_NAREDBA5_RESULTS, BDP_THEMES } from "@/services/bdp";
 import type { AgeGroup, EducationalDirection } from "@/types";
 
 const GROUPS: AgeGroup[] = ["1", "2", "3", "4"];
@@ -233,6 +234,42 @@ export default function Naredba5Page() {
         </div>
       </section>
 
+      {/* Безопасност на движението по пътищата */}
+      <section aria-labelledby="bdp-title" className="rounded-3xl border border-amber-200 bg-amber-50/40 p-5 shadow-sm sm:p-6">
+        <h2 id="bdp-title" className="text-lg font-extrabold text-slate-900">
+          {BDP.emoji} {BDP.label} (БДП)
+        </h2>
+        <p className="mt-1 text-sm leading-relaxed text-slate-700">
+          По Наредба № 5 БДП не е отделно образователно направление. Обучението е задължително във всички групи и се
+          провежда интегрирано – основно в „{BDP.host.direction}“ (ядро „{BDP.host.core}“) и в „Конструиране и технологии“
+          (ядро „Техника“) – или в допълнителни форми. Основната форма е педагогическата ситуация, предимно игра (чл. 23). Темите
+          са от {BDP.source}.
+        </p>
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          {GROUPS.map((g) => (
+            <article key={g} className="rounded-2xl border border-amber-100 bg-white p-4">
+              <h3 className="text-sm font-extrabold text-slate-900">
+                {GROUP_SHORT[g]} – минимум {BDP_MIN_PER_YEAR[g]} ситуации годишно
+              </h3>
+              <ul className="mt-2 space-y-1 text-sm text-slate-700">
+                {BDP_THEMES[g].map((t) => (
+                  <li key={t.theme} className="flex items-start gap-2">
+                    <span className="text-amber-600">•</span>
+                    <span>
+                      <strong className="text-slate-900">{t.theme}</strong> – {t.expected}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs leading-relaxed text-slate-600">
+                <strong className="text-slate-800">Наредба № 5:</strong> {BDP_NAREDBA5_RESULTS[g].world}{" "}
+                {BDP_NAREDBA5_RESULTS[g].technika}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       {/* Основни правила */}
       <section aria-labelledby="rules-title" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 id="rules-title" className="text-lg font-extrabold text-slate-900">Основни правила за деня</h2>
@@ -255,6 +292,14 @@ export default function Naredba5Page() {
             className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline"
           >
             Текстът на Наредба № 5 (PDF, РУО София-град) <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href={BDP.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline"
+          >
+            Програми на МОН по БДП (PDF) <ExternalLink className="h-3.5 w-3.5" />
           </a>
           <a
             href={ZLATNO_KLYUCHE.url}
