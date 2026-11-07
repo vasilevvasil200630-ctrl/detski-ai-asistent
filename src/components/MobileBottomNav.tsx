@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dices, Rocket, Building2, Library, Printer } from "lucide-react";
+import { Cloud, Dices, NotebookPen, Printer, Rocket } from "lucide-react";
 
 // Копирано от МатураПлюс (src/components/MobileBottomNav.tsx) — с разделите на детския сайт.
 
 const NAV_ITEMS = [
+  { href: "/cloud", label: "Облак", icon: Cloud },
   { href: "/games", label: "Игри", icon: Dices },
   { href: "/materials", label: "Печат", icon: Printer },
   { href: "/dos", label: "ДОС план", icon: Rocket },
-  { href: "/library", label: "Библиотека", icon: Library },
-  { href: "/hub", label: "Хъб", icon: Building2 },
+  { href: "/notebook", label: "Бележник", icon: NotebookPen },
 ];
 
 export function MobileBottomNav() {

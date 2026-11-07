@@ -13,6 +13,8 @@ export const PRIVATE_PAGE_ROUTES = [
   "/naredba5",
   "/library",
   "/hub",
+  "/cloud",
+  "/notebook",
   "/profile",
   "/print",
   "/login",

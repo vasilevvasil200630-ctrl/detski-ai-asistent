@@ -11,7 +11,8 @@ const CSP_DIRECTIVES = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  // Файловете за облака се качват от браузъра направо в частното хранилище на Vercel Blob
+  "connect-src 'self' https://vercel.com https://*.blob.vercel-storage.com",
   "media-src 'self' blob: data:",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
@@ -41,8 +42,12 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "origin-when-cross-origin" },
           // Микрофонът е разрешен само за самия сайт — диктуване на темата на игра или план-конспект
           { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
-          { key: "Content-Security-Policy", value: CSP_DIRECTIVES },
         ],
+      },
+      // Сайтът — с общата политика. Свалянето от облака задава своя, по-строга (sandbox), затова е изключено тук.
+      {
+        source: "/((?!api/cloud/files/[^/]+/download).*)",
+        headers: [{ key: "Content-Security-Policy", value: CSP_DIRECTIVES }],
       },
       // Service Worker-ът не се кешира, за да стига новата версия веднага
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },

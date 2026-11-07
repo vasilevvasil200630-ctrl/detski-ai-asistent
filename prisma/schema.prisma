@@ -37,6 +37,8 @@ model User {
   likes          BankGameLike[]
   materials      Material[]
   materialLikes  MaterialLike[]
+  cloudFiles     CloudFile[]
+  notes          Note[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -54,6 +56,7 @@ model Kindergarten {
   teachers  User[]
   bankGames BankGame[]
   materials Material[]
+  cloudFiles CloudFile[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -177,4 +180,64 @@ model MaterialLike {
 
   @@id([userId, materialId])
   @@index([materialId])
+}
+
+/// Файл в общия облак на детската градина: качен от учител или от директора.
+/// `shared` = вижда се от всички учители в градината; иначе е само в личните файлове на качилия.
+model CloudFile {
+  id             String         @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten   @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  uploaderId     String?
+  uploader       User?          @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  title          String
+  description    String         @default("")
+  /// Папка (id от src/lib/cloud/folders.ts), напр. "plans", "holidays", "documents"
+  folder         String         @default("other")
+  /// Възрастова група „1“…„4“ или null = за всички групи
+  ageGroup       String?
+  /// Направление по Наредба № 5 или bdp
+  direction      String?
+  /// Оригиналното име на файла (за свалянето)
+  fileName       String
+  mimeType       String
+  /// Размер в байтове
+  size           Int
+  /// Къде е съдържанието: "blob" (частно хранилище на Vercel Blob) или "db" (CloudFileData)
+  storage        String
+  blobPathname   String?        @unique
+  shared         Boolean        @default(true)
+  downloads      Int            @default(0)
+  data           CloudFileData?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([kindergartenId, shared, createdAt])
+  @@index([uploaderId, createdAt])
+}
+
+/// Съдържанието на малък файл, когато няма Vercel Blob (локално или преди хранилището да е свързано).
+model CloudFileData {
+  fileId String    @id
+  file   CloudFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  bytes  Bytes
+}
+
+/// Бележка в личния бележник на учителя — вижда я само той.
+model Note {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String    @default("")
+  body      String    @default("")
+  /// Цвят на листчето: yellow, blue, green, pink, violet
+  color     String    @default("yellow")
+  pinned    Boolean   @default(false)
+  /// Дата за напомняне/срок (само дата) — тогава бележката е и задача
+  dueDate   DateTime?
+  done      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, updatedAt])
 }
