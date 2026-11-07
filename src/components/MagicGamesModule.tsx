@@ -14,29 +14,29 @@ const AGE_OPTIONS: { id: AgeGroup; label: string; emoji: string; desc: string }[
 ];
 
 const MOOD_OPTIONS: { id: GroupMood; label: string; colorClass: string }[] = [
-  { id: 'noisy', label: '🔊 Шумни и пренапрегнати', colorClass: 'from-rose-500 to-indigo-500 border-rose-400' },
-  { id: 'tired', label: '🥱 Уморени / Тихо време', colorClass: 'from-amber-500 to-yellow-500 border-amber-400' },
-  { id: 'distracted', label: '🦋 Разсеяни', colorClass: 'from-indigo-600 to-indigo-600 border-indigo-400' },
+  { id: 'noisy', label: 'Шумни и пренапрегнати', colorClass: '' },
+  { id: 'tired', label: 'Уморени / Тихо време', colorClass: '' },
+  { id: 'distracted', label: 'Разсеяни', colorClass: '' },
 ];
 
 const LOCATION_OPTIONS: { id: PlayLocation; label: string }[] = [
-  { id: 'classroom', label: '🧸 Занималня' },
-  { id: 'music_hall', label: '🎵 Музикален салон' },
-  { id: 'yard', label: '🌳 Двор' },
+  { id: 'classroom', label: 'Занималня' },
+  { id: 'music_hall', label: 'Музикален салон' },
+  { id: 'yard', label: 'Двор' },
 ];
 
 const DURATION_OPTIONS: { id: PlayDuration; label: string }[] = [
-  { id: '5', label: '⏱️ 5 мин' },
-  { id: '15', label: '⏱️ 15 мин' },
-  { id: '30', label: '⏱️ 30 мин' },
+  { id: '5', label: '5 мин' },
+  { id: '15', label: '15 мин' },
+  { id: '30', label: '30 мин' },
 ];
 
 const RESOURCE_OPTIONS: { id: PlayResources; label: string }[] = [
-  { id: 'none', label: '🙌 Без материали' },
-  { id: 'balls', label: '⚽ Само с топки' },
-  { id: 'music', label: '🎶 С музика' },
-  { id: 'paper_pencils', label: '📄 Хартия и моливи' },
-  { id: 'hoops_ribbons', label: '🧣 Обръчи и ленти' },
+  { id: 'none', label: 'Без материали' },
+  { id: 'balls', label: 'Само с топки' },
+  { id: 'music', label: 'С музика' },
+  { id: 'paper_pencils', label: 'Хартия и моливи' },
+  { id: 'hoops_ribbons', label: 'Обръчи и ленти' },
 ];
 
 interface MagicGamesModuleProps {
@@ -124,101 +124,96 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
   return (
     <section className="space-y-8">
-      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+      <div className="border-b border-slate-200 pb-6 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-white/20">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            {activeTeacher ? <>Активен профил: {activeTeacher.avatar} {activeTeacher.name}{activeTeacher.groupName ? ` (${activeTeacher.groupName})` : ''}</> : 'Режим „Гост“ • влезте, за да споделяте игри с колегите'}
-          </span>
-          <h2 className="font-display text-2xl sm:text-3xl font-extrabold mt-2">
-            🎲 „Магическа кутия с игри“ (AI Генератор за 30 сек)
+          <h2 className="font-display text-2xl sm:text-3xl font-bold ">
+            „Магическа кутия с игри“ (AI Генератор за 30 сек)
           </h2>
-          <p className="text-emerald-50 text-sm sm:text-base mt-1 max-w-3xl">
+          <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
             Генерирайте 3 ситуационни игри със заглавие, римуван стих за старт, точни стъпки (1, 2, 3), умения по Наредба № 5 и идея за адаптация за дете със СОП!
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-bold bg-black/15 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
-          <span className="px-2.5 py-1 rounded-lg bg-white/20">{AGE_GROUP_LABELS[filters.ageGroup].short}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-white/20">{MOOD_LABELS[filters.mood].emoji} {MOOD_LABELS[filters.mood].label}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-white/20">{LOCATION_LABELS[filters.location].emoji} {LOCATION_LABELS[filters.location].label}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-white/20">{RESOURCE_LABELS[filters.resources].emoji} {RESOURCE_LABELS[filters.resources].label}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{AGE_GROUP_LABELS[filters.ageGroup].short}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{MOOD_LABELS[filters.mood].label}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{LOCATION_LABELS[filters.location].label}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{RESOURCE_LABELS[filters.resources].label}</span>
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white/95 p-6 sm:p-8 shadow-xl border-2 border-emerald-100 space-y-6">
+      <div className="rounded-2xl bg-white/95 p-6 sm:p-8 shadow-sm border border-emerald-100 space-y-6">
         <div>
-          <label className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-800 mb-3">
+          <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
             <Users className="w-5 h-5 text-emerald-600" />
             <span>1. Възрастова група{activeTeacher ? ` (автоматично синхронизирана с ${activeTeacher.name})` : ''}:</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {AGE_OPTIONS.map((item) => (
-              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, ageGroup: item.id }))} className={`flex items-center gap-3.5 p-4 rounded-2xl border-2 text-left transition-all ${filters.ageGroup === item.id ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white border-emerald-600 shadow-md scale-[1.02]' : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'}`}>
-                <span className="text-3xl">{item.emoji}</span>
-                <div><div className="font-extrabold">{item.label}</div><div className={`text-xs ${filters.ageGroup === item.id ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</div></div>
+              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, ageGroup: item.id }))} className={`flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${filters.ageGroup === item.id ? 'bg-indigo-600 text-white border-emerald-600 shadow-sm scale-[1.02]' : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'}`}>
+                <div><div className="font-semibold">{item.label}</div><div className={`text-xs ${filters.ageGroup === item.id ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</div></div>
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-800 mb-3">
+          <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
             <Smile className="w-5 h-5 text-rose-500" /> 2. Настроение на децата:
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {MOOD_OPTIONS.map((item) => (
-              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, mood: item.id }))} className={`py-4 px-5 rounded-2xl border-2 font-extrabold transition-all ${filters.mood === item.id ? `bg-gradient-to-r ${item.colorClass} text-white shadow-md scale-[1.02]` : 'bg-slate-50 hover:bg-rose-50 text-slate-800 border-slate-200'}`}>{item.label}</button>
+              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, mood: item.id }))} className={`py-4 px-5 rounded-2xl border font-semibold transition-all ${filters.mood === item.id ? `bg-indigo-600 text-white border-indigo-600` : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'}`}>{item.label}</button>
             ))}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
-            <label className="flex items-center gap-2 text-sm font-extrabold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 3. Място:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 3. Място:</label>
             <div className="flex flex-col gap-2">
               {LOCATION_OPTIONS.map((item) => (
-                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border-2 font-extrabold text-left ${filters.location === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
+                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.location === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
               ))}
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100">
-            <label className="flex items-center gap-2 text-sm font-extrabold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> 4. Времетраене:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> 4. Времетраене:</label>
             <div className="flex flex-col gap-2">
               {DURATION_OPTIONS.map((item) => (
-                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, duration: item.id }))} className={`py-3 px-4 rounded-xl border-2 font-extrabold text-left ${filters.duration === item.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
+                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, duration: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.duration === item.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
               ))}
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
-            <label className="flex items-center gap-2 text-sm font-extrabold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> 5. Налични материали:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> 5. Налични материали:</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
               {RESOURCE_OPTIONS.map((item) => (
-                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, resources: item.id }))} className={`py-2.5 px-3.5 rounded-xl border-2 text-xs sm:text-sm font-extrabold text-left ${filters.resources === item.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
+                <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, resources: item.id }))} className={`py-2.5 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold text-left ${filters.resources === item.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
               ))}
             </div>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <label className="text-xs sm:text-sm font-extrabold text-slate-700 shrink-0">🪄 По желание: Специална тема от публиката:</label>
-          <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 bg-white text-sm font-semibold" />
+          <label className="text-xs sm:text-sm font-semibold text-slate-700 shrink-0">По желание: Специална тема от публиката:</label>
+          <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
         </div>
 
         {/* Live Structured User Prompt Preview ("Запитване за игра (User Prompt)") */}
-        <div className="rounded-2xl bg-slate-900 text-slate-100 p-5 border-2 border-indigo-400/40 shadow-md space-y-3">
+        <div className="rounded-2xl bg-slate-900 text-slate-100 p-5 border border-indigo-400/40 shadow-sm space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/80 pb-2.5">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-amber-300">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-300">
               <Terminal className="w-4 h-4 text-emerald-400" />
               <span>Запитване за игра (User Prompt – обновява се автоматично според избраните бутони):</span>
             </div>
             <button
               type="button"
               onClick={handleCopyUserPrompt}
-              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
                 copiedUserPrompt ? 'bg-emerald-500 text-white' : 'bg-white/15 hover:bg-white/25 text-white'
               }`}
             >
-              {copiedUserPrompt ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> 📋 Копирай запитването (User Prompt)</>}
+              {copiedUserPrompt ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> Копирай запитването (User Prompt)</>}
             </button>
           </div>
           <pre className="whitespace-pre-wrap font-sans text-xs sm:text-sm text-slate-100 leading-relaxed">
@@ -227,16 +222,16 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         <div className="pt-2 flex justify-center">
-          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-extrabold text-white bg-gradient-to-r from-emerald-500 via-emerald-500 to-indigo-600 hover:from-emerald-600 hover:to-indigo-700 shadow-xl transition-all flex items-center justify-center gap-3">
-            {isGenerating ? <><RefreshCw className="w-6 h-6 animate-spin text-amber-200" /> Магическата кутия съчинява 3 игри...</> : <><Wand2 className="w-6 h-6 text-amber-200 animate-bounce" /> ✨ Отвори Магическата кутия (Генерирай 3 игри)</>}
+          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm transition-all flex items-center justify-center gap-3">
+            {isGenerating ? <><RefreshCw className="w-6 h-6 animate-spin text-amber-200" /> Магическата кутия съчинява 3 игри...</> : <><Wand2 className="w-6 h-6 text-amber-200" /> Отвори Магическата кутия (Генерирай 3 игри)</>}
           </button>
         </div>
       </div>
 
       {isGenerating && (
-        <div className="rounded-3xl bg-white/95 border-2 border-indigo-200 p-8 shadow-xl text-center space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center text-white shadow-lg animate-bounce"><Sparkles className="w-8 h-8" /></div>
-          <h3 className="font-display text-xl font-extrabold text-slate-900">Детският AI Асистент генерира по зададения User Prompt...</h3>
+        <div className="rounded-2xl bg-white/95 border border-indigo-200 p-8 shadow-sm text-center space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-sm"><Sparkles className="w-8 h-8" /></div>
+          <h3 className="font-display text-xl font-semibold text-slate-900">Детският AI Асистент генерира по зададения User Prompt...</h3>
           <p className="text-sm font-bold text-indigo-700">1. Заглавие • 2. Римуван стих • 3. Точни стъпки • 4. Умения по Наредба № 5 • 5. Адаптация за СОП</p>
         </div>
       )}
@@ -244,12 +239,12 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       {!isGenerating && games.length > 0 && (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 bg-indigo-50 border border-indigo-200 px-5 py-3.5 rounded-2xl">
-            <div className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-2">
+            <div className="text-xs sm:text-sm font-semibold text-indigo-950 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-indigo-600" />
               <span>Харесва ли ви някоя игра? Запазете я в своята библиотека (по възрастови групи) или я споделете с колегите от <strong>{kgName}</strong>!</span>
-              {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-black ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? '✨ Генерирано от Gemini AI' : '🛡️ Вграден демо двигател'}</span>}
+              {source && <span className={`ml-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${source === 'ai' ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}>{source === 'ai' ? 'Генерирано от Gemini AI' : 'Вграден демо двигател'}</span>}
             </div>
-            <button type="button" onClick={onOpenHub} className="text-xs font-extrabold text-indigo-700 hover:text-indigo-900 underline">
+            <button type="button" onClick={onOpenHub} className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 underline">
               Отвори Учителския хъб →
             </button>
           </div>
@@ -257,21 +252,21 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {games.map((game, idx) => {
               return (
-                <article key={game.id} className="print-card rounded-2xl bg-white border-2 border-emerald-200 shadow-lg flex flex-col justify-between overflow-hidden">
+                <article key={game.id} className="print-card rounded-2xl bg-white border border-emerald-200 shadow-sm flex flex-col justify-between overflow-hidden">
                   <div>
-                    <div className="p-5 bg-gradient-to-b from-emerald-500/10 to-transparent border-b border-slate-100">
+                    <div className="p-5 bg-slate-50 border-b border-slate-100">
                       <div className="flex flex-wrap gap-1.5 mb-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-900 text-white">Игра #{idx + 1}</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-900 text-white">Игра #{idx + 1}</span>
                         {game.tags.map((t) => <span key={t} className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900">{t}</span>)}
                       </div>
-                      <div className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">1. Заглавие на играта:</div>
-                      <h4 className={`font-display font-extrabold text-slate-900 ${projectorMode ? 'text-xl' : 'text-lg'}`}>{game.title}</h4>
+                      <div className="text-[11px] font-semibold text-emerald-800">1. Заглавие на играта:</div>
+                      <h4 className={`font-display font-semibold text-slate-900 ${projectorMode ? 'text-xl' : 'text-lg'}`}>{game.title}</h4>
                       <p className="text-xs text-slate-600 mt-1">{game.subtitle}</p>
                     </div>
                     <div className="p-5 space-y-4">
-                      <div className="p-4 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/80">
+                      <div className="p-4 rounded-2xl border border-dashed border-amber-300 bg-amber-50/80">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-extrabold text-amber-900 flex items-center gap-1"><ScrollText className="w-4 h-4" /> 2. Римуван стих за старт:</span>
+                          <span className="text-xs font-semibold text-amber-900 flex items-center gap-1"><ScrollText className="w-4 h-4" /> 2. Римуван стих за старт:</span>
                           <button type="button" onClick={() => handleSpeakRhyme(game)} className="no-print inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-white text-amber-900 border border-amber-300"><Volume2 className="w-3.5 h-3.5" /> {speakingId === game.id ? 'Спри' : 'Чуй'}</button>
                         </div>
                         <div className="space-y-1 font-bold italic text-slate-900 text-sm sm:text-base">
@@ -279,23 +274,23 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                         </div>
                       </div>
                       <div>
-                        <h5 className="text-xs font-extrabold uppercase text-slate-700 flex items-center gap-1.5 mb-2"><Target className="w-4 h-4 text-emerald-600" /> 3. Точни стъпки за играта (1, 2, 3):</h5>
+                        <h5 className="text-xs font-semibold text-slate-700 flex items-center gap-1.5 mb-2"><Target className="w-4 h-4 text-emerald-600" /> 3. Точни стъпки за играта (1, 2, 3):</h5>
                         <ol className="space-y-2">
                           {game.steps.map((s, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                              <span className="w-5 h-5 rounded-md bg-emerald-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                              <span className="w-5 h-5 rounded-md bg-emerald-600 text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                               <span>{s}</span>
                             </li>
                           ))}
                         </ol>
                       </div>
                       <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm space-y-1">
-                        <p><strong className="font-extrabold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {game.pedagogicalGoal}</p>
+                        <p><strong className="font-semibold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {game.pedagogicalGoal}</p>
                       </div>
                       <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs sm:text-sm space-y-1">
                         <p className="flex items-start gap-1.5">
                           <HeartHandshake className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                          <span><strong className="font-extrabold text-indigo-950">5. Идея за адаптация за дете със СОП:</strong> {game.sopAdaptation || 'Използване на визуална карта-опора, щадящо темпо и участие в двойка с подкрепящо другарче или учител.'}</span>
+                          <span><strong className="font-semibold text-indigo-950">5. Идея за адаптация за дете със СОП:</strong> {game.sopAdaptation || 'Използване на визуална карта-опора, щадящо темпо и участие в двойка с подкрепящо другарче или учител.'}</span>
                         </p>
                       </div>
                     </div>
@@ -314,10 +309,10 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       }}
                     />
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => handleCopyCard(game)} className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold border-2 flex items-center justify-center gap-1.5 ${copiedId === game.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>
-                        {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> 📋 Копирай</>}
+                      <button type="button" onClick={() => handleCopyCard(game)} className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 ${copiedId === game.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>
+                        {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> Копирай</>}
                       </button>
-                      <button type="button" onClick={() => window.print()} className="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold bg-white hover:bg-indigo-50 text-indigo-800 border-2 border-indigo-200 flex items-center justify-center gap-1.5"><Printer className="w-3.5 h-3.5" /> 🖨️ Принтирай</button>
+                      <button type="button" onClick={() => window.print()} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-indigo-800 border border-indigo-200 flex items-center justify-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Принтирай</button>
                     </div>
                   </div>
                 </article>

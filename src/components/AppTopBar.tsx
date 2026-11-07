@@ -181,13 +181,13 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-slate-200/90 bg-white p-2 text-xs shadow-lg ring-1 ring-black/5 z-50">
+              <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-slate-200/90 bg-white p-2 text-xs shadow-sm ring-1 ring-black/5 z-50">
                 <div className="border-b border-slate-100 px-3 py-2.5">
                   <p className="font-bold text-slate-900 truncate text-sm">{user.name}</p>
                   <p className="mt-0.5 text-xs text-slate-500 truncate">{user.email}</p>
                   <div className="mt-2 flex items-center gap-1.5">
                     <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-[#083861] border border-indigo-200/60">
-                      {user.kgRole === "ADMIN" ? "⭐ Администратор на ДГ" : "👩‍🏫 Учител"}
+                      {user.kgRole === "ADMIN" ? "Администратор на ДГ" : "Учител"}
                     </span>
                   </div>
                 </div>

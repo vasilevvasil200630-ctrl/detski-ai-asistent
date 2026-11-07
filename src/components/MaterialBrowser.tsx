@@ -22,7 +22,7 @@ type Props = {
 
 const chip = (active: boolean) =>
   `rounded-xl border px-3 py-1.5 text-sm font-bold transition-colors ${
-    active ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-indigo-50"
+    active ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
   }`;
 
 /** Списък с материали с филтри по възрастова група и вид. */
@@ -67,7 +67,7 @@ export function MaterialBrowser({ scope, holiday, initialAgeGroup = "", refreshK
         </button>
         {kinds.map((k) => (
           <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)} className={chip(kind === k)}>
-            {KIND_LABELS[k].emoji} {KIND_LABELS[k].label}
+            {KIND_LABELS[k].label}
           </button>
         ))}
       </div>

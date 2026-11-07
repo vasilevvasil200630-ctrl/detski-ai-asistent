@@ -53,12 +53,9 @@ export default function Naredba5Page() {
   return (
     <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {/* Заглавие */}
-      <div className="rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-emerald-600 p-6 text-white shadow-lg sm:p-8">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-extrabold uppercase tracking-wider">
-          <BookOpenCheck className="h-3.5 w-3.5" /> Справочник за учителя
-        </span>
-        <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">Наредба № 5 и „Златно ключе“</h1>
-        <p className="mt-1 max-w-3xl text-sm text-indigo-100 sm:text-base">
+      <div className="border-b border-slate-200 pb-6 sm:p-8">
+        <h1 className=" text-2xl font-bold sm:text-3xl">Наредба № 5 и „Златно ключе“</h1>
+        <p className="mt-1 max-w-3xl text-sm text-slate-600 sm:text-base">
           Образователните направления и ядра, продължителността и минималният брой педагогически ситуации по {NAREDBA5.title}{" "}
           ({NAREDBA5.lastAmended}) и книжките от {ZLATNO_KLYUCHE.system} на {ZLATNO_KLYUCHE.publisher}. На тези данни
           работят и AI генераторите в сайта.
@@ -66,12 +63,12 @@ export default function Naredba5Page() {
       </div>
 
       {/* Възрастови групи */}
-      <section aria-labelledby="groups-title" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 id="groups-title" className="text-lg font-extrabold text-slate-900">Възрастови групи (чл. 24 и чл. 25)</h2>
+      <section aria-labelledby="groups-title" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 id="groups-title" className="text-lg font-semibold text-slate-900">Възрастови групи (чл. 24 и чл. 25)</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+              <tr className="border-b border-slate-200 text-xs text-slate-500">
                 <th className="py-2 pr-3">Група</th>
                 <th className="py-2 pr-3">Възраст</th>
                 <th className="py-2 pr-3">Една ситуация</th>
@@ -105,8 +102,8 @@ export default function Naredba5Page() {
       </section>
 
       {/* Проверка на седмичното разпределение */}
-      <section aria-labelledby="check-title" className="rounded-3xl border-2 border-indigo-100 bg-white p-5 shadow-sm sm:p-6">
-        <h2 id="check-title" className="text-lg font-extrabold text-slate-900">Проверка на седмичното разпределение</h2>
+      <section aria-labelledby="check-title" className="rounded-2xl border border-indigo-100 bg-white p-5 shadow-sm sm:p-6">
+        <h2 id="check-title" className="text-lg font-semibold text-slate-900">Проверка на седмичното разпределение</h2>
         <p className="mt-1 text-sm text-slate-600">
           Въведете колко педагогически ситуации имате седмично по всяко направление. Проверката сравнява с минимумите от
           приложенията и с общия брой по чл. 24.
@@ -123,7 +120,7 @@ export default function Naredba5Page() {
                 setCounts(minimums(g));
               }}
               className={`rounded-xl border px-3.5 py-2 text-sm font-bold transition-colors ${
-                group === g ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-indigo-50"
+                group === g ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
               {GROUP_SHORT[g]}
@@ -137,7 +134,7 @@ export default function Naredba5Page() {
               aria-pressed={organization === o}
               onClick={() => setOrganization(o)}
               className={`rounded-xl border px-3.5 py-2 text-sm font-bold transition-colors ${
-                organization === o ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-emerald-50"
+                organization === o ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
               {o === "fullDay" ? "Целодневна" : "Полудневна"}
@@ -157,7 +154,7 @@ export default function Naredba5Page() {
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold text-slate-900">
-                    {dir.emoji} {dir.shortLabel}
+                    {dir.shortLabel}
                   </span>
                   <span className={`text-xs ${low ? "font-bold text-rose-700" : "text-slate-500"}`}>минимум {min}</span>
                 </span>
@@ -182,7 +179,7 @@ export default function Naredba5Page() {
         >
           {ok ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /> : <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />}
           <div>
-            <p className="font-extrabold">
+            <p className="font-semibold">
               Общо {total} ситуации седмично (допустимо: {std.minWeeklyTotal}–{max} за {std.name},{" "}
               {organization === "fullDay" ? "целодневна" : "полудневна"} организация).
             </p>
@@ -198,14 +195,14 @@ export default function Naredba5Page() {
 
       {/* Направления, ядра и книжки */}
       <section aria-labelledby="dirs-title">
-        <h2 id="dirs-title" className="text-lg font-extrabold text-slate-900">Образователни направления и ядра (чл. 28, ал. 2)</h2>
+        <h2 id="dirs-title" className="text-lg font-semibold text-slate-900">Образователни направления и ядра (чл. 28, ал. 2)</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {DIRECTION_ORDER.map((d) => {
             const dir = DIRECTION_STANDARDS[d];
             return (
-              <article key={d} className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-base font-extrabold text-slate-900">
-                  {dir.emoji} {dir.label}
+              <article key={d} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 className="text-base font-semibold text-slate-900">
+                  {dir.label}
                 </h3>
                 <p className="text-xs font-bold text-slate-500">Приложение № {dir.appendix}</p>
                 <ul className="mt-3 space-y-1 text-sm text-slate-700">
@@ -220,7 +217,7 @@ export default function Naredba5Page() {
                   {GROUPS.map((g) => (
                     <div key={g} className="rounded-lg bg-slate-50 px-1 py-1.5">
                       <div className="text-slate-500">{GROUP_SHORT[g]}</div>
-                      <div className="font-extrabold text-slate-900">мин. {dir.minWeekly[g]}</div>
+                      <div className="font-semibold text-slate-900">мин. {dir.minWeekly[g]}</div>
                     </div>
                   ))}
                 </div>
@@ -235,9 +232,9 @@ export default function Naredba5Page() {
       </section>
 
       {/* Безопасност на движението по пътищата */}
-      <section aria-labelledby="bdp-title" className="rounded-3xl border border-amber-200 bg-amber-50/40 p-5 shadow-sm sm:p-6">
-        <h2 id="bdp-title" className="text-lg font-extrabold text-slate-900">
-          {BDP.emoji} {BDP.label} (БДП)
+      <section aria-labelledby="bdp-title" className="rounded-2xl border border-amber-200 bg-amber-50/40 p-5 shadow-sm sm:p-6">
+        <h2 id="bdp-title" className="text-lg font-semibold text-slate-900">
+          {BDP.label} (БДП)
         </h2>
         <p className="mt-1 text-sm leading-relaxed text-slate-700">
           По Наредба № 5 БДП не е отделно образователно направление. Обучението е задължително във всички групи и се
@@ -248,7 +245,7 @@ export default function Naredba5Page() {
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           {GROUPS.map((g) => (
             <article key={g} className="rounded-2xl border border-amber-100 bg-white p-4">
-              <h3 className="text-sm font-extrabold text-slate-900">
+              <h3 className="text-sm font-semibold text-slate-900">
                 {GROUP_SHORT[g]} – минимум {BDP_MIN_PER_YEAR[g]} ситуации годишно
               </h3>
               <ul className="mt-2 space-y-1 text-sm text-slate-700">
@@ -271,8 +268,8 @@ export default function Naredba5Page() {
       </section>
 
       {/* Основни правила */}
-      <section aria-labelledby="rules-title" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 id="rules-title" className="text-lg font-extrabold text-slate-900">Основни правила за деня</h2>
+      <section aria-labelledby="rules-title" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 id="rules-title" className="text-lg font-semibold text-slate-900">Основни правила за деня</h2>
         <ul className="mt-3 space-y-2 text-sm text-slate-700">
           <li>• Основната форма е педагогическата ситуация и тя протича предимно като игра (чл. 23).</li>
           <li>• Игрите извън ситуациите са допълнителни форми – по преценка на учителя (чл. 26).</li>

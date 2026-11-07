@@ -96,15 +96,15 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
       <div className="space-y-2 p-4">
         <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
           <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-indigo-800">
-            {kind.emoji} {kind.label}
+            {kind.label}
           </span>
           <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-700">{AGE_SHORT[m.ageGroup]}</span>
           {holiday && <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-amber-800">{holiday}</span>}
           {view === "mine" && m.shared && (
-            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-800">🤝 Споделено</span>
+            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-800">Споделено</span>
           )}
         </div>
-        <h3 className="text-base font-extrabold leading-snug text-slate-900">{m.title}</h3>
+        <h3 className="text-base font-semibold leading-snug text-slate-900">{m.title}</h3>
         {(dir || m.core) && (
           <p className="text-xs text-slate-600">
             {dir}
