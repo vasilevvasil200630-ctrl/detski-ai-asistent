@@ -1,4 +1,5 @@
-import { GeneratedGame, GeneratedLessonPlan, LessonStage } from '../types';
+import { EducationalDirection, GeneratedGame, GeneratedLessonPlan, LessonStage } from '../types';
+import { matchCore } from './naredba5';
 
 /**
  * Защитни функции за отговорите от реалния AI (Gemini / OpenAI).
@@ -70,7 +71,7 @@ function normalizeGame(raw: unknown, index: number): GeneratedGame | null {
     rhymeTitle: str(g.rhymeTitle) || '📜 Римуван стих за старт:',
     rhymeLines: rhymeLines.length ? rhymeLines : ['Едно, две, три – играта започни!'],
     steps,
-    pedagogicalGoal: stripLeadingNumber(str(g.pedagogicalGoal)) || 'По Наредба № 5: социални умения, внимание и двигателна активност.',
+    pedagogicalGoal: stripLeadingNumber(str(g.pedagogicalGoal)) || 'Околен свят (ядро „Самоутвърждаване и общуване с околните“); Физическа култура (ядро „Игрова двигателна дейност“): социални умения, внимание и двигателна активност.',
     sopAdaptation: stripLeadingNumber(str(g.sopAdaptation)) || undefined,
     teacherTip: str(g.teacherTip) || 'Покажете правилата първо със собствен пример.',
   };
@@ -102,8 +103,16 @@ function normalizeStage(raw: unknown): LessonStage | null {
   return { phase, duration: str(s.duration), teacherAction, childrenActivity };
 }
 
-/** Слива отговора на модела с демо разработката поле по поле – липсващото се взима от `fallback`. */
-export function normalizeLessonPlan(parsed: unknown, fallback: GeneratedLessonPlan): GeneratedLessonPlan {
+/**
+ * Слива отговора на модела с демо разработката поле по поле – липсващото се взима от `fallback`.
+ * Направлението, продължителността и ядрото остават официалните по Наредба № 5: ядрото от AI
+ * се приема само ако е едно от изброените в приложението (или учителят го е избрал сам).
+ */
+export function normalizeLessonPlan(
+  parsed: unknown,
+  fallback: GeneratedLessonPlan,
+  opts: { direction?: EducationalDirection; coreChosen?: boolean } = {},
+): GeneratedLessonPlan {
   const p = obj(parsed);
   if (Object.keys(p).length === 0) throw new Error('AI отговорът не е валиден JSON обект');
 
@@ -123,16 +132,22 @@ export function normalizeLessonPlan(parsed: unknown, fallback: GeneratedLessonPl
   return {
     topic: pick(p.topic, fallback.topic),
     ageGroupLabel: pick(p.ageGroupLabel, fallback.ageGroupLabel),
-    directionLabel: pick(p.directionLabel, fallback.directionLabel),
-    educationalCore: pick(p.educationalCore, fallback.educationalCore),
-    totalDuration: pick(p.totalDuration, fallback.totalDuration),
+    directionLabel: fallback.directionLabel,
+    educationalCore:
+      opts.coreChosen || !opts.direction
+        ? fallback.educationalCore
+        : (matchCore(opts.direction, str(p.educationalCore)) ?? fallback.educationalCore),
+    totalDuration: fallback.totalDuration,
     goals: pickList(p.goals, fallback.goals),
     expectedResults: {
       knowledge: pick(er.knowledge, fallback.expectedResults.knowledge),
       skills: pick(er.skills, fallback.expectedResults.skills),
       attitudes: pick(er.attitudes, fallback.expectedResults.attitudes),
     },
-    materials: pickList(p.materials, fallback.materials),
+    materials: withProgramMaterial(pickList(p.materials, fallback.materials), fallback.programMaterial),
+    organizationForm: pick(p.organizationForm, fallback.organizationForm ?? ''),
+    integrativeLinks: pickList(p.integrativeLinks, fallback.integrativeLinks ?? []),
+    ...(fallback.programMaterial ? { programMaterial: fallback.programMaterial } : {}),
     stages: stages.length ? stages : fallback.stages,
     story: {
       title: pick(story.title, fallback.story.title),
@@ -150,4 +165,10 @@ export function normalizeLessonPlan(parsed: unknown, fallback: GeneratedLessonPl
       closingWarmth: pick(note.closingWarmth, fallback.parentNote.closingWarmth),
     },
   };
+}
+
+/** Книжката от „Златно ключе“ винаги е сред материалите, ако направлението има такава. */
+function withProgramMaterial(materials: string[], book: string | undefined): string[] {
+  if (!book || materials.some((m) => m.includes('Златно ключе'))) return materials;
+  return [book[0]!.toUpperCase() + book.slice(1), ...materials];
 }

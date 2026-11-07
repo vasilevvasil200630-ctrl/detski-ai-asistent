@@ -30,6 +30,14 @@ import {
   DIRECTION_LABELS,
   generateLessonPreparation,
 } from '../services/aiEngine';
+import {
+  AGE_GROUP_STANDARDS,
+  DIRECTION_ORDER,
+  DIRECTION_STANDARDS,
+  NAREDBA5,
+  situationRangeLabel,
+  ZLATNO_KLYUCHE,
+} from '../services/naredba5';
 
 interface LiveDosModuleProps {
   /** Групата на влезлия учител (по подразбиране III група) */
@@ -38,21 +46,19 @@ interface LiveDosModuleProps {
   projectorMode: boolean;
 }
 
-const AGE_GROUPS: { id: AgeGroup; label: string; badge: string }[] = [
-  { id: '1', label: '1-ва група (3-4 г.)', badge: '15 мин.' },
-  { id: '2', label: '2-ра група (4-5 г.)', badge: '20 мин.' },
-  { id: '3', label: '3-та група (5-6 г.)', badge: '25 мин.' },
-  { id: '4', label: '4-та група (6-7 г.)', badge: '30 мин.' },
-];
+// Продължителността на ситуацията е по чл. 25 от Наредба № 5
+const AGE_GROUPS: { id: AgeGroup; label: string; badge: string }[] = (['1', '2', '3', '4'] as AgeGroup[]).map((id) => ({
+  id,
+  label: AGE_GROUP_LABELS[id].short,
+  badge: situationRangeLabel(id),
+}));
 
-const DIRECTIONS: { id: EducationalDirection; label: string; emoji: string }[] = [
-  { id: 'bel', label: 'Български език и литература', emoji: '📖' },
-  { id: 'world', label: 'Околен свят', emoji: '🌍' },
-  { id: 'math', label: 'Математика', emoji: '🔢' },
-  { id: 'art', label: 'Изобразително изкуство', emoji: '🎨' },
-  { id: 'music', label: 'Музика', emoji: '🎵' },
-  { id: 'construct', label: 'Конструиране и технологии', emoji: '🧱' },
-];
+// Седемте направления по чл. 28, ал. 2 (вкл. Физическа култура)
+const DIRECTIONS: { id: EducationalDirection; label: string; emoji: string }[] = DIRECTION_ORDER.map((id) => ({
+  id,
+  label: DIRECTION_STANDARDS[id].label,
+  emoji: DIRECTION_STANDARDS[id].emoji,
+}));
 
 const QUICK_TOPICS: { label: string; topic: string; direction?: EducationalDirection }[] = [
   { label: '🍂 Есен в гората', topic: 'Есен в гората' },
@@ -76,7 +82,10 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
     if (defaultAgeGroup) setAgeGroup(defaultAgeGroup);
   }, [defaultAgeGroup]);
   const [direction, setDirection] = useState<EducationalDirection>('world');
+  // Празно = AI избира най-подходящото официално ядро за темата
+  const [core, setCore] = useState<string>('');
   const [topic, setTopic] = useState<string>('Есен в гората');
+  const dirStd = DIRECTION_STANDARDS[direction];
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [thinkingPhase, setThinkingPhase] = useState(0);
@@ -133,7 +142,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
     }, 750);
 
     try {
-      const result = await generateLessonPreparation({ ageGroup, direction, topic: targetTopic });
+      const result = await generateLessonPreparation({ ageGroup, direction, topic: targetTopic, core: core || undefined });
       setPlan(result.plan);
       setSource(result.source);
       onTimeSaved(45);
@@ -165,6 +174,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       `Група: ${p.ageGroupLabel} (${p.totalDuration})`,
       `Образователно направление: ${p.directionLabel}`,
       `Образователно ядро: ${p.educationalCore}`,
+      ...(p.organizationForm ? [`Форма на организация: ${p.organizationForm}`] : []),
+      `Нормативна основа: ${NAREDBA5.title}`,
+      `Програмна система: ${ZLATNO_KLYUCHE.system} (${ZLATNO_KLYUCHE.publisher})`,
       '',
       `🎯 ЦЕЛИ:`,
       ...p.goals.map((g, i) => `${i + 1}. ${g}`),
@@ -177,6 +189,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       `🧰 НЕОБХОДИМИ МАТЕРИАЛИ:`,
       ...p.materials.map((m) => `• ${m}`),
       '',
+      ...(p.integrativeLinks?.length
+        ? [`🔗 ИНТЕГРАТИВНИ ВРЪЗКИ:`, ...p.integrativeLinks.map((l) => `• ${l}`), '']
+        : []),
       `⏱️ ХОД НА СИТУАЦИЯТА ПО МИНУТИ:`,
       ...p.stages.map(
         (s) =>
@@ -252,7 +267,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
           </div>
           <div className="bg-black/20 backdrop-blur-sm px-4 py-3 rounded-2xl border border-white/15 text-xs font-bold space-y-1 shrink-0">
             <div className="text-amber-200 uppercase tracking-wider">Съответствие със стандарта:</div>
-            <div>✅ Наредба № 5 за предучилищното образование</div>
+            <div>✅ Наредба № 5 за предучилищното образование ({NAREDBA5.lastAmended})</div>
+            <div>✅ {ZLATNO_KLYUCHE.system} – „Бит и техника“</div>
             <div>✅ Готово за портфолио и Viber група</div>
           </div>
         </div>
@@ -310,7 +326,10 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 <button
                   key={d.id}
                   type="button"
-                  onClick={() => setDirection(d.id)}
+                  onClick={() => {
+                    setDirection(d.id);
+                    setCore('');
+                  }}
                   className={`py-3.5 px-4 rounded-2xl border-2 font-extrabold text-left transition-all flex items-center gap-3 ${
                     projectorMode ? 'text-lg' : 'text-sm sm:text-base'
                   } ${
@@ -324,6 +343,50 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 </button>
               );
             })}
+          </div>
+
+          {/* Образователно ядро по приложението към Наредба № 5 */}
+          <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 space-y-3">
+            <p className="text-xs font-extrabold uppercase tracking-wider text-indigo-800">
+              Образователно ядро (приложение № {dirStd.appendix} към Наредба № 5):
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setCore('')}
+                aria-pressed={core === ''}
+                className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border transition-all ${
+                  core === ''
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                    : 'bg-white hover:bg-indigo-50 text-slate-700 border-slate-200'
+                }`}
+              >
+                ✨ AI избира по темата (препоръчано)
+              </button>
+              {dirStd.cores.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCore(c)}
+                  aria-pressed={core === c}
+                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border transition-all ${
+                    core === c
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                      : 'bg-white hover:bg-indigo-50 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs leading-relaxed text-slate-600">
+              <strong className="text-slate-800">Минимум седмично:</strong> {dirStd.minWeekly[ageGroup]}{' '}
+              {dirStd.minWeekly[ageGroup] === 1 ? 'педагогическа ситуация' : 'педагогически ситуации'} за{' '}
+              {AGE_GROUP_STANDARDS[ageGroup].name} • <strong className="text-slate-800">„Златно ключе“:</strong>{' '}
+              {dirStd.zlatnoBook
+                ? `познавателна книжка ${dirStd.zlatnoBook} за ${ageGroup}. група`
+                : 'без отделна книжка – в книгата за учителя по всички направления'}
+            </p>
           </div>
         </div>
 
@@ -612,6 +675,12 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                       <Clock className="w-4 h-4 text-emerald-600" />
                       <span>Продължителност по ДОС: {plan.totalDuration}</span>
                     </div>
+                    {plan.organizationForm && (
+                      <p className="text-xs font-bold text-emerald-900">Форма на организация: {plan.organizationForm}</p>
+                    )}
+                    {plan.programMaterial && (
+                      <p className="text-xs font-bold text-emerald-900">📚 {plan.programMaterial}</p>
+                    )}
                   </div>
 
                   {/* Goals */}
@@ -645,6 +714,34 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                       <strong className="text-emerald-800">Отношения:</strong> {plan.expectedResults.attitudes}
                     </p>
                   </div>
+
+                  {/* Материали и интегративни връзки */}
+                  <div>
+                    <h5 className="font-extrabold text-slate-900 uppercase tracking-wider text-xs mb-2">Материали:</h5>
+                    <ul className="space-y-1 pl-1">
+                      {plan.materials.map((m, i) => (
+                        <li key={i} className="flex items-start gap-2 text-slate-700">
+                          <span className="font-extrabold text-emerald-600">•</span>
+                          <span>{m}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  {plan.integrativeLinks && plan.integrativeLinks.length > 0 && (
+                    <div>
+                      <h5 className="font-extrabold text-slate-900 uppercase tracking-wider text-xs mb-2">
+                        Интегративни връзки:
+                      </h5>
+                      <ul className="space-y-1 pl-1">
+                        {plan.integrativeLinks.map((l, i) => (
+                          <li key={i} className="flex items-start gap-2 text-slate-700">
+                            <span className="font-extrabold text-indigo-600">🔗</span>
+                            <span>{l}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Ход на ситуацията по минути */}
                   <div>

@@ -3,7 +3,7 @@ export type GroupMood = 'noisy' | 'tired' | 'distracted';
 export type PlayLocation = 'classroom' | 'music_hall' | 'yard';
 export type PlayDuration = '5' | '15' | '30';
 export type PlayResources = 'none' | 'balls' | 'music' | 'paper_pencils' | 'hoops_ribbons';
-export type EducationalDirection = 'bel' | 'world' | 'math' | 'art' | 'music' | 'construct';
+export type EducationalDirection = 'bel' | 'world' | 'math' | 'art' | 'music' | 'construct' | 'pe';
 export type AppModule = 'games' | 'hub' | 'dos' | 'prompts';
 export type PromptCategory = 'all' | 'dos_planning' | 'holidays' | 'parents' | 'inclusion_emotions' | 'portfolio';
 
@@ -96,6 +96,12 @@ export interface GeneratedLessonPlan {
   expectedResults: { knowledge: string; skills: string; attitudes: string };
   materials: string[];
   stages: LessonStage[];
+  /** Връзки с други образователни направления (интегриран подход). */
+  integrativeLinks?: string[];
+  /** Форма на организация: фронтална, групова или индивидуална. */
+  organizationForm?: string;
+  /** Познавателна книжка от „Златно ключе“ („Бит и техника“), ако има за направлението. */
+  programMaterial?: string;
   story: { title: string; hero: string; paragraphs: string[]; moral: string; discussionQuestions: string[] };
   parentNote: { viberHeader: string; summaryMessage: string; highlights: string[]; homeGameTitle: string; homeGameDescription: string; closingWarmth: string };
 }
