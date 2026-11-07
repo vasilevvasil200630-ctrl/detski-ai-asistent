@@ -2,21 +2,22 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { AUTH_REQUIRED } from "@/lib/teacher";
+import { findVisibleMaterial } from "@/lib/material-access";
 
-/** Харесване / отхаресване на игра от банката. */
+/** Харесване / отхаресване на игра от банката (игрите са материали от вид GAME). */
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
   const { id } = await params;
 
-  const game = await prisma.bankGame.findUnique({ where: { id }, select: { id: true } });
+  const game = await findVisibleMaterial(id, session.userId, { anyKindergartenGames: true });
   if (!game) return NextResponse.json({ error: "Играта не е намерена." }, { status: 404 });
 
-  const key = { userId_gameId: { userId: session.userId, gameId: id } };
-  const existing = await prisma.bankGameLike.findUnique({ where: key });
-  if (existing) await prisma.bankGameLike.delete({ where: key });
-  else await prisma.bankGameLike.create({ data: { userId: session.userId, gameId: id } }).catch(() => null);
+  const key = { userId_materialId: { userId: session.userId, materialId: id } };
+  const existing = await prisma.materialLike.findUnique({ where: key });
+  if (existing) await prisma.materialLike.delete({ where: key });
+  else await prisma.materialLike.create({ data: { userId: session.userId, materialId: id } }).catch(() => null);
 
-  const likes = await prisma.bankGameLike.count({ where: { gameId: id } });
+  const likes = await prisma.materialLike.count({ where: { materialId: id } });
   return NextResponse.json({ likedByMe: !existing, likes });
 }

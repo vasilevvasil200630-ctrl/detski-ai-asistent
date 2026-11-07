@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { MagicGamesModule } from "@/components/MagicGamesModule";
 import { useMe } from "@/lib/client/useMe";
-import { saveGameToBank } from "@/lib/client/bank";
 import { useAppStore } from "@/store/appStore";
 
 export default function GamesPage() {
@@ -14,13 +13,12 @@ export default function GamesPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* Запазването и споделянето на всяка игра е в SaveMaterialBar */}
       <MagicGamesModule
         onTimeSaved={addSavedMinutes}
         projectorMode={projectorMode}
         activeTeacher={user}
-        onSaveGameToBank={saveGameToBank}
         onOpenHub={() => router.push("/hub")}
-        onRequireLogin={() => router.push("/login?callbackUrl=/games")}
       />
     </main>
   );

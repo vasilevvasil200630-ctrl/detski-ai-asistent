@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dices, Rocket, Building2, BookMarked } from "lucide-react";
+import { Dices, Rocket, Building2, Library, CalendarHeart } from "lucide-react";
 
 // Копирано от МатураПлюс (src/components/MobileBottomNav.tsx) — с разделите на детския сайт.
 
 const NAV_ITEMS = [
   { href: "/games", label: "Игри", icon: Dices },
   { href: "/dos", label: "ДОС план", icon: Rocket },
-  { href: "/hub", label: "Банка", icon: Building2 },
-  { href: "/prompts", label: "Промптове", icon: BookMarked },
+  { href: "/library", label: "Библиотека", icon: Library },
+  { href: "/hub", label: "Хъб", icon: Building2 },
+  { href: "/holidays", label: "Празници", icon: CalendarHeart },
 ];
 
 export function MobileBottomNav() {
@@ -22,7 +23,7 @@ export function MobileBottomNav() {
       aria-label="Бърза мобилна навигация"
       className="fixed bottom-0 inset-x-0 z-30 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200/75 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs"
     >
-      <div className="grid grid-cols-4 gap-1">
+      <div className="grid grid-cols-5 gap-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);

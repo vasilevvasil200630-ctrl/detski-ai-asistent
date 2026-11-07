@@ -38,6 +38,7 @@ import {
   ZLATNO_KLYUCHE,
 } from '../services/naredba5';
 import { BDP, BDP_MIN_PER_YEAR, BDP_THEMES } from '../services/bdp';
+import { SaveMaterialBar } from './SaveMaterialBar';
 
 interface LiveDosModuleProps {
   /** Групата на влезлия учител (по подразбиране III група) */
@@ -524,6 +525,25 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       {/* Results: 3 Sections simultaneously in 3 columns OR focused tabs */}
       {!isGenerating && plan && (
         <div className="space-y-6">
+          {/* Запазване на целия план (с приказката и бележката) в библиотеката и споделяне с колегите */}
+          <div className="no-print flex flex-col gap-3 rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-bold text-slate-700">
+              📚 Запазете разработката в профила си ({AGE_GROUP_LABELS[ageGroup].short}) или я споделете с колегите.
+            </p>
+            <SaveMaterialBar
+              key={`${plan.topic}-${plan.educationalCore}`}
+              material={{
+                kind: 'LESSON',
+                title: plan.topic,
+                ageGroup,
+                direction,
+                core: plan.educationalCore,
+                holiday: null,
+                content: plan,
+              }}
+            />
+          </div>
+
           {/* Result Header & Layout Switcher */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/90 p-4 sm:p-5 rounded-2xl border border-indigo-200 shadow-sm">
             <div>

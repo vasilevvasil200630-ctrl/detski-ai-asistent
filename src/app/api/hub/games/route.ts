@@ -12,7 +12,7 @@ const ListQuery = z.object({
   ageGroup: z.enum(["1", "2", "3", "4"]).optional(),
 });
 
-/** Колективната банка: игрите на моята градина (или на всички градини). */
+/** Колективната банка: споделените игри на моята градина (или на всички градини). */
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ games: [], guest: true });
@@ -27,8 +27,10 @@ export async function GET(request: Request) {
   const me = await prisma.user.findUnique({ where: { id: session.userId }, select: { kindergartenId: true } });
   if (!me) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
 
-  const rows = await prisma.bankGame.findMany({
+  const rows = await prisma.material.findMany({
     where: {
+      kind: "GAME",
+      shared: true,
       ...(q.data.scope === "kg" ? { kindergartenId: me.kindergartenId ?? "__none__" } : {}),
       ...(q.data.ageGroup ? { ageGroup: q.data.ageGroup } : {}),
     },
@@ -36,11 +38,11 @@ export async function GET(request: Request) {
     orderBy: { createdAt: "desc" },
     take: 200,
   });
-  const liked = await prisma.bankGameLike.findMany({
-    where: { userId: session.userId, gameId: { in: rows.map((r) => r.id) } },
-    select: { gameId: true },
+  const liked = await prisma.materialLike.findMany({
+    where: { userId: session.userId, materialId: { in: rows.map((r) => r.id) } },
+    select: { materialId: true },
   });
-  const likedIds = new Set(liked.map((l) => l.gameId));
+  const likedIds = new Set(liked.map((l) => l.materialId));
   return NextResponse.json({ games: rows.map((r) => toSavedBankGame(r, likedIds)) });
 }
 
@@ -52,7 +54,7 @@ const SaveBody = z.object({
   game: z.unknown(),
 });
 
-/** Споделяне на игра в банката на моята градина. */
+/** Споделяне на игра в банката на моята градина (тя е и в моята библиотека). */
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
@@ -76,15 +78,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Профилът ти не е свързан с детска градина." }, { status: 400 });
   }
 
-  const row = await prisma.bankGame.create({
+  const { mood, location, resources } = parsed.data;
+  const row = await prisma.material.create({
     data: {
       kindergartenId: me.kindergartenId,
       authorId: session.userId,
+      kind: "GAME",
+      title: game!.title,
       ageGroup: parsed.data.ageGroup,
-      mood: parsed.data.mood,
-      location: parsed.data.location,
-      resources: parsed.data.resources,
-      game: JSON.parse(JSON.stringify(game)),
+      meta: { mood, location, resources },
+      content: JSON.parse(JSON.stringify(game)),
+      shared: true,
+      sharedAt: new Date(),
       likes: { create: { userId: session.userId } },
     },
     include: BANK_GAME_INCLUDE,

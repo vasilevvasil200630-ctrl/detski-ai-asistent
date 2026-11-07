@@ -21,6 +21,7 @@ import {
 import { AgeGroup, GoldenPromptItem, PromptCategory } from '../types';
 import { AGE_GROUP_LABELS } from '../services/aiEngine';
 import { GOLDEN_PROMPTS, PROMPT_CATEGORIES } from '../services/goldenPromptsData';
+import { SaveMaterialBar } from './SaveMaterialBar';
 
 interface GoldenPromptsModuleProps {
   onTimeSaved: (minutes: number) => void;
@@ -469,6 +470,17 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
 
               {/* Card Actions Footer */}
               <div className="no-print px-5 py-4 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+                {/* Промптът с темата на учителя се пази като помощен материал за групата */}
+                <SaveMaterialBar
+                  compact
+                  className="order-last w-full"
+                  material={{
+                    kind: 'MATERIAL',
+                    title: `${item.title}: ${customVal}`.slice(0, 140),
+                    ageGroup: selectedAge,
+                    content: { text: fullPromptText },
+                  }}
+                />
                 <button
                   type="button"
                   onClick={() => handleCopyPrompt(item)}
