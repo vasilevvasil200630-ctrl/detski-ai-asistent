@@ -11,8 +11,9 @@ export const LoginSchema = z.object({
 
 const AgeGroupSchema = z.enum(["1", "2", "3", "4"]);
 
-export const RegisterSchema = z
-  .object({
+// Облакът е само на ДГ „Пролет“: регистрацията е винаги присъединяване с код
+// (първият профил — без код, става администратор). Старите полета за нова градина се игнорират.
+export const RegisterSchema = z.object({
     email: z.string().trim().toLowerCase().email("Моля, въведи валиден имейл адрес."),
     password: z
       .string()
@@ -23,20 +24,12 @@ export const RegisterSchema = z
     avatar: z.string().trim().max(16).optional(),
     ageGroup: AgeGroupSchema.default("2"),
     groupName: z.string().trim().max(80).optional(),
-    /** create → нова детска градина; join → присъединяване с код от колега */
-    mode: z.enum(["create", "join"]),
+    /** (Остаряло) Сайтът е на една градина — полето се игнорира */
+    mode: z.enum(["create", "join"]).optional(),
     kgName: z.string().trim().max(120).optional(),
     kgCity: z.string().trim().max(80).optional(),
     kgMotto: z.string().trim().max(160).optional(),
     joinCode: z.string().trim().max(20).optional(),
-  })
-  .superRefine((v, ctx) => {
-    if (v.mode === "create" && (!v.kgName || v.kgName.length < 3)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["kgName"], message: "Моля, въведи името на детската градина." });
-    }
-    if (v.mode === "join" && (!v.joinCode || v.joinCode.length < 6)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["joinCode"], message: "Моля, въведи кода, който ти е дал колега." });
-    }
   });
 
 export const ProfileUpdateSchema = z.object({

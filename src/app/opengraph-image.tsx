@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 // По модела на МатураПлюс (src/app/opengraph-image.tsx): картинка при споделяне във Viber,
 // Facebook и Messenger (1200×630), генерира се при build. Noto Sans покрива кирилицата.
-export const alt = "Детски асистент — платформа за учителите в детската градина";
+export const alt = "Учителски облак на ДГ „Пролет“, с. Ягодово";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -41,17 +41,18 @@ export default async function OpengraphImage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`data:image/svg+xml;utf8,${encodeURIComponent(ICON_SVG)}`} width={80} height={80} alt="" />
           <div style={{ display: "flex", fontSize: 48, fontWeight: 700 }}>
-            <span style={{ color: NAVY }}>Детски</span>
-            <span style={{ color: MUTED }}>&nbsp;асистент</span>
+            <span style={{ color: NAVY }}>ДГ</span>
+            <span style={{ color: "#1ea858" }}>&nbsp;„Пролет“</span>
+            <span style={{ color: MUTED, fontWeight: 400 }}>&nbsp;· с. Ягодово</span>
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ display: "flex", fontSize: 68, fontWeight: 700, lineHeight: 1.1 }}>
-            Подготовката за детската градина — на едно място
+            Учителският облак на ДГ „Пролет“
           </div>
           <div style={{ display: "flex", fontSize: 32, color: MUTED, lineHeight: 1.4 }}>
-            Ситуационни игри, план-конспекти по ДОС и обща библиотека за учителския екип
+            Игри, работни листове, стихчета, писма до родителите и грамоти — създадени и готови за печат
           </div>
         </div>
 

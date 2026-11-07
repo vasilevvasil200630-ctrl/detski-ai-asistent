@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getSession } from "@/lib/auth/session";
+import { AUTH_REQUIRED } from "@/lib/teacher";
 import { askGeminiJson, checkAiRateLimit, hasGeminiKey } from "@/lib/ai-route";
 import { buildDemoLessonPlan, buildLessonAiPrompt } from "@/services/aiEngine";
 import { extractJson, normalizeLessonPlan } from "@/services/aiValidation";
@@ -17,6 +19,8 @@ const Params = z.object({
 });
 
 export async function POST(request: Request) {
+  // Облакът е само за учителите на градината — генерирането изисква вход
+  if (!(await getSession())) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
   const parsed = Params.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Невалидни параметри." }, { status: 400 });
   // Приема се само официално ядро (или тема от програмите на МОН за БДП) за това направление

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Bookmark, Check, ChevronDown, Copy, Heart, Loader2, Printer, Share2, Trash2, Undo2 } from "lucide-react";
 import type { SavedMaterial } from "@/types";
 import { AGE_SHORT, directionLabel, holidayLabel, KIND_LABELS, materialToText } from "@/services/materialText";
@@ -14,10 +15,6 @@ type Props = {
   onChange?: (m: SavedMaterial) => void;
   onDelete?: (id: string) => void;
 };
-
-function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
-}
 
 /** Карта на материал: преглед на съдържанието, копиране, печат, споделяне, харесване. */
 export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
@@ -38,19 +35,6 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
     } catch {
       toast("Текстът не можа да се копира.", "error");
     }
-  };
-
-  const print = () => {
-    const w = window.open("", "_blank", "width=800,height=900");
-    if (!w) return toast("Браузърът блокира прозореца за печат.", "error");
-    w.document.write(
-      `<!doctype html><html lang="bg"><head><meta charset="utf-8"><title>${escapeHtml(m.title)}</title>` +
-        `<style>body{font-family:system-ui,sans-serif;margin:32px;line-height:1.5;color:#111}h1{font-size:20px}pre{white-space:pre-wrap;font:inherit}</style>` +
-        `</head><body><h1>${escapeHtml(m.title)}</h1><pre>${escapeHtml(text)}</pre></body></html>`,
-    );
-    w.document.close();
-    w.focus();
-    w.print();
   };
 
   const toggleShare = async () => {
@@ -138,9 +122,9 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
         <button type="button" onClick={copyText} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
           {copiedText ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copiedText ? "Копирано" : "Копирай"}
         </button>
-        <button type="button" onClick={print} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
+        <Link href={`/print/${m.id}`} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
           <Printer className="h-3.5 w-3.5" /> Принтирай
-        </button>
+        </Link>
 
         {view === "mine" && (
           <>

@@ -347,4 +347,32 @@ html.projector-mode {
     box-shadow: none !important;
     border: 1px solid #cbd5e1 !important;
   }
+  /* Материали за печат: всеки лист — отделна страница A4, без рамката на екрана */
+  .print-sheet {
+    box-shadow: none !important;
+    max-width: none !important;
+    padding: 0 !important;
+    break-after: page;
+  }
+  .print-sheet:last-child {
+    break-after: auto;
+  }
+  .print-task {
+    break-inside: avoid;
+  }
+  .certificate-sheet {
+    aspect-ratio: auto !important;
+    height: 270mm;
+  }
+  .print-hide-teacher .print-teacher-note {
+    display: none !important;
+  }
+  .print-area {
+    margin: 0 !important;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 12mm;
 }

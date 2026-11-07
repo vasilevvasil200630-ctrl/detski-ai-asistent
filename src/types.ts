@@ -64,7 +64,10 @@ export interface GameFilterState {
   location: PlayLocation;
   duration: PlayDuration;
   resources: PlayResources;
+  /** Темата, която групата е взела (или тема по желание) */
   customTheme?: string;
+  /** Направление по Наредба № 5 или БДП; „mixed“ — смесени игри според настроението и материалите */
+  direction?: LessonDirection | 'mixed';
 }
 
 export interface GeneratedGame {

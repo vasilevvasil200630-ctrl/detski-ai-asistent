@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getSession } from "@/lib/auth/session";
+import { AUTH_REQUIRED } from "@/lib/teacher";
 import { askGeminiJson, checkAiRateLimit, hasGeminiKey } from "@/lib/ai-route";
 import { buildDemoContext, buildGamesAiPrompt } from "@/services/aiEngine";
 import { buildDemoGames } from "@/services/demoGames";
@@ -14,9 +16,12 @@ const Filters = z.object({
   duration: z.enum(["5", "15", "30"]),
   resources: z.enum(["none", "balls", "music", "paper_pencils", "hoops_ribbons"]),
   customTheme: z.string().trim().max(80).optional(),
+  direction: z.enum(["mixed", "bel", "world", "math", "art", "music", "construct", "pe", "bdp"]).optional(),
 });
 
 export async function POST(request: Request) {
+  // Облакът е само за учителите на градината — генерирането изисква вход
+  if (!(await getSession())) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
   const parsed = Filters.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Невалидни филтри." }, { status: 400 });
   const filters = parsed.data;

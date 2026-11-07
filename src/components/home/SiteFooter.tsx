@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { LogoIcon, LogoWordmark } from "@/components/Logo";
 import { openFeedback } from "@/components/FeedbackWidget";
+import { KG, KG_SIGNATURE } from "@/config/kindergarten";
 
 const LINKS = [
-  { title: "Инструменти", items: [["/games", "Магическа кутия с игри"], ["/dos", "ДОС план-конспект"], ["/prompts", "Златни промптове"]] },
+  { title: "Инструменти", items: [["/games", "Игри"], ["/materials", "Материали за печат"], ["/dos", "ДОС план-конспект"]] },
   { title: "Детската градина", items: [["/hub", "Учителски хъб"], ["/library", "Моята библиотека"], ["/holidays", "Празници"]] },
   { title: "Справочник", items: [["/naredba5", "Наредба № 5 и „Златно ключе“"], ["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
 ] as const;
@@ -19,7 +20,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
     return (
       <footer className="no-print border-t border-slate-200 px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
-          <span>© {year} Детски асистент · Съобразено с Наредба № 5 за предучилищното образование</span>
+          <span>© {year} {KG_SIGNATURE} · Учителски облак · Съобразено с Наредба № 5</span>
           <nav aria-label="Връзки в долната част" className="flex flex-wrap gap-4">
             <Link href="/naredba5" className="hover:text-slate-800">Наредба № 5</Link>
             <Link href="/privacy" className="hover:text-slate-800">Поверителност</Link>
@@ -41,7 +42,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
             <LogoWordmark className="text-base" />
           </Link>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
-            Платформа за учителите в детската градина. Съобразена с Наредба № 5 за предучилищното образование.
+            Учителският облак на {KG.fullName}, {KG.village}. Материали за децата от нашите групи, съобразени с Наредба № 5.
           </p>
         </div>
         {LINKS.map((group) => (
@@ -61,7 +62,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
       </div>
       <div className="border-t border-slate-100">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-500 sm:px-6">
-          <span>© {year} Детски асистент</span>
+          <span>© {year} {KG.fullName}, {KG.village}</span>
           <button type="button" onClick={openFeedback} className={FEEDBACK_BUTTON}>
             Обратна връзка
           </button>

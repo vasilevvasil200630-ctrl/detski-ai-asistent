@@ -16,6 +16,7 @@ import {
   LogOut,
   Mail,
   UserPlus,
+  Printer,
   type LucideIcon,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
@@ -42,6 +43,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/", label: "Начало", icon: LayoutDashboard },
       { href: "/games", label: "Магическа кутия с игри", icon: Dices },
+      { href: "/materials", label: "Материали за печат", icon: Printer },
       { href: "/dos", label: "ДОС план-конспект", icon: Rocket },
       { href: "/prompts", label: "Златни промптове", icon: BookMarked },
     ],
@@ -96,14 +98,14 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
           {!collapsed && (
             <Link href="/" className="group flex items-center gap-2.5" onClick={onCloseMobile}>
               <LogoIcon className="h-8 w-8 shrink-0 transition-transform" />
-              <LogoWordmark />
+              <LogoWordmark withVillage />
             </Link>
           )}
           {collapsed && (
             <Link
               href="/"
               className="mx-auto flex h-8 w-8 items-center justify-center transition-colors"
-              title="Детски асистент — Начало"
+              title="ДГ „Пролет“ — Начало"
             >
               <LogoIcon className="h-8 w-8 shrink-0" />
             </Link>
@@ -194,7 +196,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
             <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-2 text-center">
               <p className="text-xs font-semibold text-slate-800 flex items-center justify-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" />
-                {kgName ?? "Детски асистент"}
+                {kgName ?? "ДГ „Пролет“"}
               </p>
               <p className="mt-0.5 text-xs text-[#166534] font-medium">
                 {isLoggedIn ? "Колективна банка на екипа" : "Влез за общата банка с игри"}

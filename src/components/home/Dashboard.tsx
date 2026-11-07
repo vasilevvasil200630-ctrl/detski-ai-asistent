@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BookmarkPlus, CalendarHeart, Dices, FileText, Loader2 } from "lucide-react";
+import { ArrowRight, CalendarHeart, Dices, FileText, KeyRound, Loader2, Printer } from "lucide-react";
 import type { SavedMaterial, SessionTeacher } from "@/types";
 import { fetchMaterials } from "@/lib/client/materials";
 import { AGE_SHORT, KIND_LABELS } from "@/services/materialText";
@@ -54,8 +54,8 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
 
   const actions = [
     { href: "/games", label: "Нови игри", icon: Dices },
+    { href: "/materials", label: "Материали за печат", icon: Printer },
     { href: "/dos", label: "План-конспект", icon: FileText },
-    { href: "/library", label: "Добави материал", icon: BookmarkPlus },
     { href: "/holidays", label: "Празници", icon: CalendarHeart },
   ];
 
@@ -121,6 +121,15 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
         </div>
 
         <aside className="space-y-6">
+          {user.kindergarten && (
+            <section aria-labelledby="dash-code" className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 id="dash-code" className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+                <KeyRound className="h-4 w-4" aria-hidden /> Код за нови колеги
+              </h2>
+              <p className="mt-2 font-mono text-2xl font-bold tracking-wide text-slate-900">{user.kindergarten.joinCode}</p>
+              <p className="mt-1 text-sm text-slate-600">Дайте го на колега от {user.kindergarten.name}, за да се регистрира в облака.</p>
+            </section>
+          )}
           <section aria-labelledby="dash-holiday" className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 id="dash-holiday" className="text-sm font-semibold text-slate-500">Предстоящ празник</h2>
             <p className="mt-2 text-lg font-bold text-slate-900">{holiday.name}</p>

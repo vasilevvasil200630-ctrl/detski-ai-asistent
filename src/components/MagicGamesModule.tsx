@@ -4,9 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { SaveMaterialBar } from './SaveMaterialBar';
 import { VoiceMic } from './VoiceMic';
 import { speak, stopSpeaking } from '@/lib/speech';
-import { Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
+import { BookOpen, Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
 import { AgeGroup, GameFilterState, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
+
+/** Направленията по чл. 28 от Наредба № 5 и БДП (интегрирано) — за игри по направление. */
+const DIRECTION_OPTIONS: { id: NonNullable<GameFilterState['direction']>; label: string }[] = [
+  { id: 'mixed', label: 'Смесени' },
+  { id: 'bel', label: 'БЕЛ' },
+  { id: 'math', label: 'Математика' },
+  { id: 'world', label: 'Околен свят' },
+  { id: 'art', label: 'Изобразително изкуство' },
+  { id: 'music', label: 'Музика' },
+  { id: 'construct', label: 'Конструиране и технологии' },
+  { id: 'pe', label: 'Физическа култура' },
+  { id: 'bdp', label: 'БДП' },
+];
 
 const AGE_OPTIONS: { id: AgeGroup; label: string; emoji: string; desc: string }[] = [
   { id: '1', label: '1-ва група (3-4 г.)', emoji: '🐣', desc: 'Подражание и лесни образи' },
@@ -67,6 +80,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
     duration: '15',
     resources: 'none',
     customTheme: '',
+    direction: 'mixed',
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [games, setGames] = useState<GeneratedGame[]>([]);
@@ -129,7 +143,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             Магическа кутия с игри
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
-            Три ситуационни игри според групата и настроението на децата: римуван стих за начало, стъпки, умения по Наредба № 5 и адаптация за дете със СОП.
+            Три игри за вашата група — по направление и по темата, която сте взели, или според настроението на децата. Със стихче за начало, стъпки, умения по Наредба № 5 и адаптация за дете със СОП.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-bold bg-slate-50 border border-slate-200 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
@@ -155,9 +169,37 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </div>
         </div>
 
+        <fieldset className="space-y-4">
+          <legend className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
+            <BookOpen className="w-5 h-5 text-[#0a4b82]" /> 2. Направление и тема, която сте взели:
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            {DIRECTION_OPTIONS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={filters.direction === item.id}
+                onClick={() => setFilters((p) => ({ ...p, direction: item.id }))}
+                className={`rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${filters.direction === item.id ? 'border-[#0a4b82] bg-[#0a4b82] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="Темата от седмицата, напр. Есен в гората, Домашни животни, Числото 3..." aria-label="Тема, която сте взели" className="min-w-0 flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
+            <VoiceMic onTranscript={(t) => setFilters((p) => ({ ...p, customTheme: t }))} />
+          </div>
+          <p className="text-xs text-slate-500">
+            {filters.direction === 'mixed'
+              ? 'Смесени: една подвижна игра според настроението, една дидактична и една екипна.'
+              : 'И трите игри са от избраното направление, по различни образователни ядра.'}
+          </p>
+        </fieldset>
+
         <div>
           <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
-            <Smile className="w-5 h-5 text-rose-500" /> 2. Настроение на децата:
+            <Smile className="w-5 h-5 text-rose-500" /> 3. Настроение на децата:
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {MOOD_OPTIONS.map((item) => (
@@ -168,7 +210,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 3. Място:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 4. Място:</label>
             <div className="flex flex-col gap-2">
               {LOCATION_OPTIONS.map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.location === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
@@ -176,7 +218,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> 4. Времетраене:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> 5. Времетраене:</label>
             <div className="flex flex-col gap-2">
               {DURATION_OPTIONS.map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, duration: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.duration === item.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
@@ -184,7 +226,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> 5. Налични материали:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> 6. Налични материали:</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
               {RESOURCE_OPTIONS.map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, resources: item.id }))} className={`py-2.5 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold text-left ${filters.resources === item.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
@@ -193,13 +235,6 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <label className="text-xs sm:text-sm font-semibold text-slate-700 shrink-0">Тема (по желание):</label>
-          <div className="flex flex-1 items-center gap-2">
-            <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." aria-label="Тема на играта" className="min-w-0 flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
-            <VoiceMic onTranscript={(t) => setFilters((p) => ({ ...p, customTheme: t }))} />
-          </div>
-        </div>
 
         {/* Live Structured User Prompt Preview ("Запитване за игра (User Prompt)") */}
         <div className="rounded-2xl bg-slate-900 text-slate-100 p-5 border border-indigo-400/40 shadow-sm space-y-3">
@@ -306,7 +341,8 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                         title: game.title,
                         ageGroup: filters.ageGroup,
                         holiday: null,
-                        meta: { mood: filters.mood, location: filters.location, resources: filters.resources },
+                        direction: filters.direction && filters.direction !== 'mixed' ? filters.direction : null,
+                        meta: { mood: filters.mood, location: filters.location, resources: filters.resources, topic: filters.customTheme?.trim() || undefined },
                         content: game,
                       }}
                     />

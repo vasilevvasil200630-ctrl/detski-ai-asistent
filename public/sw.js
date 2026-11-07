@@ -1,12 +1,12 @@
 /**
- * Service Worker на Детски асистент — по модела на МатураПлюс (public/sw.js).
+ * Service Worker на учителския облак на ДГ „Пролет“ — по модела на МатураПлюс (public/sw.js).
  * Кешира статичните файлове и отворените страници; без интернет показва последната
  * запазена версия на страницата или /offline.html. API заявките винаги отиват към сървъра.
  */
 
-const CACHE_NAME = "detski-pwa-v1";
+const CACHE_NAME = "detski-pwa-v2";
 
-const PRECACHE_ASSETS = ["/", "/offline.html", "/manifest.json", "/icon-192.svg", "/icon-512.svg", "/naredba5", "/holidays"];
+const PRECACHE_ASSETS = ["/", "/offline.html", "/manifest.json", "/icon-192.svg", "/icon-512.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 <html lang="bg">
 <body style="margin:0;padding:24px;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a;">
   <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
-    <p style="margin:0 0 4px;font-size:12px;color:#475569;">Обратна връзка · Детски асистент</p>
+    <p style="margin:0 0 4px;font-size:12px;color:#475569;">Обратна връзка · Учителски облак на ДГ „Пролет“</p>
     <h1 style="margin:0 0 16px;font-size:20px;">${escapeHtml(TYPE_LABELS[type])} · <span style="color:#b45309;">${stars}</span></h1>
     <table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:16px;">
       <tr><td style="padding:4px 0;color:#475569;width:120px;">Подател</td><td>${escapeHtml(sender)}</td></tr>
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         from: EMAIL_CONFIG.from,
         to: EMAIL_CONFIG.adminNotificationEmail,
         ...(email ? { replyTo: email } : {}),
-        subject: `[Детски асистент] ${TYPE_LABELS[type]} · ${rating}/5`,
+        subject: `[ДГ „Пролет“] ${TYPE_LABELS[type]} · ${rating}/5`,
         html,
       });
       if (error) console.warn("[feedback] Resend грешка:", error);
