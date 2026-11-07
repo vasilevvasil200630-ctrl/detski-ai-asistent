@@ -136,6 +136,38 @@ model Material {
   @@index([holiday])
 }
 
+/// Еднократни линкове по имейл (нова парола). По модела на МатураПлюс: пази се само SHA-256
+/// на токена; `identifier` = "<цел>:<userId>".
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+/// Вид на обратната връзка от учителите.
+enum FeedbackType {
+  PRAISE
+  IDEA
+  BUG
+}
+
+/// Обратна връзка от формата „Обратна връзка“ — пази се в базата и (ако има Resend) идва по имейл.
+model Feedback {
+  id        String       @id @default(cuid())
+  type      FeedbackType
+  rating    Int
+  message   String
+  email     String?
+  page      String?
+  /// Учителят, ако е влязъл (без релация — изтрит профил не трие обратната връзка)
+  userId    String?
+  createdAt DateTime     @default(now())
+
+  @@index([createdAt])
+}
+
 model MaterialLike {
   userId     String
   materialId String

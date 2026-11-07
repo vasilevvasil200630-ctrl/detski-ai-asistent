@@ -1,0 +1,24 @@
+{
+  "name": "Детски асистент — платформа за учителите в детската градина",
+  "short_name": "Детски асистент",
+  "description": "Ситуационни игри, план-конспекти по ДОС и обща библиотека за учителския екип. Съобразено с Наредба № 5 за предучилищното образование.",
+  "lang": "bg",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Магическа кутия с игри", "short_name": "Игри", "url": "/games", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
+    { "name": "План-конспект по ДОС", "short_name": "ДОС план", "url": "/dos", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
+    { "name": "Моята библиотека", "short_name": "Библиотека", "url": "/library", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
+    { "name": "Празници", "short_name": "Празници", "url": "/holidays", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] }
+  ]
+}

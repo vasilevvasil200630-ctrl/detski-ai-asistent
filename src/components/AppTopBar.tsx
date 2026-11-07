@@ -14,8 +14,10 @@ import {
   ChevronDown,
   Monitor,
   ShieldCheck,
+  MessageSquareText,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
+import { openFeedback } from "./FeedbackWidget";
 import { ThemeToggle } from "./ThemeToggle";
 import { performSignOut } from "@/lib/session-cache";
 import { useMe } from "@/lib/client/useMe";
@@ -187,6 +189,17 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                     >
                       <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${projectorMode ? "left-3.5" : "left-0.5"}`} />
                     </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      openFeedback();
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  >
+                    <MessageSquareText className="h-4 w-4 text-slate-500" />
+                    <span>Обратна връзка</span>
                   </button>
                 </div>
                 <div className="border-t border-slate-100 pt-1.5">

@@ -105,15 +105,23 @@ function LoginForm() {
           disabled={loading}
         />
 
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 accent-[#0a4b82] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
-          />
-          Запомни ме
-        </label>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 accent-[#0a4b82] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+            />
+            Запомни ме
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-sm font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+          >
+            Забравена парола?
+          </Link>
+        </div>
 
         <FormError message={error} />
 

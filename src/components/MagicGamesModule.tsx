@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { SaveMaterialBar } from './SaveMaterialBar';
+import { VoiceMic } from './VoiceMic';
+import { speak, stopSpeaking } from '@/lib/speech';
 import { Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
 import { AgeGroup, GameFilterState, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
@@ -110,17 +112,14 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
     setTimeout(() => setCopiedId(null), 2500);
   };
 
-  const handleSpeakRhyme = (g: GeneratedGame) => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    if (speakingId === g.id) { setSpeakingId(null); return; }
-    const u = new SpeechSynthesisUtterance(g.rhymeLines.join('. '));
-    u.lang = 'bg-BG';
-    u.rate = 0.92;
-    u.onend = () => setSpeakingId(null);
-    setSpeakingId(g.id);
-    window.speechSynthesis.speak(u);
+  // Четене на глас с български глас, ако браузърът има такъв (src/lib/speech.ts от МатураПлюс)
+  const handleSpeakRhyme = async (g: GeneratedGame) => {
+    if (speakingId === g.id) { stopSpeaking(); setSpeakingId(null); return; }
+    const ok = await speak(g.rhymeLines.join('. '), () => setSpeakingId((id) => (id === g.id ? null : id)), 0.92);
+    if (ok) setSpeakingId(g.id);
   };
+
+  useEffect(() => () => stopSpeaking(), []);
 
   return (
     <section className="space-y-8">
@@ -196,7 +195,10 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
           <label className="text-xs sm:text-sm font-semibold text-slate-700 shrink-0">Тема (по желание):</label>
-          <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
+          <div className="flex flex-1 items-center gap-2">
+            <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." aria-label="Тема на играта" className="min-w-0 flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
+            <VoiceMic onTranscript={(t) => setFilters((p) => ({ ...p, customTheme: t }))} />
+          </div>
         </div>
 
         {/* Live Structured User Prompt Preview ("Запитване за игра (User Prompt)") */}

@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
+import { PRIVATE_PAGE_ROUTES } from "./src/lib/seo";
 
 // Копирано от МатураПлюс (next.config.ts): защитни заглавки и Content-Security-Policy.
-// Тук няма външни скриптове (анализи, Google вход) — Gemini и Upstash се викат само от сървъра.
+// Външни скриптове няма: Vercel Analytics е на същия домейн (/_vercel/insights); Gemini, Resend
+// и Upstash се викат само от сървъра. Нов външен скрипт/услуга → добави го тук.
 const CSP_DIRECTIVES = [
   "default-src 'self'",
   // 'unsafe-inline': Next.js вгражда inline скриптове; 'unsafe-eval' само при `next dev` (React Refresh)
@@ -37,15 +39,20 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          // Микрофонът е разрешен само за самия сайт — диктуване на темата на игра или план-конспект
+          { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
           { key: "Content-Security-Policy", value: CSP_DIRECTIVES },
         ],
       },
-      // API — никога в резултатите на търсачките
-      ...["/api", "/api/:path*"].map((source) => ({
-        source,
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
-      })),
+      // Service Worker-ът не се кешира, за да стига новата версия веднага
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+      // Лични страници и API — никога в резултатите на търсачките
+      ...[...PRIVATE_PAGE_ROUTES, "/api"].flatMap((route) =>
+        [route, `${route}/:path*`].map((source) => ({
+          source,
+          headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        })),
+      ),
     ];
   },
 };

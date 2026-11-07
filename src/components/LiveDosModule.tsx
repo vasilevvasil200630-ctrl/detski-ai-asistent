@@ -38,6 +38,8 @@ import {
   ZLATNO_KLYUCHE,
 } from '../services/naredba5';
 import { BDP, BDP_MIN_PER_YEAR, BDP_THEMES } from '../services/bdp';
+import { VoiceMic } from './VoiceMic';
+import { speak, stopSpeaking } from '@/lib/speech';
 import { SaveMaterialBar } from './SaveMaterialBar';
 
 interface LiveDosModuleProps {
@@ -237,23 +239,23 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       p.parentNote.closingWarmth,
     ].join('\n');
 
-  const handleSpeakStory = () => {
-    if (!plan || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+  // Четене на глас с български глас, ако браузърът има такъв (src/lib/speech.ts от МатураПлюс)
+  const handleSpeakStory = async () => {
+    if (!plan) return;
     if (isSpeakingStory) {
+      stopSpeaking();
       setIsSpeakingStory(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(
-      `${plan.story.title}. ${plan.story.paragraphs.join(' ')} ${plan.story.moral}`
+    const ok = await speak(
+      `${plan.story.title}. ${plan.story.paragraphs.join(' ')} ${plan.story.moral}`,
+      () => setIsSpeakingStory(false),
+      0.94,
     );
-    utterance.lang = 'bg-BG';
-    utterance.rate = 0.94;
-    utterance.onend = () => setIsSpeakingStory(false);
-    utterance.onerror = () => setIsSpeakingStory(false);
-    setIsSpeakingStory(true);
-    window.speechSynthesis.speak(utterance);
+    if (ok) setIsSpeakingStory(true);
   };
+
+  useEffect(() => () => stopSpeaking(), []);
 
   return (
     <section aria-label="План-конспект по ДОС" className="space-y-8">
@@ -417,7 +419,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
           >
             3. Тема на ситуацията (например от годишното тематично разпределение):
           </label>
-          <div className="relative">
+          <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
             <input
               id="dos-topic-input"
               type="text"
@@ -437,6 +440,8 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 Изчисти
               </button>
             )}
+          </div>
+          <VoiceMic onTranscript={setTopic} />
           </div>
 
           {/* Quick Preset Topic Chips */}

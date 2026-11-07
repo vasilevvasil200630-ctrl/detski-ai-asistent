@@ -27,6 +27,7 @@ const RULES: EnvRule[] = [
   { names: ["GEMINI_API_KEY"], effect: "AI генерацията е изключена — сайтът работи само с вградения демо двигател", required: false },
   { names: ["UPSTASH_REDIS_REST_URL"], effect: "лимитите на заявките се броят отделно във всяка инстанция (по-слабо)", required: false },
   { names: ["UPSTASH_REDIS_REST_TOKEN"], effect: "лимитите на заявките се броят отделно във всяка инстанция (по-слабо)", required: false },
+  { names: ["RESEND_API_KEY"], effect: "писма не се изпращат — „Забравена парола“ не работи, обратната връзка се пази само в базата", required: false },
 ];
 
 export type EnvProblem = { names: string[]; effect: string; required: boolean; hint?: string };

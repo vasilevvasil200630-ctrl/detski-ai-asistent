@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/AppShell";
+import { getBaseAppUrl } from "@/lib/email/config";
 
 // Копирано от МатураПлюс (src/app/layout.tsx): Geist с кирилица, метаданни, скрипт преди
 // рендериране за щадящия режим (без премигване) и AppShell около всяка страница.
@@ -24,12 +26,17 @@ const SITE_DESCRIPTION =
   "Ситуационни игри, план-конспекти по ДОС и обща библиотека с материали за учителския екип на детската градина. Съобразено с Наредба № 5 за предучилищното образование.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getBaseAppUrl()),
   title: {
     default: "Детски асистент — платформа за учителите в детската градина",
     template: "%s · Детски асистент",
   },
   description: SITE_DESCRIPTION,
   applicationName: "Детски асистент",
+  manifest: "/manifest.json",
+  appleWebApp: { capable: true, title: "Детски асистент", statusBarStyle: "default" },
+  icons: { apple: "/icon-192.svg" },
+  keywords: ["детска градина", "учители", "план-конспект", "ДОС", "ситуационни игри", "Наредба № 5", "Златно ключе", "предучилищно образование"],
   openGraph: {
     title: "Детски асистент — платформа за учителите в детската градина",
     description: SITE_DESCRIPTION,
@@ -68,6 +75,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] font-sans tracking-tight bg-app-ambient selection:bg-[#0a4b82]/15 selection:text-[#072d4c] transition-colors duration-200">
         <AppShell>{children}</AppShell>
+        {/* Vercel Analytics: без бисквитки и без лични данни — брои само посещенията на страниците */}
+        {/* Само в production: там скриптът е на същия домейн; в dev е от чужд домейн и CSP го спира */}
+        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
   );
