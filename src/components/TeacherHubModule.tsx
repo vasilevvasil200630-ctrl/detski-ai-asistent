@@ -126,7 +126,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
             Учителски хъб{kg ? `: ${kg.name}${kg.city ? ` (${kg.city})` : ''}` : ''}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
-            {kg?.motto ? `„${kg.motto}“ — ` : ''}Споделяйте любимите AI игри в общата банка на екипа — всички колеги от градината ги виждат веднага.
+            {kg?.motto ? `„${kg.motto}“ — ` : ''}Споделяйте любимите си игри в общата банка на екипа — всички колеги от градината ги виждат веднага.
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
               <Users className="w-5 h-5 text-indigo-700" />
               <span>Учителски екип{kg ? ` на ${kg.name}` : ''} ({team.length})</span>
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600">Всеки колега влиза със собствен профил — AI генераторът се настройва за неговата група.</p>
+            <p className="text-xs sm:text-sm text-slate-600">Всеки колега влиза със собствен профил — генераторът се настройва за неговата група.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {team.map((member) => {
@@ -234,7 +234,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-700 hover:bg-indigo-800 text-white shadow-sm transition-colors"
               >
                 <Sparkles className="w-4 h-4 text-amber-200" />
-                <span>Генерирай нова с AI</span>
+                <span>Генерирай нова игра</span>
               </button>
             </div>
           </div>

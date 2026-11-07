@@ -91,7 +91,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
         >
           {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
-        <Link href="/games" className="flex items-center gap-2.5 md:hidden group" aria-label="Детски AI — Начало">
+        <Link href="/games" className="flex items-center gap-2.5 md:hidden group" aria-label="Детски асистент — Начало">
           <LogoIcon className="h-8 w-8 shrink-0" />
           <LogoWordmark className="hidden text-base sm:inline" />
         </Link>
@@ -106,10 +106,10 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                 ? "border-green-200 bg-green-50 text-green-800"
                 : "border-slate-200 bg-slate-50 text-slate-600"
             }`}
-            title={aiLive ? "Сървърът е свързан с Google Gemini" : "Няма AI ключ на сървъра — работи вграденият демо двигател"}
+            title={aiLive ? "Сървърът е свързан с Google Gemini" : "Генераторът работи във вградения демо режим"}
           >
             {aiLive ? <Sparkles className="h-3.5 w-3.5" /> : <ShieldCheck className="h-3.5 w-3.5" />}
-            {aiLive ? "Gemini AI" : "Демо двигател"}
+            {aiLive ? "Gemini" : "Демо режим"}
           </span>
         )}
 

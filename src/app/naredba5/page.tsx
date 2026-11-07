@@ -58,7 +58,7 @@ export default function Naredba5Page() {
         <p className="mt-1 max-w-3xl text-sm text-slate-600 sm:text-base">
           Образователните направления и ядра, продължителността и минималният брой педагогически ситуации по {NAREDBA5.title}{" "}
           ({NAREDBA5.lastAmended}) и книжките от {ZLATNO_KLYUCHE.system} на {ZLATNO_KLYUCHE.publisher}. На тези данни
-          работят и AI генераторите в сайта.
+          работят и генераторите в сайта.
         </p>
       </div>
 

@@ -136,7 +136,7 @@ export default function HolidaysPage() {
 
         {source && (games || plan) && (
           <p className="text-xs font-bold text-slate-500">
-            {source === "ai" ? "Генерирано от Gemini AI" : "Генерирано от вградения демо двигател"} • {AGE_GROUP_LABELS[ageGroup].full}
+            {source === "ai" ? "Генерирано от Gemini" : "Генерирано от вградения демо двигател"} • {AGE_GROUP_LABELS[ageGroup].full}
           </p>
         )}
 
