@@ -231,17 +231,17 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
   };
 
   return (
-    <section aria-label="Библиотека със златни промптове и QR код за залата" className="space-y-8">
+    <section aria-label="Златни промптове" className="space-y-8">
       {/* Hero Banner */}
       <div className="border-b border-slate-200 pb-6">
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
           <div>
             <h2 className="font-display text-2xl sm:text-3xl font-bold ">
-              „Библиотека със златни промптове“ + Подарък за залата
+              Златни промптове
             </h2>
             <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-2xl">
-              Готови, изпитани шаблони (промптове) за ChatGPT, Gemini и Claude. Копирайте с 1 клик,
-              персонализирайте на живо или покажете големия QR код на проектора за колегите в залата!
+              Изпитани шаблони за ChatGPT, Gemini и Claude за планиране, празници, родители и приобщаващо образование.
+              Добавете своята тема, копирайте промпта или го запазете в библиотеката си.
             </p>
           </div>
 
@@ -249,19 +249,19 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
             <button
               type="button"
               onClick={() => setIsQrOpen(true)}
-              className="inline-flex items-center gap-2.5 px-5 py-3.5 rounded-2xl font-semibold text-sm sm:text-base bg-white text-slate-900 hover:bg-slate-100 shadow-sm hover:scale-[1.02] transition-all"
+              className="inline-flex items-center gap-2.5 px-5 py-3.5 rounded-2xl font-semibold text-sm sm:text-base bg-white text-slate-900 border border-slate-200 hover:bg-slate-100 transition-colors"
             >
               <QrCode className="w-5 h-5 text-rose-600" />
-              <span>Покажи QR код за залата</span>
+              <span>QR код</span>
             </button>
 
             <button
               type="button"
               onClick={handlePrintAllPrompts}
-              className="inline-flex items-center gap-2 px-4 py-3.5 rounded-2xl font-semibold text-sm bg-slate-50 hover:bg-black/30 text-slate-900 border border-white/25 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-3.5 rounded-2xl font-semibold text-sm bg-white hover:bg-slate-100 text-slate-900 border border-slate-200 transition-colors"
             >
               <Printer className="w-4 h-4" />
-              <span>Принтирай шпаргалка</span>
+              <span>Принтирай всички</span>
             </button>
           </div>
         </div>
@@ -398,7 +398,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
                     htmlFor={`input-${item.id}`}
                     className="block text-xs font-semibold text-amber-900"
                   >
-                    Персонализирай темата / ситуацията на живо:
+                    Вашата тема или ситуация:
                   </label>
                   <input
                     id={`input-${item.id}`}
@@ -536,7 +536,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
               </div>
               <div>
                 <h3 id={qrTitleId} className="font-display text-xl sm:text-2xl font-semibold text-slate-900">
-                  Сканирайте от екрана: Подарък за колегите
+                  Сканирайте QR кода с телефона
                 </h3>
                 <p className="text-sm text-slate-600">
                   Насочете камерата на телефона си към проектора, за да запазите формулата или линка!

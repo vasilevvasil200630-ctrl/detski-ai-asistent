@@ -26,7 +26,7 @@ export default function NotFound() {
           className={`mt-8 inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] active:bg-[#072d4c] ${focusRing}`}
         >
           <ArrowLeft className="h-4 w-4" />
-          Към Магическата кутия
+          Към началото
         </Link>
         <nav aria-label="Бързи препратки" className="mt-12 border-t border-slate-200 pt-8">
           <p className="mb-4 text-sm text-slate-500">Или отворете директно:</p>

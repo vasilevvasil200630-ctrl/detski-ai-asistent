@@ -6,6 +6,8 @@ import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { Toaster } from "./Toaster";
+import { SiteFooter } from "./home/SiteFooter";
+import { useMe } from "@/lib/client/useMe";
 
 // Копирано от МатураПлюс (src/components/AppShell.tsx): сгъваем страничен панел (запомня се),
 // горна лента, мобилна долна навигация и известия. Без синхронизацията на кеша на ученика.
@@ -14,6 +16,7 @@ const COLLAPSED_KEY = "detski-sidebar-collapsed";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, loading } = useMe();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -44,6 +47,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Началната страница за посетители е самостоятелен сайт — без страничното меню на приложението
+  if (pathname === "/" && (loading || !user)) {
+    return (
+      <>
+        {children}
+        <Toaster />
+      </>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-[var(--background)] text-[var(--foreground)] bg-app-ambient transition-colors duration-200">
       <AppSidebar
@@ -58,7 +71,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           onToggleCollapse={toggleCollapsed}
           collapsed={hydrated ? collapsed : false}
         />
-        <div className="flex-1 pb-16 md:pb-0">{children}</div>
+        <div className="flex flex-1 flex-col pb-16 md:pb-0">
+          <div className="flex-1">{children}</div>
+          <SiteFooter compact />
+        </div>
       </div>
       <MobileBottomNav />
       <Toaster />

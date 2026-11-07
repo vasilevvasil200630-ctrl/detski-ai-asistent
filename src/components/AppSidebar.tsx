@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Dices,
+  LayoutDashboard,
   Rocket,
   BookMarked,
   BookOpenCheck,
@@ -39,8 +40,9 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "ИНСТРУМЕНТИ",
     items: [
+      { href: "/", label: "Начало", icon: LayoutDashboard },
       { href: "/games", label: "Магическа кутия с игри", icon: Dices },
-      { href: "/dos", label: "ДОС план за 10 сек", icon: Rocket },
+      { href: "/dos", label: "ДОС план-конспект", icon: Rocket },
       { href: "/prompts", label: "Златни промптове", icon: BookMarked },
     ],
   },
@@ -92,14 +94,14 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
       >
         <div className="flex h-16 items-center justify-between border-b border-slate-200/75 px-4">
           {!collapsed && (
-            <Link href="/games" className="group flex items-center gap-2.5" onClick={onCloseMobile}>
+            <Link href="/" className="group flex items-center gap-2.5" onClick={onCloseMobile}>
               <LogoIcon className="h-8 w-8 shrink-0 transition-transform" />
               <LogoWordmark />
             </Link>
           )}
           {collapsed && (
             <Link
-              href="/games"
+              href="/"
               className="mx-auto flex h-8 w-8 items-center justify-center transition-colors"
               title="Детски асистент — Начало"
             >

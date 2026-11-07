@@ -61,5 +61,5 @@ export async function POST(request: Request) {
     { persistent: remember !== false },
   );
 
-  return NextResponse.json({ ok: true, redirectUrl: "/games" });
+  return NextResponse.json({ ok: true, redirectUrl: "/" });
 }

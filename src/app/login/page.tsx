@@ -29,7 +29,7 @@ function LoginForm() {
   useEffect(() => {
     getMe({ fresh: true })
       .then((d) => {
-        if (d?.user) router.replace(callbackUrl ?? "/games");
+        if (d?.user) router.replace(callbackUrl ?? "/");
         else setCheckingAuth(false);
       })
       .catch(() => setCheckingAuth(false));
@@ -52,7 +52,7 @@ function LoginForm() {
       }
       invalidateMe();
       window.dispatchEvent(new Event("detski-auth-changed"));
-      router.push(callbackUrl ?? data.redirectUrl ?? "/games");
+      router.push(callbackUrl ?? data.redirectUrl ?? "/");
       router.refresh();
     } catch {
       setError("Проблем с връзката. Опитай отново.");

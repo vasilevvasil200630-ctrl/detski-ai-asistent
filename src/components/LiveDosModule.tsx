@@ -256,17 +256,17 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   };
 
   return (
-    <section aria-label="Жива демонстрация: Пълна подготовка по ДОС" className="space-y-8">
+    <section aria-label="План-конспект по ДОС" className="space-y-8">
       {/* Hero Banner for Module 2 */}
       <div className="border-b border-slate-200 pb-6">
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl sm:text-3xl font-bold ">
-              „Пълна подготовка за 10 секунди“ (Генератор по ДОС)
+              План-конспект по ДОС
             </h2>
             <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
-              Попитайте колегите в залата за произволна тема за следващата седмица, въведете я тук и
-              генерирайте едновременно план-конспект по ДОС, авторска приказка и бележка за родителите!
+              Изберете група, направление и тема. Получавате план-конспект на педагогическа ситуация,
+              авторска приказка към темата и бележка за родителите.
             </p>
           </div>
           <div className="bg-slate-50 px-4 py-3 rounded-2xl border border-slate-200 text-xs font-bold space-y-1 shrink-0">
@@ -415,7 +415,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
             htmlFor="dos-topic-input"
             className="block text-base sm:text-lg font-semibold text-slate-900"
           >
-            3. Въведете тема на ситуацията (от колегите в залата или от годишното разпределение):
+            3. Тема на ситуацията (например от годишното тематично разпределение):
           </label>
           <div className="relative">
             <input
@@ -477,7 +477,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
               ) : (
                 <>
                   <Zap className="w-6 h-6 text-amber-300" />
-                  <span>Генерирай пълна разработка за 10 секунди</span>
+                  <span>Създай разработка</span>
                 </>
               )}
             </span>
