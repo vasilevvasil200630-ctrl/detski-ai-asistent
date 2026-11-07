@@ -127,17 +127,17 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       <div className="border-b border-slate-200 pb-6 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold ">
-            „Магическа кутия с игри“ (генератор за 30 сек)
+            Магическа кутия с игри
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
-            Генерирайте 3 ситуационни игри със заглавие, римуван стих за старт, точни стъпки (1, 2, 3), умения по Наредба № 5 и идея за адаптация за дете със СОП!
+            Три ситуационни игри според групата и настроението на децата: римуван стих за начало, стъпки, умения по Наредба № 5 и адаптация за дете със СОП.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs font-bold bg-black/15 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
-          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{AGE_GROUP_LABELS[filters.ageGroup].short}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{MOOD_LABELS[filters.mood].label}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{LOCATION_LABELS[filters.location].label}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-slate-50">{RESOURCE_LABELS[filters.resources].label}</span>
+        <div className="flex flex-wrap gap-2 text-xs font-bold bg-slate-50 border border-slate-200 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
+          <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200">{AGE_GROUP_LABELS[filters.ageGroup].short}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200">{MOOD_LABELS[filters.mood].label}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200">{LOCATION_LABELS[filters.location].label}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200">{RESOURCE_LABELS[filters.resources].label}</span>
         </div>
       </div>
 
@@ -195,7 +195,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <label className="text-xs sm:text-sm font-semibold text-slate-700 shrink-0">По желание: Специална тема от публиката:</label>
+          <label className="text-xs sm:text-sm font-semibold text-slate-700 shrink-0">Тема (по желание):</label>
           <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="напр. Дъждовни капчици, Котенца, Космос..." className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
         </div>
 

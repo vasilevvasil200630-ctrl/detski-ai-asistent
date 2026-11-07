@@ -12,9 +12,7 @@ import {
   LogOut,
   Building2,
   ChevronDown,
-  Clock,
   Monitor,
-  Sparkles,
   ShieldCheck,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
@@ -25,7 +23,7 @@ import { useAppStore } from "@/store/appStore";
 
 // Копирано от МатураПлюс (src/components/AppTopBar.tsx): лепкава лента с бутони за менюто,
 // лого на мобилни, вход/регистрация за гости и падащо профилно меню. Вместо серия и XP —
-// брояч на спестеното време, режим „Проектор“ и индикатор дали работи истински AI.
+// режим „Проектор“ в профилното меню и знак, когато генераторът е в демо режим.
 
 type Props = {
   onOpenMobile: () => void;
@@ -35,8 +33,6 @@ type Props = {
 
 export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) {
   const { user, loading } = useMe();
-  const savedMinutes = useAppStore((s) => s.savedMinutes);
-  const lastSavedGain = useAppStore((s) => s.lastSavedGain);
   const projectorMode = useAppStore((s) => s.projectorMode);
   const toggleProjectorMode = useAppStore((s) => s.toggleProjectorMode);
 
@@ -91,56 +87,23 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
         >
           {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
-        <Link href="/games" className="flex items-center gap-2.5 md:hidden group" aria-label="Детски асистент — Начало">
+        <Link href="/" className="flex items-center gap-2.5 md:hidden group" aria-label="Детски асистент — Начало">
           <LogoIcon className="h-8 w-8 shrink-0" />
           <LogoWordmark className="hidden text-base sm:inline" />
         </Link>
       </div>
 
       <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
-        {/* Дали отговаря истински AI или вграденият демо двигател */}
-        {aiLive !== null && (
+        {/* Само когато сървърът няма ключ: генераторът е в демо режим */}
+        {aiLive === false && (
           <span
-            className={`hidden lg:inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold ${
-              aiLive
-                ? "border-green-200 bg-green-50 text-green-800"
-                : "border-slate-200 bg-slate-50 text-slate-600"
-            }`}
-            title={aiLive ? "Сървърът е свързан с Google Gemini" : "Генераторът работи във вградения демо режим"}
+            className="hidden lg:inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-600"
+            title="Генераторът работи във вградения демо режим"
           >
-            {aiLive ? <Sparkles className="h-3.5 w-3.5" /> : <ShieldCheck className="h-3.5 w-3.5" />}
-            {aiLive ? "Gemini" : "Демо режим"}
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Демо режим
           </span>
         )}
-
-        {/* Спестено време — на мястото на серията/XP в МатураПлюс */}
-        <span
-          className={`hidden sm:inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border px-2.5 text-xs font-medium transition-colors duration-200 ${
-            lastSavedGain
-              ? "border-[#16a34a] bg-green-50 text-green-900 ring-2 ring-[#16a34a]/40"
-              : "border-amber-200/90 bg-amber-50/80 text-amber-900"
-          }`}
-          title="Спестено време на екипа в тази сесия"
-        >
-          <Clock className="h-3.5 w-3.5 text-amber-600" />
-          <span className="font-bold">~{savedMinutes} мин.</span>
-          {lastSavedGain && <span className="hidden sm:inline font-bold text-green-700">+{lastSavedGain}</span>}
-        </span>
-
-        <button
-          type="button"
-          onClick={toggleProjectorMode}
-          aria-pressed={projectorMode}
-          title="Режим „Проектор“ — по-едър текст за прожекция пред залата"
-          className={`hidden sm:inline-flex sm:min-h-9 sm:min-w-9 items-center justify-center gap-1.5 rounded-lg border px-2 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
-            projectorMode
-              ? "border-[#0a4b82] bg-[#0a4b82] text-white"
-              : "border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-slate-100"
-          }`}
-        >
-          <Monitor className="h-4 w-4" />
-          <span className="hidden xl:inline">Проектор</span>
-        </button>
 
         <ThemeToggle />
 
@@ -208,6 +171,23 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                     <UserIcon className="h-4 w-4 text-green-600" />
                     <span>Моят профил</span>
                   </Link>
+                  {/* По-едър текст при показване на проектор или голям екран */}
+                  <button
+                    type="button"
+                    role="menuitemcheckbox"
+                    aria-checked={projectorMode}
+                    onClick={toggleProjectorMode}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  >
+                    <Monitor className="h-4 w-4 text-slate-500" />
+                    <span className="flex-1 text-left">Режим „Проектор“</span>
+                    <span
+                      aria-hidden
+                      className={`relative h-4 w-7 rounded-full transition-colors ${projectorMode ? "bg-[#0a4b82]" : "bg-slate-300"}`}
+                    >
+                      <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${projectorMode ? "left-3.5" : "left-0.5"}`} />
+                    </span>
+                  </button>
                 </div>
                 <div className="border-t border-slate-100 pt-1.5">
                   <button

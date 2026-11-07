@@ -48,7 +48,7 @@ export default React.memo(function Logo({ className = "h-9 w-auto", showText = t
 
 export function LogoWordmark({ className = "text-base" }: { className?: string }) {
   return (
-    <span className={`font-sans font-bold tracking-tight ${className}`}>
+    <span className={`whitespace-nowrap font-sans font-bold tracking-tight ${className}`}>
       <span className="text-[#0a4b82]">Детски</span>
       <span className="text-[#1ea858]"> асистент</span>
     </span>
