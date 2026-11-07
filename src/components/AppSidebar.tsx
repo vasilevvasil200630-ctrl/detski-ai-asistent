@@ -6,6 +6,7 @@ import {
   Dices,
   Rocket,
   BookMarked,
+  BookOpenCheck,
   Building2,
   User as UserIcon,
   X,
@@ -45,6 +46,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "ДЕТСКАТА ГРАДИНА",
     items: [
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
+      { href: "/naredba5", label: "Наредба 5 и „Златно ключе“", icon: BookOpenCheck },
       { href: "/profile", label: "Моят профил", icon: UserIcon },
     ],
   },

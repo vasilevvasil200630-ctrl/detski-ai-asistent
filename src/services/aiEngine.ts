@@ -1,5 +1,15 @@
 import { AgeGroup, EducationalDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
 import { buildDemoGames, DemoContext } from './demoGames';
+import {
+  AGE_GROUP_STANDARDS,
+  DIRECTION_ORDER,
+  DIRECTION_STANDARDS,
+  naredba5PromptRules,
+  pickCore,
+  situationRangeLabel,
+  ZLATNO_KLYUCHE,
+  zlatnoBookFor,
+} from './naredba5';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -34,14 +44,14 @@ export const RESOURCE_LABELS: Record<PlayResources, { label: string; emoji: stri
   hoops_ribbons: { label: 'Обръчи и ленти', emoji: '🧣', toolName: 'цветни гимнастически обръчи и шарени ленти' },
 };
 
-export const DIRECTION_LABELS: Record<EducationalDirection, { label: string; shortLabel: string; emoji: string; coresByAge: Record<AgeGroup, string> }> = {
-  bel: { label: 'Български език и литература', shortLabel: 'БЕЛ', emoji: '📖', coresByAge: { '1': 'Възприемане на литературно произведение • Речник', '2': 'Свързана реч • Възприемане на литературно произведение', '3': 'Свързана реч • Преразказ и словесно творчество', '4': 'Подготовка за ограмотяване • Свързана реч и литературно възприемане' } },
-  world: { label: 'Околен свят', shortLabel: 'Околен свят', emoji: '🌍', coresByAge: { '1': 'Самоутвърждаване и общуване • Светът на природата', '2': 'Социална и здравословна среда • Светът на природата', '3': 'Светът на природата и неговото опазване • Социална среда', '4': 'Светът на природата и екологична култура • Социална среда' } },
-  math: { label: 'Математика', shortLabel: 'Математика', emoji: '🔢', coresByAge: { '1': 'Количествени отношения (едно и много) • Пространствени направления', '2': 'Количествени отношения (броене до 5) • Геометрични фигури', '3': 'Количествени отношения (броене до 10) • Равнинни фигури', '4': 'Количествени отношения до 10 • Измерване и логически задачи' } },
-  art: { label: 'Изобразително изкуство', shortLabel: 'Изобразително изкуство', emoji: '🎨', coresByAge: { '1': 'Художествено възприемане • Изобразителни материали', '2': 'Изобразително творчество • Форма и цвят', '3': 'Художествено пресъздаване и композиция • Декоративно творчество', '4': 'Сюжетно рисуване и композиция • Комбинирани техники' } },
-  music: { label: 'Музика', shortLabel: 'Музика', emoji: '🎵', coresByAge: { '1': 'Възприемане на музика • Пеене и ритмични движения', '2': 'Възпроизвеждане на музика • Музика и игра', '3': 'Музикална изразност • Детски музикални инструменти', '4': 'Музикално-изпълнителско творчество • Метроритъм' } },
-  construct: { label: 'Конструиране и технологии', shortLabel: 'Конструиране и технологии', emoji: '🧱', coresByAge: { '1': 'Конструиране и моделиране с модулни елементи', '2': 'Конструиране и моделиране • Обработване на материали', '3': 'Конструиране по условие и собствен замисъл • Работа с хартия и природни материали', '4': 'Проектиране и пространствено конструиране • Свързване на елементи' } },
-};
+/** Седемте направления по чл. 28, ал. 2 от Наредба № 5 (данните са в naredba5.ts). */
+export const DIRECTION_LABELS: Record<EducationalDirection, { label: string; shortLabel: string; emoji: string; cores: string[] }> =
+  Object.fromEntries(
+    DIRECTION_ORDER.map((d) => {
+      const { label, shortLabel, emoji, cores } = DIRECTION_STANDARDS[d];
+      return [d, { label, shortLabel, emoji, cores }];
+    }),
+  ) as Record<EducationalDirection, { label: string; shortLabel: string; emoji: string; cores: string[] }>;
 
 
 export function buildStructuredGameUserPrompt(filters: GameFilterState): string {
@@ -64,7 +74,7 @@ export function buildStructuredGameUserPrompt(filters: GameFilterState): string 
     '1. Заглавие на играта',
     '2. Римуван стих за старт',
     '3. Точни стъпки за играта (1, 2, 3)',
-    '4. Развивани умения по Наредба № 5',
+    '4. Развивани умения по Наредба № 5 (образователно направление и ядро)',
     '5. Идея за адаптация за дете със СОП',
   ].join('\n');
 }
@@ -96,22 +106,38 @@ export function buildDemoContext(filters: GameFilterState): DemoContext {
 
 /** Пълният промпт за 3 игри — вика се от сървъра (/api/ai/games). */
 export function buildGamesAiPrompt(filters: GameFilterState): string {
-  return `Ти си експертен български педагог в детска градина (Наредба № 5).
+  return `Ти си експертен български педагог в детска градина, работиш по Наредба № 5 за предучилищното образование и по програмната система „Златно ключе“ на „Бит и техника“.
+${naredba5PromptRules(filters.ageGroup)}
+
 ${buildStructuredGameUserPrompt(filters)}
 
-Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението, 2) дидактична/словесна с гатанка, 3) екипна игра с наличните материали.
+Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението (Физическа култура), 2) дидактична/словесна с гатанка (БЕЛ, Математика или Околен свят), 3) екипна игра с наличните материали.
 Римуваният стих да е 4 реда, наистина римуван и подходящ за възрастта. Стъпките да са 3–4, конкретни и изпълними на посоченото място.
+Полето "pedagogicalGoal" ЗАПОЧВА с направлението и ядрото с точните им имена, напр. „Физическа култура (ядро „Игрова двигателна дейност“); Околен свят (ядро „Самоутвърждаване и общуване с околните“): …“, а след двоеточието — конкретните умения.
 Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
 [{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения по Наредба № 5","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
 }
 
-export type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string };
+/** core — официалното образователно ядро; без него AI избира най-подходящото за темата. */
+export type LessonParams = { ageGroup: AgeGroup; direction: EducationalDirection; topic: string; core?: string };
 
 /** Пълният промпт за ДОС разработка — вика се от сървъра (/api/ai/lesson). */
 export function buildLessonAiPrompt(params: LessonParams, demoPlan: GeneratedLessonPlan): string {
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
-  const dirInfo = DIRECTION_LABELS[params.direction];
-  return `Ти си методист по предучилищно образование в България (Наредба № 5 - ДОС). Създай разработка на БЪЛГАРСКИ за ${ageInfo.full}, направление ${dirInfo.label}, образователно ядро „${demoPlan.educationalCore}“, тема "${demoPlan.topic}", продължителност ${ageInfo.dosDuration}. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+  const dir = DIRECTION_STANDARDS[params.direction];
+  const coreLine = params.core
+    ? `образователно ядро „${params.core}“`
+    : `образователно ядро — избери най-подходящото за темата от: ${dir.cores.map((c) => `„${c}“`).join(', ')}`;
+  const book = zlatnoBookFor(params.direction, params.ageGroup);
+  return `Ти си методист по предучилищно образование в България.
+${naredba5PromptRules(params.ageGroup)}
+
+Създай план-конспект на педагогическа ситуация на БЪЛГАРСКИ за ${ageInfo.full}, направление „${dir.label}“ (приложение № ${dir.appendix} към чл. 28), ${coreLine}, тема "${demoPlan.topic}", продължителност ${demoPlan.totalDuration} (в рамките на ${situationRangeLabel(params.ageGroup)} по чл. 25).
+Очакваните резултати да са по приложение № ${dir.appendix} за ${AGE_GROUP_STANDARDS[params.ageGroup].name}. Ситуацията протича предимно като игра.
+Етапите са точно три, както в книгата за учителя на „Златно ключе“: „${ZLATNO_KLYUCHE.situationParts.join('“, „')}“ — с минути, които дават сбор ${demoPlan.totalDuration}.
+${book ? `Сред материалите включи ${book}, без номера на страници.` : 'За физическа култура няма познавателна книжка — материалите са уреди и пособия.'}
+Може да включиш куклата-водач ${ZLATNO_KLYUCHE.guide} от „Златно ключе“ като герой в мотивацията. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Играта за вкъщи е само по желание на семейството (чл. 32 забранява домашна работа).
+Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore (точното име на ядрото), totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3–4), organizationForm (фронтална, групова или индивидуална — може комбинация), integrativeLinks (2 връзки с други направления, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
 }
 
 /** Откъде е дошъл резултатът — показва се в интерфейса. */
@@ -192,8 +218,19 @@ export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
   const topic = params.topic.trim() || 'Есен в гората';
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
   const dirInfo = DIRECTION_LABELS[params.direction];
-  const core = dirInfo.coresByAge[params.ageGroup];
+  const core = pickCore(params.direction, topic, params.core);
+  const book = zlatnoBookFor(params.direction, params.ageGroup);
   const t = topic.toLowerCase();
+  // Интегриран подход: две естествени връзки с други направления
+  const LINKS: Record<EducationalDirection, [string, string]> = {
+    bel: ['Околен свят — представи по темата чрез беседа и наблюдение', 'Изобразително изкуство — илюстриране на любим момент от приказката'],
+    math: ['Околен свят — броене и сравняване на обекти от темата', 'Физическа култура — подвижна игра с групиране по брой'],
+    world: ['Български език и литература — беседа и обогатяване на речника', 'Изобразително изкуство — рисуване на наблюдаваното'],
+    art: ['Околен свят — наблюдение на обектите, които пресъздаваме', 'Български език и литература — описание на собствената творба'],
+    music: ['Физическа култура — музикално-ритмични движения', 'Български език и литература — текстът на песента и неговият смисъл'],
+    construct: ['Математика — форми, брой и размер на елементите', 'Околен свят — къде се използва изработеното в живота'],
+    pe: ['Математика — брой повторения и посоки в пространството', 'Околен свят — здравословен начин на живот'],
+  };
 
   const hero = STORY_HEROES.find((h) => h.keys.some((k) => t.includes(k)))?.hero
     ?? `любознателното катериче Руменчо – откривателят на „${topic}“`;
@@ -218,30 +255,36 @@ export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
       `Възпитаване на любознателност, екипност и позитивно отношение към света чрез примери от „${topic}“.`,
     ],
     expectedResults: {
-      knowledge: `Разпознава и назовава основните обекти, признаци и закономерности, свързани с темата „${topic}“ според ДОС.`,
+      knowledge: `Разпознава и назовава основните обекти, признаци и закономерности, свързани с темата „${topic}“ (ядро „${core}“, приложение № ${DIRECTION_STANDARDS[params.direction].appendix} към Наредба № 5).`,
       skills: `Участва активно в диалог, групира елементи, прилага практически умения и решава игрови задачи по темата „${topic}“.`,
       attitudes: `Проявява емоционална отзивчивост, изследователски интерес и готовност за взаимопомощ в групата.`,
     },
     materials: [
+      ...(book ? [book[0]!.toUpperCase() + book.slice(1)] : []),
       `Нагледни илюстративни табла и сюжетни карти по темата „${topic}“`,
-      `Магическа кутия със загадки и кукла-маркер (${hero})`,
-      `Индивидуални материали за практическа и дидактична работа според направлението (${dirInfo.shortLabel})`,
+      `Магическа кутия със загадки и куклата ${ZLATNO_KLYUCHE.guide} като водач`,
+      params.direction === 'pe'
+        ? 'Уреди и пособия за двигателна дейност (обръчи, топки, ленти, гимнастически пейки)'
+        : `Индивидуални материали за практическа и дидактична работа (${dirInfo.shortLabel})`,
     ],
+    organizationForm: params.direction === 'pe' ? 'Фронтална и групова' : 'Фронтална, групова и индивидуална',
+    integrativeLinks: LINKS[params.direction],
+    ...(book ? { programMaterial: book } : {}),
     stages: [
       {
-        phase: '1. Емоционално въведение и мотивация',
+        phase: '1. Уводна част (мотивация)',
         duration: t1,
         teacherAction: `Посреща децата на килима с „Магическата кутия“ и чрез кратка загадка представя гостуващия герой (${hero}), който ги кани на пътешествие в света на „${topic}“.`,
         childrenActivity: `Събират се с интерес в кръг, отгатват уводната загадка, поздравяват героя и споделят какво вече знаят за „${topic}“.`,
       },
       {
-        phase: '2. Основна част (познавателна, дидактична и практическа дейност)',
+        phase: '2. Основна част (игрова, познавателна и практическа дейност)',
         duration: t2,
         teacherAction: `Представя интерактивно основните акценти по темата „${topic}“, провежда дидактичната игра „Откриватели на ${topic}“ и насочва децата в практическата мисия по ${dirInfo.label}.`,
         childrenActivity: `Наблюдават, сравняват и групират обектите от „${topic}“, отговарят на въпроси и изпълняват с ентусиазъм творческата/познавателната задача.`,
       },
       {
-        phase: '3. Заключителна част с рефлексия',
+        phase: '3. Заключителна част (обобщение и рефлексия)',
         duration: t3,
         teacherAction: `Обобщава наученото чрез рефлексивната игра „Вълшебният микрофон“: „Кое беше най-интересното ни откритие за ${topic} днес?“ и поощрява всяко дете.`,
         childrenActivity: `Споделят своите впечатления и любими моменти, подреждат материалите и изпращат героя с усмивка.`,
@@ -271,7 +314,7 @@ export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
         `Слушахме авторската приказка с героя ${hero} и беседвахме за приятелството и взаимопомощта.`,
         `Децата работиха в екип и се справиха отлично с практическата мисия по ${dirInfo.shortLabel}!`,
       ],
-      homeGameTitle: `🎲 5-минутна игра за вкъщи: „Малкият експерт по ${topic}“`,
+      homeGameTitle: `🎲 5-минутна семейна игра (по желание): „Малкият експерт по ${topic}“`,
       homeGameDescription: `Тази вечер разменете ролите за 5 минути – нека детето бъде „Учителят-експерт по ${topic}“, а вие неговият любопитен ученик! Попитайте го: „Кои са 3-те най-интересни неща за ${topic}, които научихте днес?“ и го оставете то да ви зададе гатанка!`,
       closingWarmth: `Благодарим ви за партньорството! Пожелаваме ви топла и усмихната семейна вечер! 💛`,
     },
