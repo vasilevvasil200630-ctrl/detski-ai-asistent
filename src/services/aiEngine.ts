@@ -101,6 +101,8 @@ export function finalizeGames(games: GeneratedGame[], filters: GameFilterState, 
       : {}),
     mode,
     tasks: tasks.length ? tasks : undefined,
+    // Комплектът се прави отделно, по желание на учителя (/api/ai/game-kit)
+    kit: undefined,
     ...(mode === 'quick' && fromDemo ? { pedagogicalGoal: `Бърза игра за ${MOOD_LABELS[filters.mood].goalFocus}.` } : {}),
   }));
 }

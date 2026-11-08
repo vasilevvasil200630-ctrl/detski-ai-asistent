@@ -12,6 +12,7 @@ import {
   type Pic,
   type Printable,
   type PrintableRequest,
+  type SheetKind,
   type VersesSheet,
   type Worksheet,
   type WorksheetTask,
@@ -29,6 +30,20 @@ export function buildDemoPrintable(req: PrintableRequest): Printable {
 
 /* ───────────────────────── Промпт към модела ───────────────────────── */
 
+export const SHEET_KIND_ORDER: SheetKind[] = ['count', 'match', 'odd', 'sequence', 'trace', 'sound', 'draw'];
+
+/** Формата на всеки вид задача за модела (един ред на вид). */
+export const SHEET_KIND_SPECS: Record<SheetKind, string> = {
+  count: "\"count\": {\"kind\":\"count\",\"prompt\":\"…\",\"groups\":[{\"pic\":{\"e\":\"🍎\",\"w\":\"ябълка\"},\"count\":3}]} — 3–4 групи",
+  match: "\"match\": {\"kind\":\"match\",\"prompt\":\"Свържи …\",\"pairs\":[{\"left\":{\"e\":\"🐇\",\"w\":\"заек\"},\"right\":{\"e\":\"🥕\",\"w\":\"морков\"}}]} — 3–4 двойки, дясната колона ще се разбърка автоматично",
+  odd: "\"odd\": {\"kind\":\"odd\",\"prompt\":\"Огради излишното.\",\"rows\":[{\"items\":[4 картинки],\"odd\":индекс на излишната 0–3}]} — 2–3 реда",
+  sequence: "\"sequence\": {\"kind\":\"sequence\",\"prompt\":\"Продължи редицата.\",\"pattern\":[2–3 картинки]}",
+  trace: "\"trace\": {\"kind\":\"trace\",\"prompt\":\"…\",\"shape\":\"line|arches|wave|zigzag|loops\",\"start\":{картинка},\"end\":{картинка}} — подготовка за писане",
+  sound: "\"sound\": {\"kind\":\"sound\",\"prompt\":\"Огради картинките, които започват със звука „С“.\",\"sound\":\"С\",\"pics\":[6 картинки]} — само за III и IV група",
+  draw: "\"draw\": {\"kind\":\"draw\",\"prompt\":\"Нарисувай …\"}",
+};
+
+
 function directionText(d: LessonDirection): string {
   return d === 'bdp' ? `${BDP.label} (интегрирано в „Околен свят“)` : `${DIRECTION_STANDARDS[d].label} (ядра: ${DIRECTION_STANDARDS[d].cores.join(', ')})`;
 }
@@ -45,13 +60,7 @@ ${req.direction === 'bdp' ? bdpPromptRules(req.ageGroup) : ''}
 Децата не четат — условията са кратки, за да ги прочете учителят. Картинките са ЕДНО емоджи всяка (без текст), с дума за учителя.
 Числата в задачите за броене са от 1 до ${COUNT_MAX[req.ageGroup]}. Брой задачи: ${req.ageGroup === '1' || req.ageGroup === '2' ? 3 : 4}, различни по вид.
 Видове задачи (поле "kind"):
-- "count": {"kind":"count","prompt":"…","groups":[{"pic":{"e":"🍎","w":"ябълка"},"count":3}]} — 3–4 групи
-- "match": {"kind":"match","prompt":"Свържи …","pairs":[{"left":{"e":"🐇","w":"заек"},"right":{"e":"🥕","w":"морков"}}]} — 3–4 двойки, дясната колона ще се разбърка автоматично
-- "odd": {"kind":"odd","prompt":"Огради излишното.","rows":[{"items":[4 картинки],"odd":индекс на излишната 0–3}]} — 2–3 реда
-- "sequence": {"kind":"sequence","prompt":"Продължи редицата.","pattern":[2–3 картинки]}
-- "trace": {"kind":"trace","prompt":"…","shape":"line|arches|wave|zigzag|loops","start":{картинка},"end":{картинка}} — подготовка за писане
-- "sound": {"kind":"sound","prompt":"Огради картинките, които започват със звука „С“.","sound":"С","pics":[6 картинки]} — само за III и IV група
-- "draw": {"kind":"draw","prompt":"Нарисувай …"}
+${SHEET_KIND_ORDER.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}
 Върни САМО валиден JSON (без markdown): {"title":"…","tasks":[…],"teacherNote":"цел по Наредба № 5 и отговорите"}`;
   }
 
@@ -88,7 +97,7 @@ function obj(v: unknown): Record<string, unknown> {
 function arr(v: unknown): unknown[] {
   return Array.isArray(v) ? v : [];
 }
-function pic(v: unknown): Pic | null {
+export function pic(v: unknown): Pic | null {
   const o = obj(v);
   const e = str(o.e ?? o.emoji, 24);
   const w = str(o.w ?? o.word, 40);
@@ -103,7 +112,7 @@ const shuffle = <T,>(a: T[]): T[] => {
   return c;
 };
 
-function normalizeTask(raw: unknown, age: AgeGroup): WorksheetTask | null {
+export function normalizeTask(raw: unknown, age: AgeGroup): WorksheetTask | null {
   const t = obj(raw);
   const prompt = str(t.prompt, 200);
   if (!prompt) return null;

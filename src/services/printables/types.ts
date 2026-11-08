@@ -101,3 +101,53 @@ export const PRINTABLE_TYPE_LABELS: Record<PrintableType, string> = {
   verses: 'Стихчета и гатанки',
   letter: 'Писмо до родителите',
 };
+
+/* ───────────────────────── Комплект към играта ───────────────────────── */
+
+/** Вид задача в работния лист — учителят избира кои да влязат. */
+export type SheetKind = WorksheetTask['kind'];
+
+export const SHEET_KIND_LABELS: Record<SheetKind, string> = {
+  count: 'Преброй и огради',
+  match: 'Свържи с линия',
+  odd: 'Огради излишното',
+  sequence: 'Продължи редицата',
+  trace: 'По пунктира',
+  sound: 'Първият звук (III–IV гр.)',
+  draw: 'Нарисувай и оцвети',
+};
+
+/** Карти с картинки за изрязване (за самата игра). */
+export interface PictureCards {
+  title: string;
+  cards: Pic[];
+}
+
+/** Бележка до родителите след играта (играта вкъщи е само по желание — чл. 32). */
+export interface KitParentNote {
+  title: string;
+  paragraphs: string[];
+  homeIdea?: string;
+}
+
+/** Части на комплекта, които учителят отмята. */
+export type KitPart = 'worksheet' | 'cards' | 'poster' | 'parent' | 'supplies';
+
+export const KIT_PART_LABELS: Record<KitPart, { label: string; hint: string }> = {
+  worksheet: { label: 'Работен лист', hint: 'Задачи към играта — изберете кои' },
+  cards: { label: 'Карти с картинки', hint: '8 карти за изрязване за самата игра' },
+  poster: { label: 'Стихчето за стената', hint: 'Римуваният стих на цял лист, с едри букви' },
+  parent: { label: 'Бележка до родителите', hint: 'Какво играхме и идея за вкъщи по желание' },
+  supplies: { label: 'Списък с пособия', hint: 'Какво да приготвите преди играта' },
+};
+
+export const KIT_PART_ORDER: KitPart[] = ['worksheet', 'cards', 'poster', 'parent', 'supplies'];
+
+/** Комплектът към играта: всяка част е по желание на учителя. */
+export interface GameKit {
+  worksheet?: Worksheet;
+  cards?: PictureCards;
+  poster?: boolean;
+  parentNote?: KitParentNote;
+  supplies?: string[];
+}
