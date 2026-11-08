@@ -10,6 +10,7 @@ import { FormError, PrimaryButton, TextField } from "@/components/auth/AuthUI";
 import type { AgeGroup } from "@/types";
 import { ChangePasswordSection } from "@/components/profile/ChangePasswordSection";
 import { DeleteAccountSection } from "@/components/profile/DeleteAccountSection";
+import { ExportDataSection } from "@/components/profile/ExportDataSection";
 
 const AVATARS = ["👩‍🏫", "👨‍🏫", "👩‍🎨", "🦸‍♀️", "🧚‍♀️", "👩‍🔬", "🌟", "🦉"];
 const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
@@ -129,6 +130,7 @@ export default function ProfilePage() {
       </form>
 
       <ChangePasswordSection />
+      <ExportDataSection />
       <DeleteAccountSection isAdmin={user.kgRole === "ADMIN"} />
     </main>
   );
