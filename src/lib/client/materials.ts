@@ -2,6 +2,7 @@
 
 import { toast } from "@/components/Toaster";
 import type { AgeGroup, LessonDirection, MaterialKind, SavedMaterial } from "@/types";
+import type { GameKit } from "@/services/printables/types";
 
 export type NewMaterial = {
   kind: MaterialKind;
@@ -68,6 +69,15 @@ export function setMaterialShared(id: string, shared: boolean) {
     `/api/materials/${id}`,
     { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shared }) },
     "Промяната не беше записана.",
+  );
+}
+
+/** Записва (или маха с null) материалите към запазена игра. */
+export function setMaterialKit(id: string, kit: GameKit | null) {
+  return call<{ material: SavedMaterial }>(
+    `/api/materials/${id}`,
+    { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kit }) },
+    "Материалите не бяха записани към играта.",
   );
 }
 

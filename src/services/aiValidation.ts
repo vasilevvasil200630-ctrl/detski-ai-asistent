@@ -1,5 +1,6 @@
 import { EducationalDirection, GameMode, GameTask, GeneratedGame, GeneratedLessonPlan, LessonDirection, LessonStage } from '../types';
 import { matchCore } from './naredba5';
+import { sanitizeKit } from './printables/kit';
 
 /**
  * Защитни функции за отговорите от реалния AI (Gemini / OpenAI).
@@ -92,6 +93,7 @@ function normalizeGame(raw: unknown, index: number): GeneratedGame | null {
     steps,
     ...(GAME_MODES_SET.includes(g.mode as GameMode) ? { mode: g.mode as GameMode } : {}),
     ...(normalizeTasks(g.tasks) ? { tasks: normalizeTasks(g.tasks) } : {}),
+    ...(sanitizeKit(g.kit) ? { kit: sanitizeKit(g.kit) } : {}),
     pedagogicalGoal: stripLeadingNumber(str(g.pedagogicalGoal)) || 'Околен свят (ядро „Самоутвърждаване и общуване с околните“); Физическа култура (ядро „Игрова двигателна дейност“): социални умения, внимание и двигателна активност.',
     sopAdaptation: stripLeadingNumber(str(g.sopAdaptation)) || undefined,
     teacherTip: str(g.teacherTip) || 'Покажете правилата първо със собствен пример.',

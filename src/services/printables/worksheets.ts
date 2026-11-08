@@ -1,7 +1,7 @@
 import type { AgeGroup, LessonDirection } from '../../types';
 import { DIRECTION_STANDARDS } from '../naredba5';
 import { MATCH_PAIRS, PATTERN_PICS, otherThemePics, themeFor } from './themes';
-import type { Pic, Worksheet, WorksheetTask } from './types';
+import type { Pic, SheetKind, Worksheet, WorksheetTask } from './types';
 
 /**
  * Вграден генератор на работни листове (без връзка към модела). Всяко извикване разбърква
@@ -143,7 +143,44 @@ function answersNote(tasks: WorksheetTask[]): string[] {
 }
 
 export function buildDemoWorksheet(age: AgeGroup, direction: LessonDirection, topic: string): Worksheet {
-  const tasks = tasksFor(direction, age, topic).slice(0, TASKS_PER_SHEET[age]);
+  return finishWorksheet(age, direction, topic, tasksFor(direction, age, topic).slice(0, TASKS_PER_SHEET[age]));
+}
+
+/** Задача от избран вид — с картинките на темата и двойките/шарките на направлението. */
+function kindTask(kind: SheetKind, age: AgeGroup, direction: LessonDirection, topic: string): WorksheetTask | null {
+  const theme = themeFor(topic);
+  const pics = theme.pics;
+  const older = age === '3' || age === '4';
+  const t = topic.trim() || 'темата';
+  switch (kind) {
+    case 'count':
+      return countTask(pics, age);
+    case 'match': {
+      const pairs = direction in MATCH_PAIRS ? MATCH_PAIRS[direction as keyof typeof MATCH_PAIRS] : null;
+      return pairs ? matchTask(pairs, 'Свържи с линия двете картинки, които си подхождат.', older ? 4 : 3) : countMatchTask(pics, age);
+    }
+    case 'odd':
+      return oddTask(pics, theme.id, older ? 3 : 2);
+    case 'sequence': {
+      const pattern = direction in PATTERN_PICS ? [...PATTERN_PICS[direction as keyof typeof PATTERN_PICS]] : pics;
+      return sequenceTask(pattern, age);
+    }
+    case 'trace':
+      return traceTask(pics, age);
+    case 'sound':
+      return older ? soundTask(pics) : null;
+    case 'draw':
+      return draw(`Нарисувай и оцвети любимия си момент от играта „${t}“.`);
+  }
+}
+
+/** Работен лист от видовете задачи, които учителят е избрал (в същия ред). */
+export function buildWorksheetFromKinds(age: AgeGroup, direction: LessonDirection, topic: string, kinds: SheetKind[]): Worksheet {
+  const tasks = kinds.map((k) => kindTask(k, age, direction, topic)).filter((x): x is WorksheetTask => x !== null);
+  return tasks.length ? finishWorksheet(age, direction, topic, tasks.slice(0, 4)) : buildDemoWorksheet(age, direction, topic);
+}
+
+function finishWorksheet(age: AgeGroup, direction: LessonDirection, topic: string, tasks: WorksheetTask[]): Worksheet {
   const dirLabel = direction === 'bdp' ? 'Безопасност на движението по пътищата' : DIRECTION_STANDARDS[direction].label;
   const answers = answersNote(tasks);
   return {

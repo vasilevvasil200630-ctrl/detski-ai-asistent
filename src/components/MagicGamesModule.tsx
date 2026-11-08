@@ -7,6 +7,9 @@ import { speak, stopSpeaking } from '@/lib/speech';
 import { BookOpen, Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Building2, HeartHandshake, Terminal, Zap, Puzzle, GraduationCap, ListChecks } from 'lucide-react';
 import { AgeGroup, GameFilterState, GameMode, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
 import { GameTaskPicker } from './games/GameTaskPicker';
+import { GameKitDialog, KitPrintPortal, printKit } from './games/GameKitDialog';
+import { setMaterialKit } from '@/lib/client/materials';
+import type { GameKit } from '../services/printables/types';
 import { GAME_MODE_ORDER, GAME_MODES, isValidTask, taskLine, tasksError } from '../services/gameTasks';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
 
@@ -94,6 +97,20 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   const [copiedUserPrompt, setCopiedUserPrompt] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [source, setSource] = useState<AiSource | null>(null);
+  /** Играта, чиито материали са отворени; играта за „Печат на всичко“ от картата */
+  const [kitFor, setKitFor] = useState<number | null>(null);
+  const [printIdx, setPrintIdx] = useState<number | null>(null);
+  /** Запазените игри: id на играта → id в библиотеката (за да се допишат материалите към нея) */
+  const [savedIds, setSavedIds] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (printIdx === null) return;
+    const t = setTimeout(() => {
+      printKit();
+      setPrintIdx(null);
+    }, 50);
+    return () => clearTimeout(t);
+  }, [printIdx]);
 
   // Задачите са различни за всяка група — при смяна на групата остават само валидните
   const setAgeGroup = (ageGroup: AgeGroup) =>
@@ -131,6 +148,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
     setIsGenerating(true);
     try {
       const res = await generateKindergartenGames(filters);
+      setKitFor(null);
       setGames(res.games);
       setSource(res.source);
       onTimeSaved(30);
@@ -415,6 +433,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                     {/* Запазване в библиотеката по групи и споделяне с колегите (Хъб → банка с игри) */}
                     <SaveMaterialBar
                       compact
+                      onSaved={(m) => setSavedIds((prev) => ({ ...prev, [game.id]: m.id }))}
                       material={{
                         kind: 'GAME',
                         title: game.title,
@@ -425,6 +444,20 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                         content: game,
                       }}
                     />
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setKitFor(idx)}
+                        className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#0a4b82] bg-[#0a4b82] text-white hover:bg-[#083861] flex items-center justify-center gap-1.5"
+                      >
+                        <PackageOpen className="w-3.5 h-3.5" aria-hidden /> {game.kit ? 'Материали ✓' : 'Материали към играта'}
+                      </button>
+                      {game.kit && (
+                        <button type="button" onClick={() => setPrintIdx(idx)} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#0a4b82]/30 bg-white text-[#0a4b82] hover:bg-sky-50 flex items-center justify-center gap-1.5">
+                          <Printer className="w-3.5 h-3.5" aria-hidden /> Печат на всичко
+                        </button>
+                      )}
+                    </div>
                     <div className="flex gap-2">
                       <button type="button" onClick={() => handleCopyCard(game)} className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 ${copiedId === game.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>
                         {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> Копирай</>}
@@ -438,6 +471,36 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </div>
         </div>
       )}
+      {(() => {
+        const idx = kitFor ?? printIdx;
+        const game = idx !== null ? games[idx] : undefined;
+        if (!game) return null;
+        // Работният лист е по направлението на задачите, иначе по избраното направление
+        const gameDirection = game.tasks?.[0]?.direction ?? (game.mode !== 'quick' && filters.direction && filters.direction !== 'mixed' ? filters.direction : null);
+        const sheetDirection = gameDirection ?? 'world';
+        const setKit = (kit: GameKit) => {
+          setGames((prev) => prev.map((g) => (g.id === game.id ? { ...g, kit } : g)));
+          const savedId = savedIds[game.id];
+          if (savedId) void setMaterialKit(savedId, kit);
+        };
+        return (
+          <>
+            <KitPrintPortal game={game} ageGroup={filters.ageGroup} direction={gameDirection} />
+            {kitFor !== null && (
+              <GameKitDialog
+                game={game}
+                ageGroup={filters.ageGroup}
+                direction={sheetDirection}
+                labelDirection={gameDirection}
+                topic={filters.customTheme?.trim() ?? ''}
+                resources={filters.resources !== 'none' ? RESOURCE_LABELS[filters.resources].toolName : undefined}
+                onClose={() => setKitFor(null)}
+                onKit={setKit}
+              />
+            )}
+          </>
+        );
+      })()}
     </section>
   );
 };

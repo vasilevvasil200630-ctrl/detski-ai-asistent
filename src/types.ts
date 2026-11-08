@@ -103,6 +103,8 @@ export interface GeneratedGame {
   mode?: GameMode;
   /** Образователните задачи, избрани от учителя (по Наредба № 5) */
   tasks?: GameTask[];
+  /** Материалите към играта: работен лист, карти, стихче за стената, бележка, пособия */
+  kit?: import('./services/printables/types').GameKit;
   sopAdaptation?: string;
   teacherTip: string;
 }

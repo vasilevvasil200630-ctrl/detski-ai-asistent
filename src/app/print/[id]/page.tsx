@@ -7,7 +7,7 @@ import { PrintableSheet } from "@/components/print/PrintableSheet";
 import { KG_SIGNATURE } from "@/config/kindergarten";
 import { isPrintable } from "@/services/printables";
 import { AGE_SHORT, directionLabel, materialToText } from "@/services/materialText";
-import { taskLine } from "@/services/gameTasks";
+import { GameKitSheets } from "@/components/print/GameKitSheets";
 import type { GeneratedGame, GeneratedLessonPlan, SavedMaterial } from "@/types";
 
 /** Изглед за печат на всеки материал от библиотеката: игра, план-конспект или материал за печат. */
@@ -58,7 +58,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
           onClick={() => window.print()}
           className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
         >
-          <Printer className="h-4 w-4" aria-hidden /> Принтирай
+          <Printer className="h-4 w-4" aria-hidden /> {material.kind === "GAME" && content?.kit ? "Печат на всичко" : "Принтирай"}
         </button>
       </div>
 
@@ -67,7 +67,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
       ) : material.kind === "LESSON" && content && Array.isArray(content.stages) ? (
         <LessonPrint plan={content as unknown as GeneratedLessonPlan} />
       ) : material.kind === "GAME" && content && Array.isArray(content.steps) ? (
-        <GamePrint game={content as unknown as GeneratedGame} material={material} />
+        <GameKitSheets game={content as unknown as GeneratedGame} ageGroup={material.ageGroup} direction={material.direction} />
       ) : (
         <article className="print-sheet mx-auto max-w-[210mm] bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-10">
           <p className="text-xs font-semibold text-slate-500">
@@ -78,64 +78,6 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         </article>
       )}
     </main>
-  );
-}
-
-function GamePrint({ game, material }: { game: GeneratedGame; material: SavedMaterial }) {
-  const dir = directionLabel(material.direction);
-  return (
-    <article className="print-sheet mx-auto max-w-[210mm] bg-white p-8 text-slate-900 shadow-sm ring-1 ring-slate-200 sm:p-10">
-      <p className="text-xs font-semibold text-slate-500">
-        {KG_SIGNATURE} · {AGE_SHORT[material.ageGroup]}
-        {dir ? ` · ${dir}` : ""}
-      </p>
-      <h1 className="mt-1 text-2xl font-bold">{game.title}</h1>
-      {game.subtitle && <p className="text-slate-600">{game.subtitle}</p>}
-      <section className="mt-6 rounded-xl border border-slate-300 p-4">
-        <h2 className="font-bold">Стихче за начало</h2>
-        <div className="mt-2 space-y-0.5 text-lg italic">
-          {game.rhymeLines.map((l, i) => (
-            <p key={i}>{l}</p>
-          ))}
-        </div>
-      </section>
-      <section className="mt-5">
-        <h2 className="font-bold">Ход на играта</h2>
-        <ol className="mt-2 list-decimal space-y-1.5 pl-5 leading-relaxed">
-          {game.steps.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ol>
-      </section>
-      {game.tasks && game.tasks.length > 0 && (
-        <section className="mt-5 rounded-xl border border-slate-300 p-4">
-          <h2 className="font-bold">Образователни задачи (Наредба № 5)</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed">
-            {game.tasks.map((t) => (
-              <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-      <dl className="mt-5 space-y-2 text-sm leading-relaxed">
-        <div>
-          <dt className="inline font-bold">{game.mode === "quick" ? "Полза от играта: " : "Умения по Наредба № 5: "}</dt>
-          <dd className="inline">{game.pedagogicalGoal}</dd>
-        </div>
-        {game.sopAdaptation && (
-          <div>
-            <dt className="inline font-bold">Адаптация за дете със СОП: </dt>
-            <dd className="inline">{game.sopAdaptation}</dd>
-          </div>
-        )}
-        {game.teacherTip && (
-          <div>
-            <dt className="inline font-bold">Съвет: </dt>
-            <dd className="inline">{game.teacherTip}</dd>
-          </div>
-        )}
-      </dl>
-    </article>
   );
 }
 

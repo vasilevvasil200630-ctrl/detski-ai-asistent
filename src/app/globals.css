@@ -372,6 +372,18 @@ html.projector-mode {
   }
 }
 
+/* „Печат на всичко“ от Магическата кутия: само комплектът към играта, без останалата страница */
+@media screen {
+  #kit-print-root {
+    display: none;
+  }
+}
+@media print {
+  body.printing-kit > *:not(#kit-print-root) {
+    display: none !important;
+  }
+}
+
 @page {
   size: A4;
   margin: 12mm;
