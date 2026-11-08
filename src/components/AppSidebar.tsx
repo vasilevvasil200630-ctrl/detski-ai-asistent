@@ -21,6 +21,7 @@ import {
   NotebookPen,
   UsersRound,
   type LucideIcon,
+  Store,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { performSignOut } from "@/lib/session-cache";
@@ -59,6 +60,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/cloud", label: "Общ облак", icon: Cloud },
       { href: "/notebook", label: "Моят бележник", icon: NotebookPen },
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
+      { href: "/showcase", label: "Витрина за родители", icon: Store },
       { href: "/library", label: "Моята библиотека", icon: Library },
       { href: "/holidays", label: "Празници", icon: CalendarHeart },
       { href: "/naredba5", label: "Наредба 5 и „Златно ключе“", icon: BookOpenCheck },

@@ -32,6 +32,7 @@ export default function ProfilePage() {
   const [avatar, setAvatar] = useState(AVATARS[0]!);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>("2");
   const [groupName, setGroupName] = useState("");
+  const [showcaseBio, setShowcaseBio] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +43,7 @@ export default function ProfilePage() {
     setAvatar(user.avatar);
     setAgeGroup(user.ageGroup);
     setGroupName(user.groupName);
+    setShowcaseBio(user.showcaseBio ?? "");
   }, [user]);
 
   async function save(e: FormEvent<HTMLFormElement>) {
@@ -52,7 +54,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, jobTitle, avatar, ageGroup, groupName }),
+        body: JSON.stringify({ name, jobTitle, avatar, ageGroup, groupName, showcaseBio }),
       });
       const data: { error?: string } = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -123,6 +125,18 @@ export default function ProfilePage() {
           </div>
         </fieldset>
         <TextField label="Име на групата" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="II група „Пчелички“" />
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-slate-800">Кратко представяне за витрината (по желание)</span>
+          <textarea
+            value={showcaseBio}
+            onChange={(e) => setShowcaseBio(e.target.value)}
+            maxLength={400}
+            rows={3}
+            placeholder="Напр. „Работя с децата от 15 години. Обичам игрите навън и музиката.“"
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm leading-relaxed"
+          />
+          <span className="mt-1 block text-xs text-slate-500">Вижда се публично на витрината за родители, ако имате одобрени дейности. Без лични данни.</span>
+        </label>
         <FormError message={error} />
         <PrimaryButton type="submit" loading={saving}>
           Запази промените

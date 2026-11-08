@@ -67,10 +67,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Посетител: само страницата на градината, входът и правните страници; останалото е заключено
   if (!user) {
-    const isPublic = PUBLIC_PATHS.includes(pathname);
+    // Публичната витрина за родителите е отворена за всички
+    const isShowcase = pathname === "/vitrina" || pathname.startsWith("/vitrina/");
+    const isPublic = PUBLIC_PATHS.includes(pathname) || isShowcase;
     return (
       <>
-        <GuestShell footer={pathname === "/" ? "full" : "compact"}>{isPublic ? children : <SignInGate path={pathname} />}</GuestShell>
+        <GuestShell footer={pathname === "/" ? "full" : "compact"} variant={isShowcase ? "showcase" : "site"}>{isPublic ? children : <SignInGate path={pathname} />}</GuestShell>
         <Toaster />
         <FeedbackWidget />
         <PwaProvider />

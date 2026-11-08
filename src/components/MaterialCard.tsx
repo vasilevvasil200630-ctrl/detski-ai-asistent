@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bookmark, Check, ChevronDown, Copy, Heart, Loader2, Printer, Share2, Trash2, Undo2 } from "lucide-react";
+import { Bookmark, Check, ChevronDown, Copy, Heart, Loader2, Printer, Share2, Store, Trash2, Undo2 } from "lucide-react";
+import { ProposeShowcaseDialog } from "@/components/showcase/ProposeShowcaseDialog";
 import type { SavedMaterial } from "@/types";
 import { AGE_SHORT, directionLabel, holidayLabel, KIND_LABELS, materialToText } from "@/services/materialText";
 import { copyMaterial, deleteMaterial, setMaterialShared, toggleMaterialLike } from "@/lib/client/materials";
@@ -22,6 +23,8 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [copiedText, setCopiedText] = useState(false);
   const [copiedToLibrary, setCopiedToLibrary] = useState(false);
+  const [proposing, setProposing] = useState(false);
+  const [proposed, setProposed] = useState(false);
   const kind = KIND_LABELS[m.kind];
   const text = materialToText(m.kind, m.content);
   const dir = directionLabel(m.direction);
@@ -141,6 +144,14 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
             </button>
             <button
               type="button"
+              onClick={() => setProposing(true)}
+              disabled={busy !== null || proposed}
+              className="inline-flex items-center gap-1 rounded-lg border border-[#0a4b82]/30 bg-white px-2.5 py-1.5 text-xs font-bold text-[#0a4b82] hover:bg-sky-50 disabled:opacity-60"
+            >
+              {proposed ? <Check className="h-3.5 w-3.5" /> : <Store className="h-3.5 w-3.5" />} {proposed ? "Чака одобрение" : "За витрината"}
+            </button>
+            <button
+              type="button"
               onClick={remove}
               disabled={busy !== null}
               aria-label={`Изтрий ${m.title}`}
@@ -179,6 +190,17 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
           </>
         )}
       </div>
+      {proposing && (
+        <ProposeShowcaseDialog
+          materialId={m.id}
+          defaultTitle={m.title}
+          onClose={() => setProposing(false)}
+          onDone={() => {
+            setProposing(false);
+            setProposed(true);
+          }}
+        />
+      )}
     </article>
   );
 }
