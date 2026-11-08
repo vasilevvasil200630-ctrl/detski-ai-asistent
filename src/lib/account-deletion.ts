@@ -22,6 +22,8 @@ export async function deleteUserAccount(userId: string): Promise<void> {
     prisma.material.deleteMany({ where: { authorId: userId } }),
     prisma.bankGame.deleteMany({ where: { authorId: userId } }),
     prisma.cloudFile.deleteMany({ where: { uploaderId: userId } }),
+    // Обратната връзка остава (до 2 години), но вече без връзка с профила
+    prisma.feedback.updateMany({ where: { userId }, data: { userId: null } }),
     prisma.verificationToken.deleteMany({ where: { identifier: { in: [`reset:${userId}`] } } }),
     // Харесванията (MaterialLike, BankGameLike) се трият каскадно заедно с профила
     prisma.user.delete({ where: { id: userId } }),
