@@ -19,46 +19,51 @@ enum KgRole {
 
 /// Учител (потребителски профил). Вход с имейл и парола (bcrypt + JWT бисквитка).
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  passwordHash   String
-  name           String
-  avatar         String        @default("👩‍🏫")
+  id                        String         @id @default(cuid())
+  email                     String         @unique
+  passwordHash              String
+  name                      String
+  avatar                    String         @default("👩‍🏫")
   /// Длъжност, напр. „Старши учител“
-  jobTitle       String        @default("Учител")
+  jobTitle                  String         @default("Учител")
   /// Възрастова група „1“…„4“ (I–IV група)
-  ageGroup       String        @default("2")
+  ageGroup                  String         @default("2")
   /// Име на групата, напр. „II група „Пчелички“ (4–5 г.)“
-  groupName      String        @default("")
-  kgRole         KgRole        @default(TEACHER)
-  kindergartenId String?
-  kindergarten   Kindergarten? @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
-  bankGames      BankGame[]
-  likes          BankGameLike[]
-  materials      Material[]
-  materialLikes  MaterialLike[]
-  cloudFiles     CloudFile[]
-  notes          Note[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  groupName                 String         @default("")
+  kgRole                    KgRole         @default(TEACHER)
+  /// Влязла е с временна парола от директора — сайтът я подканва да си сложи своя
+  mustChangePassword        Boolean        @default(false)
+  /// Премахната от екипа от директора: без достъп, споделеното от нея остава в градината
+  removedAt                 DateTime?
+  removedFromKindergartenId String?
+  kindergartenId            String?
+  kindergarten              Kindergarten?  @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
+  bankGames                 BankGame[]
+  likes                     BankGameLike[]
+  materials                 Material[]
+  materialLikes             MaterialLike[]
+  cloudFiles                CloudFile[]
+  notes                     Note[]
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
 
   @@index([kindergartenId])
 }
 
 /// Детска градина — общото пространство на учителския екип.
 model Kindergarten {
-  id        String     @id @default(cuid())
-  name      String
-  city      String     @default("")
-  motto     String     @default("")
+  id         String      @id @default(cuid())
+  name       String
+  city       String      @default("")
+  motto      String      @default("")
   /// Код за присъединяване на колеги (напр. ДГ-7K4P2M)
-  joinCode  String     @unique
-  teachers  User[]
-  bankGames BankGame[]
-  materials Material[]
+  joinCode   String      @unique
+  teachers   User[]
+  bankGames  BankGame[]
+  materials  Material[]
   cloudFiles CloudFile[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.

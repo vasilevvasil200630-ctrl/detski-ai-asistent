@@ -122,6 +122,8 @@ export interface SessionTeacher {
   ageGroup: AgeGroup;
   groupName: string;
   kgRole: 'ADMIN' | 'TEACHER';
+  /** Влязла е с временна парола от директора */
+  mustChangePassword: boolean;
   kindergarten: { id: string; name: string; city: string; motto: string; joinCode: string } | null;
 }
 

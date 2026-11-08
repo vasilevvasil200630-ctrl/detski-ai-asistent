@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { KeyRound } from "lucide-react";
 import { FormError, PasswordField, PrimaryButton } from "@/components/auth/AuthUI";
 import { toast } from "@/components/Toaster";
+import { invalidateMe } from "@/lib/client/me";
 
 /** Смяна на паролата от профила. Входовете на други устройства спират да важат. */
 export function ChangePasswordSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  // Банерът „временна парола“ води към /profile#change-password — профилът се зарежда след прехода
+  useEffect(() => {
+    if (window.location.hash === "#change-password") {
+      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      sectionRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+    }
+  }, []);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -36,6 +45,9 @@ export function ChangePasswordSection() {
       setNewPassword("");
       setConfirm("");
       toast("Паролата е сменена.", "success");
+      // Банерът „временна парола“ изчезва — профилът се чете наново
+      invalidateMe();
+      window.dispatchEvent(new Event("detski-auth-changed"));
     } catch {
       setError("Проблем с връзката. Опитайте отново.");
     } finally {
@@ -44,7 +56,7 @@ export function ChangePasswordSection() {
   }
 
   return (
-    <section aria-labelledby="change-password-title" className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section ref={sectionRef} id="change-password" aria-labelledby="change-password-title" className="mt-8 scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <h2 id="change-password-title" className="flex items-center gap-2 text-lg font-bold text-slate-900">
         <KeyRound className="h-5 w-5 text-[#0a4b82]" aria-hidden /> Смяна на паролата
       </h2>

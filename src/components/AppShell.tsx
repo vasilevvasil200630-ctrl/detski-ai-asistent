@@ -12,7 +12,8 @@ import { PwaProvider } from "./pwa/PwaProvider";
 import { useMe } from "@/lib/client/useMe";
 import { GuestShell } from "./home/GuestShell";
 import { SignInGate } from "./home/SignInGate";
-import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { KeyRound, Loader2 } from "lucide-react";
 
 /** Страниците, които посетител без профил вижда. Всичко друго е зад вход (облакът е затворен). */
 const PUBLIC_PATHS = ["/", "/login", "/register", "/forgot-password", "/reset-password", "/privacy", "/terms"];
@@ -92,6 +93,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           collapsed={hydrated ? collapsed : false}
         />
         <div className="flex flex-1 flex-col pb-16 md:pb-0">
+          {user.mustChangePassword && (
+            <div role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 sm:px-6">
+              <p className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 text-sm text-amber-900">
+                <KeyRound className="h-4 w-4 shrink-0" aria-hidden />
+                Влезли сте с временна парола от директора. Сложете си своя, за да е профилът ви защитен.
+                <Link href="/profile#change-password" className="font-semibold underline underline-offset-2 hover:text-amber-950">
+                  Смени паролата
+                </Link>
+              </p>
+            </div>
+          )}
           <div className="flex-1">{children}</div>
           <SiteFooter compact />
         </div>

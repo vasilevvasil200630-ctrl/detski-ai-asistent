@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   const updated = await prisma.user.update({
     where: { id: session.userId },
-    data: { passwordHash: await hashPassword(parsed.data.newPassword) },
+    data: { passwordHash: await hashPassword(parsed.data.newPassword), mustChangePassword: false },
     select: { id: true, email: true, name: true, passwordHash: true },
   });
   await revokeEmailTokens("reset", updated.id);
