@@ -16,6 +16,7 @@ export const PRIVATE_PAGE_ROUTES = [
   "/cloud",
   "/notebook",
   "/team",
+  "/showcase",
   "/profile",
   "/print",
   "/login",
@@ -27,6 +28,7 @@ export const PRIVATE_PAGE_ROUTES = [
 /** Публичните страници — за sitemap.xml. */
 export const PUBLIC_PAGE_ROUTES = [
   { path: "/", priority: 1.0, changeFrequency: "monthly" },
+  { path: "/vitrina", priority: 0.8, changeFrequency: "weekly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" },
 ] as const;

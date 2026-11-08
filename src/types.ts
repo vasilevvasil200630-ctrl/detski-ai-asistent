@@ -146,6 +146,8 @@ export interface SessionTeacher {
   jobTitle: string;
   ageGroup: AgeGroup;
   groupName: string;
+  /** Кратко представяне за публичната витрина */
+  showcaseBio: string;
   kgRole: 'ADMIN' | 'TEACHER';
   /** Влязла е с временна парола от директора */
   mustChangePassword: boolean;

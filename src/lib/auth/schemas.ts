@@ -34,6 +34,7 @@ export const RegisterSchema = z.object({
 
 export const ProfileUpdateSchema = z.object({
   name: z.string().trim().min(2).max(80).optional(),
+  showcaseBio: z.string().trim().max(400, "Представянето е твърде дълго.").optional(),
   jobTitle: z.string().trim().max(60).optional(),
   avatar: z.string().trim().max(16).optional(),
   ageGroup: AgeGroupSchema.optional(),

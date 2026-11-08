@@ -44,6 +44,10 @@ model User {
   materialLikes             MaterialLike[]
   cloudFiles                CloudFile[]
   notes                     Note[]
+  showcaseItems             ShowcaseItem[] @relation("ShowcaseAuthor")
+  reviewedShowcaseItems     ShowcaseItem[] @relation("ShowcaseReviewer")
+  /// Кратко представяне на учителя за публичната витрина (по желание)
+  showcaseBio               String         @default("")
   createdAt                 DateTime       @default(now())
   updatedAt                 DateTime       @updatedAt
 
@@ -52,18 +56,19 @@ model User {
 
 /// Детска градина — общото пространство на учителския екип.
 model Kindergarten {
-  id         String      @id @default(cuid())
-  name       String
-  city       String      @default("")
-  motto      String      @default("")
+  id            String         @id @default(cuid())
+  name          String
+  city          String         @default("")
+  motto         String         @default("")
   /// Код за присъединяване на колеги (напр. ДГ-7K4P2M)
-  joinCode   String      @unique
-  teachers   User[]
-  bankGames  BankGame[]
-  materials  Material[]
-  cloudFiles CloudFile[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  joinCode      String         @unique
+  teachers      User[]
+  bankGames     BankGame[]
+  materials     Material[]
+  cloudFiles    CloudFile[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  showcaseItems ShowcaseItem[]
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
@@ -245,4 +250,49 @@ model Note {
   updatedAt DateTime  @updatedAt
 
   @@index([userId, updatedAt])
+}
+
+/// Състояние на дейност за публичната витрина: учителят предлага, директорът одобрява.
+enum ShowcaseStatus {
+  PENDING
+  APPROVED
+  RETURNED
+}
+
+/// Дейност на публичната витрина за родителите: копие на материала към момента на предлагането,
+/// разказ какво са правили децата и снимки без деца (от облака на учителя). Вижда се публично само
+/// след одобрение от директора и докато авторът е в екипа на градината.
+model ShowcaseItem {
+  id             String         @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten   @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User           @relation("ShowcaseAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  /// Материалът, от който е предложена (само за справка; показва се копието в content)
+  materialId     String?
+  kind           MaterialKind
+  title          String
+  /// „Какво направихме с децата“
+  story          String
+  ageGroup       String
+  direction      String?
+  holiday        String?
+  /// Копие на съдържанието (игра с материалите, план-конспект или материал за печат)
+  content        Json
+  /// Снимки без деца: id на файлове от облака на автора
+  imageIds       String[]       @default([])
+  /// Родителите могат да отпечатат играта и листовете
+  allowPrint     Boolean        @default(true)
+  status         ShowcaseStatus @default(PENDING)
+  /// Бележка от директора при връщане
+  reviewNote     String?
+  reviewedById   String?
+  reviewedBy     User?          @relation("ShowcaseReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt     DateTime?
+  publishedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([kindergartenId, status, publishedAt])
+  @@index([authorId, createdAt])
 }

@@ -11,6 +11,7 @@ export const TEACHER_SELECT = {
   jobTitle: true,
   ageGroup: true,
   groupName: true,
+  showcaseBio: true,
   kgRole: true,
   mustChangePassword: true,
   kindergarten: { select: { id: true, name: true, city: true, motto: true, joinCode: true } },
