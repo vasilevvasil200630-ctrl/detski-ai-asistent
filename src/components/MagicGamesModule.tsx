@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { SaveMaterialBar } from './SaveMaterialBar';
 import { VoiceMic } from './VoiceMic';
 import { speak, stopSpeaking } from '@/lib/speech';
-import { BookOpen, Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Share2, Building2, HeartHandshake, Terminal } from 'lucide-react';
-import { AgeGroup, GameFilterState, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
+import { BookOpen, Sparkles, Copy, Check, Printer, Wand2, Target, ScrollText, Volume2, RefreshCw, Users, Smile, MapPin, Timer, PackageOpen, Building2, HeartHandshake, Terminal, Zap, Puzzle, GraduationCap, ListChecks } from 'lucide-react';
+import { AgeGroup, GameFilterState, GameMode, GeneratedGame, GroupMood, PlayDuration, PlayLocation, PlayResources, SessionTeacher } from '../types';
+import { GameTaskPicker } from './games/GameTaskPicker';
+import { GAME_MODE_ORDER, GAME_MODES, isValidTask, taskLine, tasksError } from '../services/gameTasks';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
 
 /** Направленията по чл. 28 от Наредба № 5 и БДП (интегрирано) — за игри по направление. */
@@ -20,6 +22,8 @@ const DIRECTION_OPTIONS: { id: NonNullable<GameFilterState['direction']>; label:
   { id: 'pe', label: 'Физическа култура' },
   { id: 'bdp', label: 'БДП' },
 ];
+
+const MODE_ICONS: Record<GameMode, typeof Zap> = { quick: Zap, theme: Puzzle, dos: GraduationCap };
 
 const AGE_OPTIONS: { id: AgeGroup; label: string; emoji: string; desc: string }[] = [
   { id: '1', label: '1-ва група (3-4 г.)', emoji: '🐣', desc: 'Подражание и лесни образи' },
@@ -74,6 +78,8 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 }) => {
   const kgName = activeTeacher?.kindergarten?.name ?? 'вашата детска градина';
   const [filters, setFilters] = useState<GameFilterState>({
+    mode: 'theme',
+    tasks: [],
     ageGroup: activeTeacher?.ageGroup ?? '2',
     mood: 'noisy',
     location: 'classroom',
@@ -89,9 +95,28 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [source, setSource] = useState<AiSource | null>(null);
 
+  // Задачите са различни за всяка група — при смяна на групата остават само валидните
+  const setAgeGroup = (ageGroup: AgeGroup) =>
+    setFilters((p) => ({ ...p, ageGroup, tasks: (p.tasks ?? []).filter((t) => isValidTask(t, ageGroup)) }));
+
   useEffect(() => {
-    if (activeTeacher) setFilters((prev) => ({ ...prev, ageGroup: activeTeacher.ageGroup }));
+    if (activeTeacher) setAgeGroup(activeTeacher.ageGroup);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTeacher?.id, activeTeacher?.ageGroup]);
+
+  const mode: GameMode = filters.mode ?? 'theme';
+  const tasks = filters.tasks ?? [];
+  const problem = tasksError(mode, tasks, filters.direction);
+  const setMode = (next: GameMode) =>
+    setFilters((p) => ({
+      ...p,
+      mode: next,
+      tasks: next === 'quick' ? [] : p.tasks ?? [],
+      duration: next === 'quick' && p.duration === '30' ? '15' : p.duration,
+    }));
+  const pickedDirection = filters.direction && filters.direction !== 'mixed' ? filters.direction : null;
+  const directionOptions = mode === 'dos' ? DIRECTION_OPTIONS.filter((d) => d.id !== 'mixed') : DIRECTION_OPTIONS;
+  const stepAfterTasks = mode === 'quick' ? 3 : 4;
 
   const liveUserPromptText = buildStructuredGameUserPrompt(filters);
 
@@ -102,6 +127,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
   };
 
   const handleGenerate = async () => {
+    if (problem) return;
     setIsGenerating(true);
     try {
       const res = await generateKindergartenGames(filters);
@@ -118,7 +144,8 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       `1. Заглавие на играта: ${g.title}`,
       `2. Римуван стих за старт:\n${g.rhymeLines.map((l) => `„${l}“`).join('\n')}`,
       `3. Точни стъпки за играта:\n${g.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`,
-      `4. Развивани умения по Наредба № 5: ${g.pedagogicalGoal}`,
+      ...(g.tasks?.length ? [`Образователни задачи (Наредба № 5):\n${g.tasks.map((t) => `• ${taskLine(t)}`).join('\n')}`] : []),
+      `4. ${g.mode === 'quick' ? 'Полза от играта' : 'Развивани умения по Наредба № 5'}: ${g.pedagogicalGoal}`,
       `5. Идея за адаптация за дете със СОП: ${g.sopAdaptation || 'Индивидуална визуална опора и участие в спокоен ритъм с подкрепящо другарче.'}`,
     ].join('\n\n');
     try { await navigator.clipboard.writeText(text); } catch {}
@@ -143,7 +170,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             Магическа кутия с игри
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-1 max-w-3xl">
-            Три игри за вашата група — по направление и по темата, която сте взели, или според настроението на децата. Със стихче за начало, стъпки, умения по Наредба № 5 и адаптация за дете със СОП.
+            Три игри за вашата група: бърза игра за свободна минутка, игра към темата или ситуация по ДОС с образователни задачи, които избирате сами от Наредба № 5. Със стихче за начало, стъпки и адаптация за дете със СОП.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-bold bg-slate-50 border border-slate-200 p-3.5 rounded-2xl xl:shrink-0 xl:max-w-sm">
@@ -155,6 +182,31 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
       </div>
 
       <div className="rounded-2xl bg-white/95 p-6 sm:p-8 shadow-sm border border-emerald-100 space-y-6">
+        <fieldset>
+          <legend className="mb-3 text-sm sm:text-base font-semibold text-slate-800">Каква игра ви трябва?</legend>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {GAME_MODE_ORDER.map((id) => {
+              const Icon = MODE_ICONS[id];
+              const active = mode === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setMode(id)}
+                  className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors ${active ? 'border-[#0a4b82] bg-[#0a4b82] text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'}`}
+                >
+                  <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${active ? 'text-amber-200' : 'text-[#0a4b82]'}`} aria-hidden />
+                  <span>
+                    <span className="block font-semibold">{GAME_MODES[id].label}</span>
+                    <span className={`mt-0.5 block text-xs leading-relaxed ${active ? 'text-sky-100' : 'text-slate-500'}`}>{GAME_MODES[id].hint}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+
         <div>
           <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
             <Users className="w-5 h-5 text-emerald-600" />
@@ -162,7 +214,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {AGE_OPTIONS.map((item) => (
-              <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, ageGroup: item.id }))} className={`flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${filters.ageGroup === item.id ? 'bg-indigo-600 text-white border-emerald-600 shadow-sm scale-[1.02]' : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'}`}>
+              <button key={item.id} type="button" onClick={() => setAgeGroup(item.id)} className={`flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${filters.ageGroup === item.id ? 'bg-indigo-600 text-white border-emerald-600 shadow-sm scale-[1.02]' : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'}`}>
                 <div><div className="font-semibold">{item.label}</div><div className={`text-xs ${filters.ageGroup === item.id ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</div></div>
               </button>
             ))}
@@ -171,10 +223,11 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
         <fieldset className="space-y-4">
           <legend className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
-            <BookOpen className="w-5 h-5 text-[#0a4b82]" /> 2. Направление и тема, която сте взели:
+            <BookOpen className="w-5 h-5 text-[#0a4b82]" /> {mode === 'quick' ? '2. Тема (по желание):' : '2. Направление и тема, която сте взели:'}
           </legend>
+          {mode !== 'quick' && (
           <div className="flex flex-wrap gap-2">
-            {DIRECTION_OPTIONS.map((item) => (
+            {directionOptions.map((item) => (
               <button
                 key={item.id}
                 type="button"
@@ -186,20 +239,37 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
               </button>
             ))}
           </div>
+          )}
           <div className="flex items-center gap-2">
             <input type="text" value={filters.customTheme} onChange={(e) => setFilters((p) => ({ ...p, customTheme: e.target.value }))} placeholder="Темата от седмицата, напр. Есен в гората, Домашни животни, Числото 3..." aria-label="Тема, която сте взели" className="min-w-0 flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold" />
             <VoiceMic onTranscript={(t) => setFilters((p) => ({ ...p, customTheme: t }))} />
           </div>
           <p className="text-xs text-slate-500">
-            {filters.direction === 'mixed'
-              ? 'Смесени: една подвижна игра според настроението, една дидактична и една екипна.'
-              : 'И трите игри са от избраното направление, по различни образователни ядра.'}
+            {mode === 'quick'
+              ? 'Бързи игри: една подвижна според настроението, една словесна и една в кръг или по двойки.'
+              : tasks.length > 0
+                ? 'И трите игри водят към избраните задачи.'
+                : mode === 'dos' && !pickedDirection
+                  ? 'Изберете направлението на ситуацията.'
+                  : filters.direction === 'mixed'
+                    ? 'Смесени: една подвижна игра според настроението, една дидактична и една екипна.'
+                    : 'И трите игри са от избраното направление, по различни образователни ядра.'}
           </p>
         </fieldset>
 
+        {mode !== 'quick' && (
+          <GameTaskPicker
+            ageGroup={filters.ageGroup}
+            direction={pickedDirection}
+            tasks={tasks}
+            required={mode === 'dos'}
+            onChange={(next) => setFilters((p) => ({ ...p, tasks: next }))}
+          />
+        )}
+
         <div>
           <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
-            <Smile className="w-5 h-5 text-rose-500" /> 3. Настроение на децата:
+            <Smile className="w-5 h-5 text-rose-500" /> {stepAfterTasks}. Настроение на децата:
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {MOOD_OPTIONS.map((item) => (
@@ -210,7 +280,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> 4. Място:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><MapPin className="w-5 h-5 text-indigo-600" /> {stepAfterTasks + 1}. Място:</label>
             <div className="flex flex-col gap-2">
               {LOCATION_OPTIONS.map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, location: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.location === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
@@ -218,15 +288,15 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> 5. Времетраене:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><Timer className="w-5 h-5 text-amber-600" /> {stepAfterTasks + 2}. Времетраене:</label>
             <div className="flex flex-col gap-2">
-              {DURATION_OPTIONS.map((item) => (
+              {DURATION_OPTIONS.filter((item) => mode !== 'quick' || item.id !== '30').map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, duration: item.id }))} className={`py-3 px-4 rounded-xl border font-semibold text-left ${filters.duration === item.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
               ))}
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> 6. Налични материали:</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3"><PackageOpen className="w-5 h-5 text-emerald-600" /> {stepAfterTasks + 3}. Налични материали:</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
               {RESOURCE_OPTIONS.map((item) => (
                 <button key={item.id} type="button" onClick={() => setFilters((p) => ({ ...p, resources: item.id }))} className={`py-2.5 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold text-left ${filters.resources === item.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}>{item.label}</button>
@@ -258,8 +328,9 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
           </pre>
         </div>
 
-        <div className="pt-2 flex justify-center">
-          <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-semibold text-white bg-emerald-500 hover:bg-emerald-600 shadow-sm transition-all flex items-center justify-center gap-3">
+        <div className="pt-2 flex flex-col items-center gap-2">
+          {problem && <p role="status" className="text-sm font-semibold text-amber-700">{problem}</p>}
+          <button type="button" disabled={isGenerating || Boolean(problem)} onClick={handleGenerate} className="w-full sm:w-auto sm:min-w-[460px] max-w-full py-5 px-8 rounded-2xl font-display text-lg sm:text-xl font-semibold text-white bg-emerald-500 hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-300 shadow-sm transition-all flex items-center justify-center gap-3">
             {isGenerating ? <><RefreshCw className="w-6 h-6 animate-spin text-amber-200" /> Магическата кутия съчинява 3 игри...</> : <><Wand2 className="w-6 h-6 text-amber-200" /> Отвори Магическата кутия (Генерирай 3 игри)</>}
           </button>
         </div>
@@ -321,8 +392,16 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                           ))}
                         </ol>
                       </div>
+                      {game.tasks && game.tasks.length > 0 && (
+                        <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs sm:text-sm">
+                          <p className="flex items-center gap-1.5 font-semibold text-[#0a4b82]"><ListChecks className="w-4 h-4" aria-hidden /> Образователни задачи (Наредба № 5):</p>
+                          <ul className="mt-1.5 space-y-1 list-disc pl-5 text-slate-700">
+                            {game.tasks.map((t) => <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>)}
+                          </ul>
+                        </div>
+                      )}
                       <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm space-y-1">
-                        <p><strong className="font-semibold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {game.pedagogicalGoal}</p>
+                        <p><strong className="font-semibold text-emerald-950">4. {game.mode === 'quick' ? 'Полза от играта' : 'Развивани умения по Наредба № 5'}:</strong> {game.pedagogicalGoal}</p>
                       </div>
                       <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs sm:text-sm space-y-1">
                         <p className="flex items-start gap-1.5">
@@ -341,8 +420,8 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                         title: game.title,
                         ageGroup: filters.ageGroup,
                         holiday: null,
-                        direction: filters.direction && filters.direction !== 'mixed' ? filters.direction : null,
-                        meta: { mood: filters.mood, location: filters.location, resources: filters.resources, topic: filters.customTheme?.trim() || undefined },
+                        direction: mode !== 'quick' && filters.direction && filters.direction !== 'mixed' ? filters.direction : null,
+                        meta: { mode, mood: filters.mood, location: filters.location, resources: filters.resources, topic: filters.customTheme?.trim() || undefined },
                         content: game,
                       }}
                     />

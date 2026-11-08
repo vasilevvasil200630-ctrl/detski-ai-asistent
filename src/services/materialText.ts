@@ -2,6 +2,7 @@ import type { GeneratedGame, GeneratedLessonPlan, LessonDirection, MaterialKind 
 import { DIRECTION_STANDARDS } from './naredba5';
 import { BDP } from './bdp';
 import { findHoliday } from './holidays';
+import { taskLine } from './gameTasks';
 
 /** Текстов вид на материалите — за преглед, копиране и печат в библиотеката. */
 
@@ -34,7 +35,8 @@ export function formatGameText(g: GeneratedGame): string {
     '👣 Стъпки:',
     ...(g.steps ?? []).map((s, i) => `${i + 1}. ${s}`),
     '',
-    `🎯 Развивани умения по Наредба № 5: ${g.pedagogicalGoal}`,
+    ...(g.tasks?.length ? ['📌 Образователни задачи (Наредба № 5):', ...g.tasks.map((t) => `• ${taskLine(t)}`), ''] : []),
+    `🎯 ${g.mode === 'quick' ? 'Полза от играта' : 'Развивани умения по Наредба № 5'}: ${g.pedagogicalGoal}`,
     ...(g.sopAdaptation ? [`🤝 Адаптация за дете със СОП: ${g.sopAdaptation}`] : []),
     ...(g.teacherTip ? [`💡 Съвет: ${g.teacherTip}`] : []),
   ]

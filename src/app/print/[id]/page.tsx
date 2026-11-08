@@ -7,6 +7,7 @@ import { PrintableSheet } from "@/components/print/PrintableSheet";
 import { KG_SIGNATURE } from "@/config/kindergarten";
 import { isPrintable } from "@/services/printables";
 import { AGE_SHORT, directionLabel, materialToText } from "@/services/materialText";
+import { taskLine } from "@/services/gameTasks";
 import type { GeneratedGame, GeneratedLessonPlan, SavedMaterial } from "@/types";
 
 /** Изглед за печат на всеки материал от библиотеката: игра, план-конспект или материал за печат. */
@@ -106,9 +107,19 @@ function GamePrint({ game, material }: { game: GeneratedGame; material: SavedMat
           ))}
         </ol>
       </section>
+      {game.tasks && game.tasks.length > 0 && (
+        <section className="mt-5 rounded-xl border border-slate-300 p-4">
+          <h2 className="font-bold">Образователни задачи (Наредба № 5)</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed">
+            {game.tasks.map((t) => (
+              <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>
+            ))}
+          </ul>
+        </section>
+      )}
       <dl className="mt-5 space-y-2 text-sm leading-relaxed">
         <div>
-          <dt className="inline font-bold">Умения по Наредба № 5: </dt>
+          <dt className="inline font-bold">{game.mode === "quick" ? "Полза от играта: " : "Умения по Наредба № 5: "}</dt>
           <dd className="inline">{game.pedagogicalGoal}</dd>
         </div>
         {game.sopAdaptation && (

@@ -1,4 +1,4 @@
-import { EducationalDirection, GeneratedGame, GeneratedLessonPlan, LessonStage } from '../types';
+import { EducationalDirection, GameMode, GameTask, GeneratedGame, GeneratedLessonPlan, LessonDirection, LessonStage } from '../types';
 import { matchCore } from './naredba5';
 
 /**
@@ -48,6 +48,25 @@ export function extractJson(raw: string): unknown {
   return null;
 }
 
+const GAME_MODES_SET: GameMode[] = ['quick', 'theme', 'dos'];
+const TASK_DIRECTIONS: LessonDirection[] = ['bel', 'world', 'math', 'art', 'music', 'construct', 'pe', 'bdp'];
+
+/** Задачите към записана игра — само формата (дословната проверка по наредбата е при генерирането). */
+function normalizeTasks(v: unknown): GameTask[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const tasks = v
+    .map((raw) => {
+      const t = obj(raw);
+      const direction = TASK_DIRECTIONS.find((d) => d === t.direction);
+      const core = str(t.core).slice(0, 120);
+      const result = str(t.result).slice(0, 400);
+      return direction && core && result ? { direction, core, result } : null;
+    })
+    .filter((t): t is GameTask => t !== null)
+    .slice(0, 3);
+  return tasks.length ? tasks : undefined;
+}
+
 /** Премахва номерацията „1. “, „2) “ и т.н., която моделът понякога добавя към полетата. */
 function stripLeadingNumber(s: string): string {
   return s.replace(/^\s*\d+[.)]\s*/, '');
@@ -71,6 +90,8 @@ function normalizeGame(raw: unknown, index: number): GeneratedGame | null {
     rhymeTitle: str(g.rhymeTitle) || '📜 Римуван стих за старт:',
     rhymeLines: rhymeLines.length ? rhymeLines : ['Едно, две, три – играта започни!'],
     steps,
+    ...(GAME_MODES_SET.includes(g.mode as GameMode) ? { mode: g.mode as GameMode } : {}),
+    ...(normalizeTasks(g.tasks) ? { tasks: normalizeTasks(g.tasks) } : {}),
     pedagogicalGoal: stripLeadingNumber(str(g.pedagogicalGoal)) || 'Околен свят (ядро „Самоутвърждаване и общуване с околните“); Физическа култура (ядро „Игрова двигателна дейност“): социални умения, внимание и двигателна активност.',
     sopAdaptation: stripLeadingNumber(str(g.sopAdaptation)) || undefined,
     teacherTip: str(g.teacherTip) || 'Покажете правилата първо със собствен пример.',
