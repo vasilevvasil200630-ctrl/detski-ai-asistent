@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           {emailReady === false && (
             <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-relaxed text-amber-900">
               <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              Изпращането на писма още не е включено. Помолете администратора на вашата градина или ни пишете чрез „Обратна връзка“.
+              Изпращането на писма още не е включено. Обърнете се към директора: от „Управление на екипа“ може веднага да ви бъде дадена временна парола.
             </p>
           )}
           <TextField

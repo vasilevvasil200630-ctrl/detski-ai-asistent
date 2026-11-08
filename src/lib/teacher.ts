@@ -12,6 +12,7 @@ export const TEACHER_SELECT = {
   ageGroup: true,
   groupName: true,
   kgRole: true,
+  mustChangePassword: true,
   kindergarten: { select: { id: true, name: true, city: true, motto: true, joinCode: true } },
 } as const;
 

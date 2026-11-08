@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   // Новата парола анулира всички стари сесии (отпечатъкът на паролата в тях вече не съвпада)
   const user = await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash },
+    data: { passwordHash, mustChangePassword: false },
     select: { id: true, email: true, name: true, passwordHash: true },
   });
   await revokeEmailTokens("reset", user.id);

@@ -209,6 +209,11 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
               </h2>
               <p className="mt-2 font-mono text-2xl font-bold tracking-wide text-slate-900">{user.kindergarten.joinCode}</p>
               <p className="mt-1 text-sm text-slate-600">Дайте го на колега от {user.kindergarten.name}, за да се регистрира в облака.</p>
+              {user.kgRole === "ADMIN" && (
+                <Link href="/team" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                  Управление на екипа <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
             </section>
           )}
           <section aria-labelledby="dash-holiday" className="rounded-2xl border border-slate-200 bg-white p-5">

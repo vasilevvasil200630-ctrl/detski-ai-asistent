@@ -19,6 +19,7 @@ import {
   Printer,
   Cloud,
   NotebookPen,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
@@ -32,6 +33,8 @@ type NavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
+  /** Само за директора / администратора на облака */
+  adminOnly?: boolean;
 };
 
 type NavGroup = {
@@ -59,6 +62,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/library", label: "Моята библиотека", icon: Library },
       { href: "/holidays", label: "Празници", icon: CalendarHeart },
       { href: "/naredba5", label: "Наредба 5 и „Златно ключе“", icon: BookOpenCheck },
+      { href: "/team", label: "Управление на екипа", icon: UsersRound, adminOnly: true },
       { href: "/profile", label: "Моят профил", icon: UserIcon },
     ],
   },
@@ -133,7 +137,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
                 <div className="mb-2 mx-auto h-px w-8 bg-slate-200" aria-hidden />
               )}
               <ul className="space-y-1.5">
-                {group.items.map(({ href, label, icon: Icon }) => {
+                {group.items.filter((item) => !item.adminOnly || user?.kgRole === "ADMIN").map(({ href, label, icon: Icon }) => {
                   const active = isActive(href);
                   return (
                     <li key={href}>
