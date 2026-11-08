@@ -7,6 +7,7 @@ import { AgeGroup, SavedBankGame, SessionTeacher } from '../types';
 import { AGE_GROUP_LABELS } from '../services/aiEngine';
 import { copyMaterial } from '../lib/client/materials';
 import { toast } from './Toaster';
+import { taskLine } from '../services/gameTasks';
 
 export interface TeamMember {
   id: string;
@@ -379,7 +380,15 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
 
                   {/* Goal & SOP Adaptation */}
                   <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs sm:text-sm space-y-1.5">
-                    <p><strong className="font-semibold text-emerald-950">4. Развивани умения по Наредба № 5:</strong> {item.game.pedagogicalGoal}</p>
+                    {item.game.tasks && item.game.tasks.length > 0 && (
+                      <div>
+                        <strong className="font-semibold text-[#0a4b82]">Образователни задачи (Наредба № 5):</strong>
+                        <ul className="mt-1 list-disc space-y-0.5 pl-5 text-slate-700">
+                          {item.game.tasks.map((t) => <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    <p><strong className="font-semibold text-emerald-950">4. {item.game.mode === 'quick' ? 'Полза от играта' : 'Развивани умения по Наредба № 5'}:</strong> {item.game.pedagogicalGoal}</p>
                     <p className="text-indigo-900 bg-indigo-50/90 p-2.5 rounded-lg border border-indigo-200">
                       <strong className="font-semibold">5. Идея за адаптация за дете със СОП:</strong>{' '}
                       {item.game.sopAdaptation || 'Осигурете визуална карта-опора, предвидим сигнал и участие в двойка с подкрепящо другарче или учител.'}

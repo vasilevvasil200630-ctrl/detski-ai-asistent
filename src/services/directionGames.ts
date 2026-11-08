@@ -372,8 +372,10 @@ let turn = 0;
 
 /** Три игри от избраното направление (въртят се при всяко генериране). */
 export function buildDirectionGames(c: DemoContext, direction: LessonDirection): GeneratedGame[] {
-  const pool = T[direction];
-  const v = turn++;
+  const preferred = T[direction].filter((t) => c.preferCores?.includes(t.core.replace(' (БДП)', '')));
+  // Първо игрите по ядрата на избраните задачи, после останалите
+  const pool = preferred.length ? [...preferred, ...T[direction].filter((t) => !preferred.includes(t))] : T[direction];
+  const v = preferred.length ? 0 : turn++;
   const kw = c.kw?.trim() || 'нашата тема';
   const stamp = Date.now();
   const colors: GeneratedGame['badgeColor'][] = ['mint', 'lavender', 'coral'];

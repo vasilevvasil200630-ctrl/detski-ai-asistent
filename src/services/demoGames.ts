@@ -30,6 +30,8 @@ export interface DemoContext {
   kw?: string;
   /** Избрано направление — тогава трите игри са от него (directionGames.ts) */
   direction?: LessonDirection;
+  /** Ядрата на избраните от учителя задачи — игрите с тези ядра излизат първи */
+  preferCores?: string[];
 }
 
 interface DemoTemplate {

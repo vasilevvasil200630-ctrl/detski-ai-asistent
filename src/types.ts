@@ -58,7 +58,26 @@ export interface GoldenPromptItem {
   buildSampleResult: (ageGroupLabel: string, customInput: string) => { title: string; content: string[]; tip: string };
 }
 
+/**
+ * Режим на играта: бърза (без образователни задачи), към тема (0–3 задачи по избор)
+ * или ситуация по ДОС (1–3 задължителни задачи).
+ */
+export type GameMode = 'quick' | 'theme' | 'dos';
+
+/** Образователна задача, избрана от учителя: очакван резултат по Наредба № 5 (или тема по БДП). */
+export interface GameTask {
+  direction: LessonDirection;
+  /** Образователното ядро (за БДП — темата от програмата на МОН) */
+  core: string;
+  /** Очакваният резултат точно както е в наредбата (за БДП — по програмата) */
+  result: string;
+}
+
 export interface GameFilterState {
+  /** Липсва при старите заявки — значи „theme“ */
+  mode?: GameMode;
+  /** Избраните от учителя задачи (празно при „quick“) */
+  tasks?: GameTask[];
   ageGroup: AgeGroup;
   mood: GroupMood;
   location: PlayLocation;
@@ -80,6 +99,10 @@ export interface GeneratedGame {
   rhymeLines: string[];
   steps: string[];
   pedagogicalGoal: string;
+  /** Режимът, в който е създадена играта */
+  mode?: GameMode;
+  /** Образователните задачи, избрани от учителя (по Наредба № 5) */
+  tasks?: GameTask[];
   sopAdaptation?: string;
   teacherTip: string;
 }

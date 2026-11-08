@@ -11,6 +11,7 @@ import {
   zlatnoBookFor,
 } from './naredba5';
 import { BDP, BDP_NAREDBA5_RESULTS, BDP_THEMES, bdpPromptRules, findBdpTheme } from './bdp';
+import { GAME_MODES, taskLine, tasksPromptBlock } from './gameTasks';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -62,23 +63,46 @@ export function buildStructuredGameUserPrompt(filters: GameFilterState): string 
   const durInfo = DURATION_LABELS[filters.duration];
   const resInfo = RESOURCE_LABELS[filters.resources];
   const kw = filters.customTheme?.trim();
+  const mode = filters.mode ?? 'theme';
+  const tasks = mode === 'quick' ? [] : filters.tasks ?? [];
 
   return [
     'Моля, създай ситуационна игра за детската градина със следните параметри:',
+    `- Вид: ${GAME_MODES[mode].label}`,
     `- Възрастова група: ${ageInfo.short}`,
     `- Настроение на децата: ${moodInfo.label}`,
     `- Място: ${locInfo.label}`,
     `- Времетраене: ${durInfo.label}ути`,
     `- Налични материали: ${resInfo.label}`,
-    ...(filters.direction && filters.direction !== 'mixed' ? [`- Образователно направление: ${directionName(filters.direction)}`] : []),
+    ...(mode !== 'quick' && filters.direction && filters.direction !== 'mixed' ? [`- Образователно направление: ${directionName(filters.direction)}`] : []),
     ...(kw ? [`- Тема, която групата е взела: ${kw}`] : []),
+    ...(tasks.length ? ['- Образователни задачи (очаквани резултати по Наредба № 5):', ...tasks.map((t) => `  • ${taskLine(t)}`)] : []),
     'Форматирай отговора с:',
     '1. Заглавие на играта',
     '2. Римуван стих за старт',
     '3. Точни стъпки за играта (1, 2, 3)',
-    '4. Развивани умения по Наредба № 5 (образователно направление и ядро)',
+    mode === 'quick' ? '4. Полза от играта' : '4. Развивани умения по Наредба № 5 (образователно направление и ядро)',
     '5. Идея за адаптация за дете със СОП',
   ].join('\n');
+}
+
+/**
+ * Прикачва режима и избраните задачи към готовите игри (и от модела, и от демо двигателя).
+ * В бързия режим ползата идва от настроението, не от направленията.
+ */
+export function finalizeGames(games: GeneratedGame[], filters: GameFilterState, fromDemo = false): GeneratedGame[] {
+  const mode = filters.mode ?? 'theme';
+  const tasks = mode === 'quick' ? [] : filters.tasks ?? [];
+  return games.map((g) => ({
+    ...g,
+    // Резервна (вградена) игра без шаблон за ядрото на задачата — изрична последна стъпка към задачите
+    ...(fromDemo && tasks.length && !tasks.some((t) => g.tags.includes(t.core))
+      ? { steps: [...g.steps, `Накрая — към задачата: ${tasks.map((t) => t.result.charAt(0).toLowerCase() + t.result.slice(1)).join('; ')}. Добавете кратък рунд, в който децата правят точно това с материалите от играта.`] }
+      : {}),
+    mode,
+    tasks: tasks.length ? tasks : undefined,
+    ...(mode === 'quick' && fromDemo ? { pedagogicalGoal: `Бърза игра за ${MOOD_LABELS[filters.mood].goalFocus}.` } : {}),
+  }));
 }
 
 export function buildDemoContext(filters: GameFilterState): DemoContext {
@@ -103,22 +127,35 @@ export function buildDemoContext(filters: GameFilterState): DemoContext {
     resLabel: resInfo.label,
     toolName: resInfo.toolName,
     kw: filters.customTheme?.trim() || undefined,
-    direction: filters.direction && filters.direction !== 'mixed' ? filters.direction : undefined,
+    direction:
+      filters.mode === 'quick'
+        ? undefined
+        : filters.direction && filters.direction !== 'mixed'
+          ? filters.direction
+          : filters.tasks?.[0]?.direction,
+    preferCores: filters.mode === 'quick' ? undefined : filters.tasks?.map((t) => t.core),
   };
 }
 
 /** Пълният промпт за 3 игри — вика се от сървъра (/api/ai/games). */
 export function buildGamesAiPrompt(filters: GameFilterState): string {
+  const mode = filters.mode ?? 'theme';
+  const tasks = mode === 'quick' ? [] : filters.tasks ?? [];
+  const goalRule =
+    mode === 'quick' || tasks.length > 0
+      ? ''
+      : 'Полето "pedagogicalGoal" ЗАПОЧВА с направлението и ядрото с точните им имена, напр. „Физическа култура (ядро „Игрова двигателна дейност“); Околен свят (ядро „Самоутвърждаване и общуване с околните“): …“, а след двоеточието — конкретните умения.\n';
   return `Ти си експертен български педагог в детска градина, работиш по Наредба № 5 за предучилищното образование и по програмната система „Златно ключе“ на „Бит и техника“.
 ${naredba5PromptRules(filters.ageGroup)}
 
 ${buildStructuredGameUserPrompt(filters)}
 
+${tasksPromptBlock(mode, tasks)}
+
 ${gamesTaskLine(filters)}
 Римуваният стих да е 4 реда, наистина римуван и подходящ за възрастта. Стъпките да са 3–4, конкретни и изпълними на посоченото място.
-Полето "pedagogicalGoal" ЗАПОЧВА с направлението и ядрото с точните им имена, напр. „Физическа култура (ядро „Игрова двигателна дейност“); Околен свят (ядро „Самоутвърждаване и общуване с околните“): …“, а след двоеточието — конкретните умения.
-Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
-[{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"Развивани умения по Наредба № 5","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
+${goalRule}Върни САМО валиден JSON масив от 3 обекта (без markdown, без номерация в стойностите) със следната структура:
+[{"title":"Заглавие на играта","subtitle":"Кратко подзаглавие","tags":["Таг1","Таг2"],"rhymeTitle":"📜 Римуван стих за старт:","rhymeLines":["Ред 1","Ред 2","Ред 3","Ред 4"],"steps":["Стъпка 1","Стъпка 2","Стъпка 3"],"pedagogicalGoal":"${mode === 'quick' ? 'Полза от играта' : 'Развивани умения по Наредба № 5'}","sopAdaptation":"Идея за адаптация за дете със СОП","teacherTip":"Практичен съвет към учителя"}]`;
 }
 
 function directionName(d: LessonDirection): string {
@@ -129,6 +166,14 @@ function directionName(d: LessonDirection): string {
 function gamesTaskLine(filters: GameFilterState): string {
   const kw = filters.customTheme?.trim();
   const topicRule = kw ? ` Всички игри затвърждават темата „${kw}“, която групата е взела.` : '';
+  if (filters.mode === 'quick') {
+    return `Генерирай 3 РАЗЛИЧНИ бързи игри на БЪЛГАРСКИ ЕЗИК: 1) подвижна според настроението, 2) словесна или с гатанка, 3) игра в кръг или по двойки.${topicRule}`;
+  }
+  const tasks = filters.tasks ?? [];
+  if (tasks.length > 0) {
+    const bdp = tasks.some((t) => t.direction === 'bdp') ? `${bdpPromptRules(filters.ageGroup)}\n` : '';
+    return `${bdp}Генерирай 3 РАЗЛИЧНИ по вид игри на БЪЛГАРСКИ ЕЗИК (дидактична, подвижна, творческа или ролева), които водят към избраните задачи.${topicRule}`;
+  }
   if (!filters.direction || filters.direction === 'mixed') {
     return `Генерирай 3 РАЗЛИЧНИ игри на БЪЛГАРСКИ ЕЗИК: 1) подвижно-регулираща според настроението (Физическа култура), 2) дидактична/словесна с гатанка (БЕЛ, Математика или Околен свят), 3) екипна игра с наличните материали.${topicRule}`;
   }
@@ -228,7 +273,7 @@ export async function generateKindergartenGames(filters: GameFilterState): Promi
       .then((data) => (Array.isArray(data.games) && data.games.length ? data : Promise.reject(new Error('empty'))))
       .catch((e) => {
         console.warn('Fallback to Smart Demo Engine (client):', e);
-        return { games: buildDemoGames(buildDemoContext(filters)), source: 'demo' as const };
+        return { games: finalizeGames(buildDemoGames(buildDemoContext(filters)), filters, true), source: 'demo' as const };
       }),
   );
 }
