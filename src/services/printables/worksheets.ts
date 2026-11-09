@@ -242,7 +242,7 @@ function finishWorksheet(age: AgeGroup, direction: LessonDirection, topic: strin
   const goals = [...new Set(tasks.map((x) => DRAWN_GOALS[x.kind]).filter(Boolean))];
   return {
     type: 'worksheet',
-    title: topic.trim() ? `Работен лист: ${topic.trim()}` : `Работен лист по ${dirLabel.toLowerCase()}`,
+    title: topic.trim() ? `Работен лист: ${topic.trim()}` : `Работен лист по ${dirLabel}`,
     ageGroup: age,
     direction,
     topic: topic.trim(),

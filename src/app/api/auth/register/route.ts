@@ -24,11 +24,14 @@ async function ensureKindergarten() {
   });
 }
 
-/** Нужен ли е код: не — само докато в градината няма нито един учител. */
+/**
+ * Нужен ли е код (не — само докато в градината няма нито един учител) и дали облакът приема
+ * нови учители (директорът затваря регистрацията, когато екипът е пълен; първият профил — винаги).
+ */
 export async function GET() {
   const kg = await ensureKindergarten();
   const members = await prisma.user.count({ where: { kindergartenId: kg.id } });
-  return NextResponse.json({ needsCode: members > 0 });
+  return NextResponse.json({ needsCode: members > 0, open: members === 0 || kg.teacherSignupOpen }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -63,8 +66,10 @@ export async function POST(request: Request) {
       // Проверката е в транзакцията: двама „първи“ едновременно не стават и двамата администратори
       const members = await tx.user.count({ where: { kindergartenId: kg.id } });
       const isFirst = members === 0;
-      if (!isFirst && normalizeJoinCode(data.joinCode ?? "") !== kg.joinCode) {
-        throw new Error("BAD_CODE");
+      if (!isFirst) {
+        const current = await tx.kindergarten.findUnique({ where: { id: kg.id }, select: { teacherSignupOpen: true, joinCode: true } });
+        if (!current?.teacherSignupOpen) throw new Error("CLOSED");
+        if (normalizeJoinCode(data.joinCode ?? "") !== current.joinCode) throw new Error("BAD_CODE");
       }
       return tx.user.create({
         data: {
@@ -81,6 +86,12 @@ export async function POST(request: Request) {
       });
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "CLOSED") {
+      return NextResponse.json(
+        { error: `Регистрацията на нови учители в ${KG.name} е затворена. Ако сте нов колега, обърнете се към директора.`, code: "SIGNUP_CLOSED" },
+        { status: 403 },
+      );
+    }
     if (error instanceof Error && error.message === "BAD_CODE") {
       return NextResponse.json(
         { error: `Кодът не е верен. Поискайте кода на ${KG.name} от администратора на облака.` },

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Lock } from "lucide-react";
+import { useSignupOpen } from "@/lib/client/signup";
 import { KG } from "@/config/kindergarten";
 import { NAREDBA5 } from "@/services/naredba5";
 
@@ -7,7 +10,7 @@ import { NAREDBA5 } from "@/services/naredba5";
 const INSIDE = [
   {
     title: "Игри за всяко направление",
-    text: "Ситуационни игри по възрастова група и по темата, която сте взели — БЕЛ, математика, околен свят, изобразително изкуство, музика, конструиране и технологии, физическа култура и БДП.",
+    text: "Ситуационни игри по възрастова група и по темата, която сте взели — БЕЛ, Математика, Околен свят, Изобразително изкуство, Музика, Конструиране и технологии, Физическа култура и БДП.",
   },
   {
     title: "Материали за печат",
@@ -25,6 +28,7 @@ const INSIDE = [
 
 /** Началната страница на облака за посетители: коя е градината и как се влиза. */
 export function Landing() {
+  const signupOpen = useSignupOpen();
   return (
     <main>
       <section className="mx-auto max-w-6xl px-4 pb-14 pt-12 sm:px-6 sm:pt-16 lg:pt-20">
@@ -47,16 +51,18 @@ export function Landing() {
             >
               Вход за учители <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
+            {signupOpen && (
             <Link
               href="/register"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
             >
               Регистрация с кода на градината
             </Link>
+            )}
           </div>
           <p className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-slate-500">
             <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-            Облакът е само за учителите на {KG.name}. Кодът за регистрация се дава от администратора на облака.
+            Облакът е само за учителите на {KG.name}.{signupOpen ? " Кодът за регистрация се дава от администратора на облака." : ""}
           </p>
         </div>
       </section>

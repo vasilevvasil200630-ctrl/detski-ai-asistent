@@ -31,6 +31,7 @@ const LINK = "font-semibold text-[#0a4b82] underline-offset-4 transition-colors 
 export default function RegisterPage() {
   const router = useRouter();
   const [needsCode, setNeedsCode] = useState<boolean | null>(null);
+  const [open, setOpen] = useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +47,10 @@ export default function RegisterPage() {
   useEffect(() => {
     fetch("/api/auth/register")
       .then((r) => r.json())
-      .then((d: { needsCode?: boolean }) => setNeedsCode(d.needsCode !== false))
+      .then((d: { needsCode?: boolean; open?: boolean }) => {
+        setNeedsCode(d.needsCode !== false);
+        setOpen(d.open !== false);
+      })
       .catch(() => setNeedsCode(true));
   }, []);
 
@@ -104,6 +108,21 @@ export default function RegisterPage() {
       {needsCode === null ? (
         <div className="flex justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
+        </div>
+      ) : !open ? (
+        <div className="space-y-4">
+          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            Регистрацията на нови учители в {KG.name} е затворена — екипът вече е в облака. Ако сте нов колега, обърнете се
+            към директора: той ще я отвори за вас.
+          </p>
+          <p className="text-sm leading-relaxed text-slate-600">
+            Родител или гост? Не ви трябва профил —{" "}
+            <Link href="/vitrina" className={LINK}>
+              вижте какво правим в градината
+            </Link>
+            .
+          </p>
         </div>
       ) : (
         <>

@@ -68,6 +68,8 @@ model Kindergarten {
   motto         String         @default("")
   /// Код за присъединяване на колеги (напр. ДГ-7K4P2M)
   joinCode      String         @unique
+  /// Приемане на нови учители: директорът го изключва, когато екипът е пълен (първият профил — винаги)
+  teacherSignupOpen Boolean    @default(true)
   teachers      User[]
   bankGames     BankGame[]
   materials     Material[]
