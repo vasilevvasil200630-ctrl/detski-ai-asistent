@@ -8,6 +8,7 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "check:content": "jiti scripts/check-content.ts",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "db:dev": "prisma dev",

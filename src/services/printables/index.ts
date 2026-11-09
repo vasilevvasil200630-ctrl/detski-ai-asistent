@@ -2,7 +2,7 @@ import { KG } from '../../config/kindergarten';
 import { AGE_GROUP_STANDARDS, DIRECTION_STANDARDS, naredba5PromptRules } from '../naredba5';
 import { BDP, bdpPromptRules } from '../bdp';
 import type { AgeGroup, LessonDirection } from '../../types';
-import { COUNT_MAX, buildDemoWorksheet, buildStyledWorksheet } from './worksheets';
+import { ANSWER_MAX, answersWithDots, buildDemoWorksheet, buildStyledWorksheet, countPrompt } from './worksheets';
 import { HALF_SHAPE_IDS, solveMaze } from './drawings';
 import { buildDemoVerses } from './verses';
 import { buildDemoLetter, letterSignature } from './letters';
@@ -40,12 +40,12 @@ export const SHEET_KIND_ORDER: SheetKind[] = ['count', 'match', 'odd', 'sequence
 
 /** Формата на всеки вид задача за модела (един ред на вид). */
 export const SHEET_KIND_SPECS: Record<SheetKind, string> = {
-  count: "\"count\": {\"kind\":\"count\",\"prompt\":\"…\",\"groups\":[{\"pic\":{\"e\":\"🍎\",\"w\":\"ябълка\"},\"count\":3}]} — 3–4 групи",
+  count: "\"count\": {\"kind\":\"count\",\"prompt\":\"…\",\"groups\":[{\"pic\":{\"e\":\"🍎\",\"w\":\"ябълка\"},\"count\":3}]} — 3–4 групи; в I–II група отговорът е карта с точки, не цифра",
   match: "\"match\": {\"kind\":\"match\",\"prompt\":\"Свържи …\",\"pairs\":[{\"left\":{\"e\":\"🐇\",\"w\":\"заек\"},\"right\":{\"e\":\"🥕\",\"w\":\"морков\"}}]} — 3–4 двойки, дясната колона ще се разбърка автоматично",
   odd: "\"odd\": {\"kind\":\"odd\",\"prompt\":\"Огради излишното.\",\"rows\":[{\"items\":[4 картинки],\"odd\":индекс на излишната 0–3}]} — 2–3 реда",
   sequence: "\"sequence\": {\"kind\":\"sequence\",\"prompt\":\"Продължи редицата.\",\"pattern\":[2–3 картинки]}",
   trace: "\"trace\": {\"kind\":\"trace\",\"prompt\":\"…\",\"shape\":\"line|arches|wave|zigzag|loops\",\"start\":{картинка},\"end\":{картинка}} — подготовка за писане",
-  sound: "\"sound\": {\"kind\":\"sound\",\"prompt\":\"Огради картинките, които започват със звука „С“.\",\"sound\":\"С\",\"pics\":[6 картинки]} — само за III и IV група",
+  sound: "\"sound\": {\"kind\":\"sound\",\"prompt\":\"Огради картинките, които започват със звука „С“.\",\"sound\":\"С\",\"pics\":[6 картинки]} — само за IV група; без думи, които започват с я, ю, щ",
   draw: "\"draw\": {\"kind\":\"draw\",\"prompt\":\"Нарисувай …\"}",
   // Рисуваните задачи се правят от вградения двигател — моделът не ги получава
   maze: '',
@@ -68,7 +68,7 @@ ${naredba5PromptRules(req.ageGroup)}`;
 ${req.direction === 'bdp' ? bdpPromptRules(req.ageGroup) : ''}
 Създай РАБОТЕН ЛИСТ ЗА ПЕЧАТ в направление ${directionText(req.direction)} по темата „${req.topic || 'по избор, подходяща за сезона'}“.
 Децата не четат — условията са кратки, за да ги прочете учителят. Картинките са ЕДНО емоджи всяка (без текст), с дума за учителя.
-Числата в задачите за броене са от 1 до ${COUNT_MAX[req.ageGroup]}. Брой задачи: ${req.ageGroup === '1' || req.ageGroup === '2' ? 3 : 4}, различни по вид.
+Числата в задачите за броене са от 1 до ${ANSWER_MAX[req.ageGroup]}${answersWithDots(req.ageGroup) ? ' (децата още не познават цифрите — отговорът е брой точки)' : ''}. Брой задачи: ${req.ageGroup === '1' || req.ageGroup === '2' ? 3 : 4}, различни по вид.
 Видове задачи (поле "kind"):
 ${SHEET_KIND_ORDER.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}
 Върни САМО валиден JSON (без markdown): {"title":"…","tasks":[…],"teacherNote":"цел по Наредба № 5 и отговорите"}`;
@@ -126,14 +126,15 @@ export function normalizeTask(raw: unknown, age: AgeGroup): WorksheetTask | null
   const t = obj(raw);
   const prompt = str(t.prompt, 200);
   if (!prompt) return null;
-  const max = COUNT_MAX[age];
+  const max = ANSWER_MAX[age];
   switch (t.kind) {
     case 'count': {
       const groups = arr(t.groups)
         .map((g) => ({ pic: pic(obj(g).pic), count: Math.round(Number(obj(g).count)) }))
         .filter((g): g is { pic: Pic; count: number } => !!g.pic && g.count >= 1 && g.count <= max)
         .slice(0, 4);
-      return groups.length >= 2 ? { kind: 'count', prompt, groups, max } : null;
+      // Условието е наше: точки за I–II група, число за III–IV група
+      return groups.length >= 2 ? { kind: 'count', prompt: countPrompt(age), groups, max, ...(answersWithDots(age) ? { dots: true } : {}) } : null;
     }
     case 'match': {
       const pairs = arr(t.pairs)
@@ -167,7 +168,7 @@ export function normalizeTask(raw: unknown, age: AgeGroup): WorksheetTask | null
       return start && end ? { kind: 'trace', prompt, shape, start, end } : null;
     }
     case 'sound': {
-      if (age === '1' || age === '2') return null;
+      if (age !== '4') return null;
       const sound = str(t.sound, 2).toUpperCase();
       const pics = arr(t.pics).map(pic).filter((p): p is Pic => !!p).slice(0, 8);
       return sound && pics.length >= 4 ? { kind: 'sound', prompt, sound, pics } : null;

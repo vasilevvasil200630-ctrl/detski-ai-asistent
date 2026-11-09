@@ -210,12 +210,13 @@ function savedTask(raw: unknown, age: AgeGroup): WorksheetTask | null {
   if (!prompt) return null;
   switch (t.kind) {
     case 'count': {
-      const max = COUNT_MAX[age];
+      const savedMax = Math.round(Number(t.max));
+      const max = savedMax >= 3 && savedMax <= COUNT_MAX[age] ? savedMax : COUNT_MAX[age];
       const groups = list(t.groups)
         .map((g) => ({ pic: savedPic(o(g).pic), count: Math.round(Number(o(g).count)) }))
         .filter((g): g is { pic: Pic; count: number } => !!g.pic && g.count >= 1 && g.count <= max)
         .slice(0, 4);
-      return groups.length ? { kind: 'count', prompt, groups, max } : null;
+      return groups.length ? { kind: 'count', prompt, groups, max, ...(t.dots === true ? { dots: true } : {}) } : null;
     }
     case 'match': {
       const pairs = list(t.pairs)

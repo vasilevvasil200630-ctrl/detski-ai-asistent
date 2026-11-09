@@ -80,7 +80,7 @@ export function GameKitDialog({
     };
   }, [busy, onClose]);
 
-  const kindOptions = SHEET_KIND_ORDER.filter((k) => k !== 'sound' || ageGroup === '3' || ageGroup === '4');
+  const kindOptions = SHEET_KIND_ORDER.filter((k) => k !== 'sound' || ageGroup === '4');
   const togglePart = (p: KitPart) => setParts((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
   const toggleKind = (k: SheetKind) =>
     setKinds((prev) => (prev.includes(k) ? prev.filter((x) => x !== k) : prev.length >= MAX_SHEET_KINDS ? prev : [...prev, k]));
