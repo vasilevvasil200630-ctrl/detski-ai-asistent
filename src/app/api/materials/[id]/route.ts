@@ -29,6 +29,8 @@ const PatchBody = z.object({
   ageGroup: z.enum(["1", "2", "3", "4"]).optional(),
   /** Материалите към игра (работен лист, карти…); null ги маха */
   kit: z.unknown().optional(),
+  /** „Изпитано с деца“ с бележка как е минало; null маха отметката */
+  tried: z.object({ note: z.string().trim().max(500, "Бележката е твърде дълга.").default("") }).nullable().optional(),
 });
 
 /** Само авторът променя своя материал: споделяне/спиране на споделянето, заглавие, група. */
@@ -52,7 +54,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     sharedAt?: Date | null;
     kindergartenId?: string | null;
     content?: Prisma.InputJsonValue;
+    triedAt?: Date | null;
+    triedNote?: string | null;
   } = {};
+  if (parsed.data.tried !== undefined) {
+    data.triedAt = parsed.data.tried ? new Date() : null;
+    data.triedNote = parsed.data.tried ? parsed.data.tried.note : null;
+  }
   if (parsed.data.kit !== undefined) {
     const content = existing.content && typeof existing.content === "object" && !Array.isArray(existing.content) ? (existing.content as Record<string, unknown>) : null;
     if (existing.kind !== "GAME" || !content) return NextResponse.json({ error: "Материали се добавят само към игра." }, { status: 400 });

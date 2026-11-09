@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { KG } from "@/config/kindergarten";
-import { publicShowcaseWhere, SHOWCASE_INCLUDE, showcaseTeachers, toShowcaseView } from "@/lib/showcase";
+import { monthLabel, publicShowcaseWhere, SHOWCASE_INCLUDE, showcaseMonths, showcaseTeachers, toShowcaseView } from "@/lib/showcase";
 import { ShowcaseCard, TeacherCard } from "@/components/showcase/ShowcaseCards";
 import { AGE_SHORT, directionLabel } from "@/services/materialText";
 import { DIRECTION_ORDER } from "@/services/naredba5";
@@ -17,8 +17,9 @@ export default async function ShowcasePublicPage({ searchParams }: { searchParam
   const { group, dir } = await searchParams;
   const ageGroup = AGES.find((a) => a === group);
   const direction = DIRS.find((d) => d === dir);
-  const [teachers, rows] = await Promise.all([
+  const [teachers, months, rows] = await Promise.all([
     showcaseTeachers(),
+    showcaseMonths(),
     prisma.showcaseItem.findMany({
       where: publicShowcaseWhere({ ...(ageGroup ? { ageGroup } : {}), ...(direction ? { direction } : {}) }),
       include: SHOWCASE_INCLUDE,
@@ -46,6 +47,21 @@ export default async function ShowcasePublicPage({ searchParams }: { searchParam
           вкъщи — само ако детето пожелае.
         </p>
       </header>
+
+      {months.length > 0 && (
+        <section aria-labelledby="months-title" className="mt-8">
+          <h2 id="months-title" className="text-sm font-bold uppercase tracking-wide text-slate-500">
+            Бюлетин по месеци
+          </h2>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {months.slice(0, 12).map((m) => (
+              <Link key={m.ym} href={`/vitrina/mesec/${m.ym}`} className={chip(false)}>
+                {monthLabel(m.ym)} · {m.count}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {teachers.length > 0 && (
         <section aria-labelledby="teachers-title" className="mt-10">

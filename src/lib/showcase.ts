@@ -121,3 +121,30 @@ export async function validShowcaseImages(ids: string[], me: { id: string; kinde
   return { ok: true as const, ids: unique };
 }
 
+
+/** „2026-11“ → начало и край на месеца (по UTC; за бюлетина е достатъчно точно). */
+export function monthRange(ym: string): { from: Date; to: Date } | null {
+  const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(ym);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]) - 1;
+  return { from: new Date(Date.UTC(y, mo, 1)), to: new Date(Date.UTC(y, mo + 1, 1)) };
+}
+
+/** Месеците с одобрени дейности (най-новите първи) — за бюлетините. */
+export async function showcaseMonths(): Promise<{ ym: string; count: number }[]> {
+  const rows = await prisma.showcaseItem.findMany({ where: publicShowcaseWhere(), select: { publishedAt: true } });
+  const counts = new Map<string, number>();
+  for (const r of rows) {
+    if (!r.publishedAt) continue;
+    const ym = r.publishedAt.toISOString().slice(0, 7);
+    counts.set(ym, (counts.get(ym) ?? 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([ym, count]) => ({ ym, count }));
+}
+
+export function monthLabel(ym: string): string {
+  const range = monthRange(ym);
+  if (!range) return ym;
+  return range.from.toLocaleDateString("bg-BG", { month: "long", year: "numeric", timeZone: "UTC" }).replace(/\s*г\.?$/, "");
+}

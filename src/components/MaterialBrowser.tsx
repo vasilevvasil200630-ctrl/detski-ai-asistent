@@ -29,6 +29,7 @@ const chip = (active: boolean) =>
 export function MaterialBrowser({ scope, holiday, initialAgeGroup = "", refreshKey = 0, excludeKind, emptyText }: Props) {
   const [ageGroup, setAgeGroup] = useState<AgeGroup | "">(initialAgeGroup);
   const [kind, setKind] = useState<MaterialKind | "">("");
+  const [onlyTried, setOnlyTried] = useState(false);
   const [items, setItems] = useState<SavedMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [noKindergarten, setNoKindergarten] = useState(false);
@@ -37,11 +38,11 @@ export function MaterialBrowser({ scope, holiday, initialAgeGroup = "", refreshK
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetchMaterials({ scope, ageGroup: ageGroup || undefined, kind: kind || undefined, holiday });
+    const res = await fetchMaterials({ scope, ageGroup: ageGroup || undefined, kind: kind || undefined, holiday, tried: onlyTried ? "1" : undefined });
     setItems((res?.materials ?? []).filter((m) => m.kind !== excludeKind));
     setNoKindergarten(Boolean(res?.noKindergarten));
     setLoading(false);
-  }, [scope, ageGroup, kind, holiday, excludeKind]);
+  }, [scope, ageGroup, kind, holiday, excludeKind, onlyTried]);
 
   useEffect(() => {
     void load();
@@ -70,6 +71,9 @@ export function MaterialBrowser({ scope, holiday, initialAgeGroup = "", refreshK
             {KIND_LABELS[k].label}
           </button>
         ))}
+        <button type="button" aria-pressed={onlyTried} onClick={() => setOnlyTried((v) => !v)} className={chip(onlyTried)}>
+          ✓ Само изпитаните с деца
+        </button>
       </div>
 
       {loading ? (

@@ -22,6 +22,7 @@ import {
   UsersRound,
   type LucideIcon,
   Store,
+  FolderHeart,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { performSignOut } from "@/lib/session-cache";
@@ -62,6 +63,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
       { href: "/showcase", label: "Витрина за родители", icon: Store },
       { href: "/library", label: "Моята библиотека", icon: Library },
+      { href: "/portfolio", label: "Моето портфолио", icon: FolderHeart },
       { href: "/holidays", label: "Празници", icon: CalendarHeart },
       { href: "/naredba5", label: "Наредба 5 и „Златно ключе“", icon: BookOpenCheck },
       { href: "/team", label: "Управление на екипа", icon: UsersRound, adminOnly: true },

@@ -140,6 +140,9 @@ model Material {
   sharedAt       DateTime?
   /// Ако е копие от материал на колега
   copiedFromId   String?
+  /// „Изпитано с деца“: кога учителят е провел материала с групата и как е минало
+  triedAt        DateTime?
+  triedNote      String?
   likes          MaterialLike[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
