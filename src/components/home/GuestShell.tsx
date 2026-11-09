@@ -19,7 +19,7 @@ export function GuestShell({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      <header className="border-b border-slate-200">
+      <header className="border-b border-slate-200 print:hidden">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5" aria-label={`${KG.siteName} — начало`}>
             <LogoIcon className="h-9 w-9" />
@@ -61,7 +61,9 @@ export function GuestShell({
         </div>
       </header>
       <div className="flex-1">{children}</div>
-      <SiteFooter compact={footer === "compact"} />
+      <div className="print:hidden">
+        <SiteFooter compact={footer === "compact"} />
+      </div>
     </div>
   );
 }

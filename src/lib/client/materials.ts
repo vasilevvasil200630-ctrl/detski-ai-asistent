@@ -72,6 +72,15 @@ export function setMaterialShared(id: string, shared: boolean) {
   );
 }
 
+/** „Изпитано с деца“ с бележка (или null — маха отметката). */
+export function setMaterialTried(id: string, tried: { note: string } | null) {
+  return call<{ material: SavedMaterial }>(
+    `/api/materials/${id}`,
+    { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tried }) },
+    "Отметката не беше записана.",
+  );
+}
+
 /** Записва (или маха с null) материалите към запазена игра. */
 export function setMaterialKit(id: string, kit: GameKit | null) {
   return call<{ material: SavedMaterial }>(

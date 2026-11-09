@@ -179,4 +179,6 @@ export interface SavedMaterial {
   likes: number;
   likedByMe: boolean;
   copiedFromId: string | null;
+  /** „Изпитано с деца“: кога и как е минало (null — още не е отбелязано) */
+  tried: { at: string; note: string } | null;
 }

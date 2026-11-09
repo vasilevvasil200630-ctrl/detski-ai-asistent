@@ -45,6 +45,7 @@ export function toSavedMaterial(row: MaterialRow, userId: string, likedIds: Set<
     likes: row._count.likes,
     likedByMe: likedIds.has(row.id),
     copiedFromId: row.copiedFromId,
+    tried: row.triedAt ? { at: row.triedAt.toISOString(), note: row.triedNote ?? "" } : null,
   };
 }
 
@@ -69,6 +70,8 @@ export const ListMaterialsQuery = z.object({
   ageGroup: AGE.optional(),
   kind: z.enum(["GAME", "LESSON", "MATERIAL"]).optional(),
   holiday: z.enum(HOLIDAY_IDS).optional(),
+  /** 1 — само изпитаните с деца */
+  tried: z.enum(["1"]).optional(),
 });
 
 const MAX_CONTENT_CHARS = 60_000;

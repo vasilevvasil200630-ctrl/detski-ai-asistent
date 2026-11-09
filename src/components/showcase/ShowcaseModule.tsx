@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Camera, Check, ChevronDown, ExternalLink, Loader2, Pencil, Store, Trash2, Undo2 } from "lucide-react";
+import { CalendarDays, Camera, Check, ChevronDown, ExternalLink, Loader2, Pencil, QrCode, Store, Trash2, Undo2 } from "lucide-react";
 import { useMe } from "@/lib/client/useMe";
 import { toast } from "@/components/Toaster";
 import { AGE_SHORT, directionLabel } from "@/services/materialText";
@@ -124,6 +124,19 @@ export function ShowcaseModule() {
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#0a4b82] hover:bg-slate-50"
           >
             Публичната витрина <ExternalLink className="h-4 w-4" aria-hidden />
+          </Link>
+          <Link
+            href={`/vitrina/mesec/${new Date().toISOString().slice(0, 7)}`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <CalendarDays className="h-4 w-4" aria-hidden /> Бюлетин за месеца
+          </Link>
+          <Link
+            href="/showcase/qr"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <QrCode className="h-4 w-4" aria-hidden /> QR код за таблото
           </Link>
         </div>
       </div>

@@ -17,6 +17,7 @@ export const PRIVATE_PAGE_ROUTES = [
   "/notebook",
   "/team",
   "/showcase",
+  "/portfolio",
   "/profile",
   "/print",
   "/login",

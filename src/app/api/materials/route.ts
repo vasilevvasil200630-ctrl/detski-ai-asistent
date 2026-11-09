@@ -30,6 +30,7 @@ export async function GET(request: Request) {
       ...(q.data.ageGroup ? { ageGroup: q.data.ageGroup } : {}),
       ...(q.data.kind ? { kind: q.data.kind } : {}),
       ...(q.data.holiday ? { holiday: q.data.holiday } : {}),
+      ...(q.data.tried ? { triedAt: { not: null } } : {}),
     },
     include: MATERIAL_INCLUDE,
     orderBy: { createdAt: "desc" },
