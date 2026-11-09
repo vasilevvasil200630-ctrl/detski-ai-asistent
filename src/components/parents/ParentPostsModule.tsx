@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Check, ExternalLink, EyeOff, Loader2, Pencil, Send, ShieldCheck, Trash2, Undo2, X } from "lucide-react";
+import { CalendarDays, Check, ExternalLink, EyeOff, Loader2, Pencil, QrCode, Send, ShieldCheck, Trash2, Undo2, X } from "lucide-react";
 import { toast } from "@/components/Toaster";
 import { PARENT_POST_KINDS, PARENT_POST_LABEL, type GroupView, type ParentPostKind, type ParentPostView } from "@/lib/parents-shared";
 
@@ -160,6 +160,11 @@ export function ParentPostsModule() {
         {data?.group && (
           <Link href={`/grupi/${data.group.slug}`} target="_blank" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
             <ExternalLink className="h-4 w-4" aria-hidden /> Страницата на {data.group.label}
+          </Link>
+        )}
+        {data && (data.group || data.isAdmin) && (
+          <Link href="/showcase/qr" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+            <QrCode className="h-4 w-4" aria-hidden /> QR плакат
           </Link>
         )}
       </header>
