@@ -59,7 +59,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   // Публичната витрина за родителите е отворена за всички
-  const isShowcase = pathname === "/vitrina" || pathname.startsWith("/vitrina/");
+  // Публичните страници за родителите: витрината и страниците на групите
+  const isShowcase = pathname === "/vitrina" || pathname.startsWith("/vitrina/") || pathname === "/grupi" || pathname.startsWith("/grupi/");
 
   // Витрината се рисува веднага (за родителите и търсачките): съдържанието е в HTML-а,
   // а липсваща дейност връща истински код 404. Учителят после вижда менюто си.

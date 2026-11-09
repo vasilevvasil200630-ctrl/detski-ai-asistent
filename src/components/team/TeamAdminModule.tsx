@@ -19,6 +19,8 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "@/components/Toaster";
+import { GroupsSection } from "./GroupsSection";
+import type { GroupView } from "@/lib/parents-shared";
 import { AGE_SHORT } from "@/services/materialText";
 
 type Member = {
@@ -29,6 +31,7 @@ type Member = {
   jobTitle: string;
   ageGroup: string;
   groupName: string;
+  groupId: string | null;
   role: "ADMIN" | "TEACHER";
   me: boolean;
   mustChangePassword: boolean;
@@ -230,10 +233,16 @@ export function TeamAdminModule() {
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [busy, setBusy] = useState(false);
+  const [groups, setGroups] = useState<GroupView[]>([]);
 
   const load = useCallback(async () => {
     try {
-      setData(await api<TeamData>("/api/admin/team", { cache: "no-store" }));
+      const [team, g] = await Promise.all([
+        api<TeamData>("/api/admin/team", { cache: "no-store" }),
+        api<{ groups: GroupView[] }>("/api/admin/groups", { cache: "no-store" }),
+      ]);
+      setData(team);
+      setGroups(g.groups);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Екипът не можа да се зареди.");
@@ -432,6 +441,8 @@ export function TeamAdminModule() {
           </button>
         </section>
       )}
+
+      <GroupsSection groups={groups} onChange={load} />
 
       <section aria-labelledby="team-title" className="mt-8">
         <h2 id="team-title" className="text-lg font-bold text-slate-900">
@@ -748,6 +759,7 @@ export function TeamAdminModule() {
       {dialog?.kind === "edit" && (
         <EditMemberDialog
           member={dialog.member}
+          groups={groups}
           busy={busy}
           onClose={() => setDialog(null)}
           onSave={(patch) =>
@@ -801,22 +813,26 @@ function ConfirmRow({
 
 function EditMemberDialog({
   member,
+  groups,
   busy,
   onClose,
   onSave,
 }: {
   member: Member;
+  groups: GroupView[];
   busy: boolean;
   onClose: () => void;
   onSave: (patch: {
     jobTitle: string;
-    groupName: string;
-    ageGroup: string;
+    groupName?: string;
+    ageGroup?: string;
+    groupId: string | null;
   }) => void;
 }) {
   const [jobTitle, setJobTitle] = useState(member.jobTitle);
   const [groupName, setGroupName] = useState(member.groupName);
   const [ageGroup, setAgeGroup] = useState(member.ageGroup);
+  const [groupId, setGroupId] = useState(member.groupId ?? "");
   const field =
     "mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20";
   return (
@@ -824,11 +840,8 @@ function EditMemberDialog({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSave({
-            jobTitle: jobTitle.trim(),
-            groupName: groupName.trim(),
-            ageGroup,
-          });
+          // С група възрастта и името идват от нея; без група — както са въведени
+          onSave(groupId ? { jobTitle: jobTitle.trim(), groupId } : { jobTitle: jobTitle.trim(), groupName: groupName.trim(), ageGroup, groupId: null });
         }}
       >
         <label className="mt-4 block text-sm font-medium text-slate-700">
@@ -848,6 +861,22 @@ function EditMemberDialog({
             ))}
           </datalist>
         </label>
+        {groups.length > 0 && (
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Група в градината
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} className={field}>
+              <option value="">— без група —</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.label}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-xs font-normal text-slate-500">Учителят публикува за родителите на тази група.</span>
+          </label>
+        )}
+        {!groupId && (
+        <>
         <label className="mt-4 block text-sm font-medium text-slate-700">
           Възрастова група
           <select
@@ -873,6 +902,8 @@ function EditMemberDialog({
             className={field}
           />
         </label>
+        </>
+        )}
         <div className="mt-6 flex justify-end gap-2">
           <button
             type="button"

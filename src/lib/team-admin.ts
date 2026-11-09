@@ -43,6 +43,7 @@ export const TEAM_MEMBER_SELECT = {
   jobTitle: true,
   ageGroup: true,
   groupName: true,
+  groupId: true,
   kgRole: true,
   mustChangePassword: true,
   createdAt: true,

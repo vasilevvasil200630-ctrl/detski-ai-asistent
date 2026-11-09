@@ -37,6 +37,8 @@ export interface PlanView {
   groupName: string;
   schoolYear: number;
   shared: boolean;
+  /** Темата на седмицата — на страницата на групата за родителите (ако е утвърдено) */
+  showToParents: boolean;
   mine: boolean;
   authorName: string;
   approvedAt: string | null;

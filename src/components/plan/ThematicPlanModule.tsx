@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { BadgeCheck, CalendarRange, ChevronDown, Copy, FileDown, Loader2, Plus, Printer, Share2, Sparkles, Trash2 } from "lucide-react";
+import { BadgeCheck, CalendarRange, ChevronDown, Copy, FileDown, HeartHandshake, Loader2, Plus, Printer, Share2, Sparkles, Trash2 } from "lucide-react";
 import { useMe } from "@/lib/client/useMe";
 import { toast } from "@/components/Toaster";
 import { KG_SIGNATURE } from "@/config/kindergarten";
@@ -263,6 +263,25 @@ export function ThematicPlanModule() {
               {plan.mine && (
                 <button type="button" onClick={() => patchPlan({ shared: !plan.shared }, plan.shared ? "Вече не е споделено." : "Колегите могат да го видят и да си направят копие.")} className={btn}>
                   <Share2 className="h-4 w-4" aria-hidden /> {plan.shared ? "Спри споделянето" : "Сподели с колегите"}
+                </button>
+              )}
+              {plan.mine && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    patchPlan(
+                      { showToParents: !plan.showToParents },
+                      plan.showToParents
+                        ? "Темата вече не се вижда на страницата на групата."
+                        : plan.approvedAt
+                          ? "Темата на седмицата се вижда на страницата на групата."
+                          : "Готово — темата ще се вижда, след като директорът утвърди разпределението.",
+                    )
+                  }
+                  className={btn}
+                  title="Темата на седмицата и темите на ситуациите — на страницата на групата за родителите"
+                >
+                  <HeartHandshake className="h-4 w-4" aria-hidden /> {plan.showToParents ? "Скрий темата от родителите" : "Покажи темата на родителите"}
                 </button>
               )}
               {!plan.mine && (

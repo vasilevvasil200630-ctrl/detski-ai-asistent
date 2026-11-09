@@ -32,6 +32,7 @@ export function toPlanView(row: PlanRow, meId: string): PlanView {
     groupName: row.groupName,
     schoolYear: row.schoolYear,
     shared: row.shared,
+    showToParents: row.showToParents,
     mine: row.authorId === meId,
     authorName: row.author?.name ?? "Бивш колега",
     approvedAt: row.approvedAt?.toISOString() ?? null,

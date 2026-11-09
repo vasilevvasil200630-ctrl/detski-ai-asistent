@@ -5,6 +5,7 @@
  * Без path alias-и — файлът се импортира и от next.config.ts.
  */
 export const PRIVATE_PAGE_ROUTES = [
+  "/za-roditelite",
   "/games",
   "/materials",
   "/dos",
@@ -32,6 +33,7 @@ export const PRIVATE_PAGE_ROUTES = [
 export const PUBLIC_PAGE_ROUTES = [
   { path: "/", priority: 1.0, changeFrequency: "monthly" },
   { path: "/vitrina", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/grupi", priority: 0.8, changeFrequency: "weekly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" },
 ] as const;

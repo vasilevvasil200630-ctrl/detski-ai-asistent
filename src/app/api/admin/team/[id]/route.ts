@@ -6,6 +6,7 @@ import { revokeEmailTokens } from "@/lib/auth/email-tokens";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { deleteUserAccount } from "@/lib/account-deletion";
 import { generateTempPassword, requireAdmin, unusablePassword } from "@/lib/team-admin";
+import { groupLabel } from "@/lib/parents-shared";
 
 const ActionSchema = z.discriminatedUnion("action", [
   /** Права: администратор (директор/заместник) или учител */
@@ -16,6 +17,8 @@ const ActionSchema = z.discriminatedUnion("action", [
     jobTitle: z.string().trim().min(2, "Длъжността е твърде кратка.").max(60).optional(),
     groupName: z.string().trim().max(80).optional(),
     ageGroup: z.enum(["1", "2", "3", "4"]).optional(),
+    /** Групата в градината (null — без група); тогава възрастта и името идват от групата */
+    groupId: z.string().min(1).max(40).nullable().optional(),
   }),
   /** Нова временна парола (когато учителката е забравила своята) */
   z.object({ action: z.literal("resetPassword") }),
@@ -75,10 +78,24 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       await prisma.user.update({ where: { id }, data: { kgRole: body.role } });
       return NextResponse.json({ ok: true });
     case "update": {
-      const { jobTitle, groupName, ageGroup } = body;
+      const { jobTitle, groupName, ageGroup, groupId } = body;
+      let fromGroup: { groupId: string | null; ageGroup?: string; groupName?: string } | null = null;
+      if (groupId !== undefined) {
+        if (groupId === null) fromGroup = { groupId: null };
+        else {
+          const g = await prisma.group.findUnique({ where: { id: groupId }, select: { kindergartenId: true, name: true, ageGroup: true } });
+          if (!g || g.kindergartenId !== me.kindergartenId) return NextResponse.json({ error: "Групата не е намерена." }, { status: 400 });
+          fromGroup = { groupId, ageGroup: g.ageGroup, groupName: groupLabel(g) };
+        }
+      }
       await prisma.user.update({
         where: { id },
-        data: { ...(jobTitle ? { jobTitle } : {}), ...(groupName !== undefined ? { groupName } : {}), ...(ageGroup ? { ageGroup } : {}) },
+        data: {
+          ...(jobTitle ? { jobTitle } : {}),
+          ...(groupName !== undefined ? { groupName } : {}),
+          ...(ageGroup ? { ageGroup } : {}),
+          ...(fromGroup ?? {}),
+        },
       });
       return NextResponse.json({ ok: true });
     }
