@@ -1,5 +1,7 @@
 import { AgeGroup, EducationalDirection, LessonDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
 import { buildDemoGames, DemoContext } from './demoGames';
+import { gameForCore } from './directionGames';
+import { resultsForGroup } from './naredba5Results';
 import {
   AGE_GROUP_STANDARDS,
   DIRECTION_ORDER,
@@ -323,8 +325,14 @@ function buildDemoBdpPlan(params: LessonParams): GeneratedLessonPlan {
   // Без познавателна книжка: за БДП „Златно ключе“ не посочва отделна
   const { programMaterial: _omit, ...rest } = base;
   void _omit;
+  // Основната част — игра по БДП, не общата по „Околен свят“
+  const bdpGame = gameForCore('bdp', BDP.host.core, topic, params.ageGroup);
+  const stages = bdpGame
+    ? rest.stages.map((st, i) => (i === 1 ? { ...st, teacherAction: `Провежда играта „${bdpGame.title}“ (тема по БДП „${theme.theme}“): ${bdpGame.steps.join(' ')}`, childrenActivity: `Участват в играта и упражняват: ${bdpGame.skills}.` } : st))
+    : rest.stages;
   return {
     ...rest,
+    stages,
     directionLabel: `${BDP.label} (интегрирано в „${BDP.host.direction}“)`,
     educationalCore: `${BDP.host.core} (${BDP.host.direction}) • тема по БДП „${theme.theme}“`,
     goals: [...BDP.goals],
@@ -376,6 +384,11 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
   };
   const [t1, t2, t3] = timings[params.ageGroup];
 
+  // Съдържанието по направлението: очакваните резултати дословно от наредбата и играта за ядрото
+  const results = resultsForGroup(params.direction, params.ageGroup).find((r) => r.core === core)?.results ?? [];
+  const appendix = DIRECTION_STANDARDS[params.direction].appendix;
+  const game = gameForCore(params.direction, core, topic, params.ageGroup);
+
   return {
     topic,
     ageGroupLabel: ageInfo.full,
@@ -388,8 +401,14 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
       `Възпитаване на любознателност, екипност и позитивно отношение към света чрез примери от „${topic}“.`,
     ],
     expectedResults: {
-      knowledge: `Разпознава и назовава основните обекти, признаци и закономерности, свързани с темата „${topic}“ (ядро „${core}“, приложение № ${DIRECTION_STANDARDS[params.direction].appendix} към Наредба № 5).`,
-      skills: `Участва активно в диалог, групира елементи, прилага практически умения и решава игрови задачи по темата „${topic}“.`,
+      knowledge: results[0]
+        ? `${results[0]} (Наредба № 5, приложение № ${appendix}, ядро „${core}“).`
+        : `Разпознава и назовава основните обекти и признаци по темата „${topic}“ (ядро „${core}“, приложение № ${appendix} към Наредба № 5).`,
+      skills: results[1]
+        ? `${results[1]} (Наредба № 5, приложение № ${appendix}, ядро „${core}“).`
+        : game
+          ? `Упражнява: ${game.skills}.`
+          : `Участва активно в диалог, групира елементи и решава игрови задачи по темата „${topic}“.`,
       attitudes: `Проявява емоционална отзивчивост, изследователски интерес и готовност за взаимопомощ в групата.`,
     },
     materials: [
@@ -413,8 +432,12 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
       {
         phase: '2. Основна част (игрова, познавателна и практическа дейност)',
         duration: t2,
-        teacherAction: `Представя интерактивно основните акценти по темата „${topic}“, провежда дидактичната игра „Откриватели на ${topic}“ и насочва децата в практическата мисия по ${dirInfo.label}.`,
-        childrenActivity: `Наблюдават, сравняват и групират обектите от „${topic}“, отговарят на въпроси и изпълняват с ентусиазъм творческата/познавателната задача.`,
+        teacherAction: game
+          ? `Провежда играта „${game.title}“ (${dirInfo.label}, ядро „${core}“): ${game.steps.join(' ')}`
+          : `Представя основните понятия по темата „${topic}“ с нагледни материали и провежда дидактична игра по ядро „${core}“.`,
+        childrenActivity: game
+          ? `Участват в играта и упражняват: ${game.skills}.`
+          : `Наблюдават, сравняват и групират обектите от „${topic}“ и отговарят на въпроси.`,
       },
       {
         phase: '3. Заключителна част (обобщение и рефлексия)',

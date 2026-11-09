@@ -99,11 +99,13 @@ function holidayDate(h: Holiday, schoolYear: number): Date | null {
   const y = h.month >= 9 ? schoolYear : schoolYear + 1;
   const fixed: Record<string, [number, number]> = {
     'first-day': [9, 15],
+    nezavisimost: [9, 22],
     buditeli: [11, 1],
     semeystvo: [11, 21],
     koleda: [12, 22],
     'nova-godina': [1, 2],
     babinden: [1, 21],
+    levski: [2, 19],
     'baba-marta': [3, 1],
     'treti-mart': [3, 3],
     mama: [3, 8],

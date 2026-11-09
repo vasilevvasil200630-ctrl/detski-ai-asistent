@@ -25,14 +25,14 @@ const Emoji = ({ pic, size = "text-4xl" }: { pic: Pic; size?: string }) => (
   </span>
 );
 
-function TaskBox({ n, prompt, children }: { n: number; prompt: string; children: React.ReactNode }) {
+function TaskBox({ n, prompt, children, tight }: { n: number; prompt: string; children: React.ReactNode; tight?: boolean }) {
   return (
-    <section className="print-task break-inside-avoid rounded-2xl border-2 border-slate-300 p-4">
+    <section className={`print-task break-inside-avoid rounded-2xl border-2 border-slate-300 ${tight ? "p-3" : "p-4"}`}>
       <h3 className="flex items-start gap-2 text-base font-bold">
         <span className="print-num grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-900 text-sm text-white">{n}</span>
         <span className="pt-0.5">{prompt}</span>
       </h3>
-      <div className="mt-4">{children}</div>
+      <div className={tight ? "mt-3" : "mt-4"}>{children}</div>
     </section>
   );
 }
@@ -50,29 +50,42 @@ function TaskBody({ task, compact }: { task: WorksheetTask; compact?: boolean })
   switch (task.kind) {
     case "count":
       return (
-        <div className="space-y-3">
+        <div className={compact ? "space-y-2" : "space-y-3"}>
           {task.groups.map((g, i) => (
-            <div key={i} className="flex flex-col gap-3 border-b border-dashed border-slate-200 pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div key={i} className={`flex flex-col border-b border-dashed border-slate-200 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4 ${compact ? "gap-2 pb-2" : "gap-3 pb-3"}`}>
               <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
                 {Array.from({ length: g.count }, (_, k) => (
                   <Emoji key={k} pic={g.pic} size="text-3xl" />
                 ))}
               </div>
               {/* До 5 — в един ред; до 10 — блок 2×5, за да не скача под картинките */}
-              <div className={`grid shrink-0 gap-1.5 ${task.max > 5 ? "grid-cols-5" : "auto-cols-max grid-flow-col"}`}>
-                {Array.from({ length: task.max }, (_, k) => (
-                  <span key={k} className="grid h-8 w-8 place-items-center rounded-full border-2 border-slate-400 text-base font-bold">
-                    {k + 1}
-                  </span>
-                ))}
-              </div>
+              {task.dots ? (
+                /* I–II група: карти с точки вместо цифри */
+                <div className="flex shrink-0 flex-wrap gap-1.5">
+                  {Array.from({ length: task.max }, (_, k) => (
+                    <span key={k} className="flex h-9 min-w-9 items-center justify-center gap-0.5 rounded-lg border-2 border-slate-400 px-1.5" aria-label={`${k + 1}`}>
+                      {Array.from({ length: k + 1 }, (_, d) => (
+                        <span key={d} className="h-2 w-2 rounded-full bg-slate-800" aria-hidden />
+                      ))}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className={`grid shrink-0 gap-1.5 ${task.max > 5 ? "grid-cols-5" : "auto-cols-max grid-flow-col"}`}>
+                  {Array.from({ length: task.max }, (_, k) => (
+                    <span key={k} className="grid h-8 w-8 place-items-center rounded-full border-2 border-slate-400 text-base font-bold">
+                      {k + 1}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
       );
     case "match":
       return (
-        <div className="grid grid-cols-2 gap-x-24 gap-y-4">
+        <div className={`grid grid-cols-2 gap-x-24 ${compact ? "gap-y-2" : "gap-y-4"}`}>
           {task.pairs.map((p, i) => (
             <div key={i} className="contents">
               <div className="flex items-center justify-end gap-3">
@@ -81,7 +94,18 @@ function TaskBody({ task, compact }: { task: WorksheetTask; compact?: boolean })
               </div>
               <div className="flex items-center gap-3">
                 <span className="h-3 w-3 shrink-0 rounded-full bg-slate-800" aria-hidden />
-                {/^\d+$/.test(p.right.e) ? <span className="text-3xl font-bold">{p.right.e}</span> : <Emoji pic={p.right} size="text-3xl" />}
+                {/^\d+$/.test(p.right.e) ? (
+                  <span className="text-3xl font-bold">{p.right.e}</span>
+                ) : /^●+$/.test(p.right.e) ? (
+                  /* Карта с точки (I–II група) — в рамка, за да не се слива с точката за свързване */
+                  <span className="flex h-9 min-w-9 items-center justify-center gap-0.5 rounded-lg border-2 border-slate-400 px-1.5" aria-label={p.right.w}>
+                    {Array.from({ length: p.right.e.length }, (_, d) => (
+                      <span key={d} className="h-2 w-2 rounded-full bg-slate-800" aria-hidden />
+                    ))}
+                  </span>
+                ) : (
+                  <Emoji pic={p.right} size="text-3xl" />
+                )}
               </div>
             </div>
           ))}
@@ -89,11 +113,11 @@ function TaskBody({ task, compact }: { task: WorksheetTask; compact?: boolean })
       );
     case "odd":
       return (
-        <div className="space-y-3">
+        <div className={compact ? "space-y-2" : "space-y-3"}>
           {task.rows.map((r, i) => (
-            <div key={i} className="flex items-center justify-around gap-2 rounded-xl border border-slate-200 py-2">
+            <div key={i} className={`flex items-center justify-around gap-2 rounded-xl border border-slate-200 ${compact ? "py-1" : "py-2"}`}>
               {r.items.map((pic, k) => (
-                <Emoji key={k} pic={pic} />
+                <Emoji key={k} pic={pic} size={compact ? "text-3xl" : "text-4xl"} />
               ))}
             </div>
           ))}
@@ -164,9 +188,9 @@ function WorksheetSheet({ ws }: { ws: Worksheet }) {
           <p>Дата: _____________</p>
         </div>
       </header>
-      <div className="mt-5 space-y-4">
+      <div className={ws.tasks.length >= 4 ? "mt-4 space-y-3" : "mt-5 space-y-4"}>
         {ws.tasks.map((task, i) => (
-          <TaskBox key={i} n={i + 1} prompt={task.prompt}>
+          <TaskBox key={i} n={i + 1} prompt={task.prompt} tight={ws.tasks.length >= 4}>
             <TaskBody task={task} compact={ws.tasks.length > 2} />
           </TaskBox>
         ))}

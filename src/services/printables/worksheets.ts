@@ -10,8 +10,19 @@ import { describeDifferences, differencesTask, halfTask, mazeTask } from './draw
  * резултати по групи от Наредба № 5 (числов обхват, графомоторика, звуков анализ).
  */
 
-/** Най-голямото число по групи (приложение № 2, „Количествени отношения“). */
+/** До колко броят децата по групи (приложение № 2, „Количествени отношения“) — горната граница при проверка. */
 export const COUNT_MAX: Record<AgeGroup, number> = { '1': 3, '2': 5, '3': 10, '4': 10 };
+/**
+ * До колко е отговорът в листа: цифрите са очакван резултат едва в III група (до 5) и в IV група (до 10);
+ * в I и II група децата ограждат карта със същия брой точки, не цифра.
+ */
+export const ANSWER_MAX: Record<AgeGroup, number> = { '1': 3, '2': 5, '3': 5, '4': 10 };
+export const answersWithDots = (age: AgeGroup) => age === '1' || age === '2';
+const DOTS_PROMPT = 'Преброй картинките и огради картата със същия брой точки.';
+const DIGITS_PROMPT = 'Преброй картинките и огради числото.';
+export const countPrompt = (age: AgeGroup) => (answersWithDots(age) ? DOTS_PROMPT : DIGITS_PROMPT);
+/** Букви, които не са един звук в началото на думата (я = й+а, ю = й+у, щ = ш+т) или не започват дума. */
+const NOT_ONE_SOUND = new Set(['Я', 'Ю', 'Щ', 'Ь', 'Ъ']);
 const TASKS_PER_SHEET: Record<AgeGroup, number> = { '1': 3, '2': 3, '3': 4, '4': 4 };
 const TRACE_BY_AGE: Record<AgeGroup, Extract<WorksheetTask, { kind: 'trace' }>['shape']> = {
   '1': 'line',
@@ -31,10 +42,10 @@ function shuffle<T>(arr: readonly T[]): T[] {
 const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 
 function countTask(pics: Pic[], age: AgeGroup): WorksheetTask {
-  const max = COUNT_MAX[age];
+  const max = ANSWER_MAX[age];
   const n = age === '1' || age === '2' ? 3 : 4;
   const groups = shuffle(pics).slice(0, n).map((pic) => ({ pic, count: randInt(1, max) }));
-  return { kind: 'count', prompt: 'Преброй картинките и огради числото.', groups, max };
+  return { kind: 'count', prompt: countPrompt(age), groups, max, ...(answersWithDots(age) ? { dots: true } : {}) };
 }
 
 function sequenceTask(pattern: Pic[], age: AgeGroup): WorksheetTask {
@@ -66,11 +77,16 @@ function matchTask(pairs: readonly (readonly [Pic, Pic])[], prompt: string, n: n
 
 /** Съвпадението се пази по реда на картинките вляво; дясната колона е разбъркана (виж teacherNote). */
 function countMatchTask(pics: Pic[], age: AgeGroup): WorksheetTask {
-  const max = COUNT_MAX[age];
+  const max = ANSWER_MAX[age];
+  const dots = answersWithDots(age);
   const nums = shuffle(Array.from({ length: max }, (_, i) => i + 1)).slice(0, Math.min(4, max));
-  const pairs = nums.map((n, i) => ({ left: { e: pics[i % pics.length]!.e.repeat(n), w: `${n}` }, right: { e: String(n), w: `${n}` } }));
+  const pairs = nums.map((n, i) => ({ left: { e: pics[i % pics.length]!.e.repeat(n), w: `${n}` }, right: { e: dots ? '●'.repeat(n) : String(n), w: `${n}` } }));
   const rights = shuffle(pairs.map((p) => p.right));
-  return { kind: 'match', prompt: 'Свържи всяка група с нейното число.', pairs: pairs.map((p, i) => ({ left: p.left, right: rights[i]! })) };
+  return {
+    kind: 'match',
+    prompt: dots ? 'Свържи всяка група с картата със същия брой точки.' : 'Свържи всяка група с нейното число.',
+    pairs: pairs.map((p, i) => ({ left: p.left, right: rights[i]! })),
+  };
 }
 
 function traceTask(pics: Pic[], age: AgeGroup, prompt = 'Следвай пунктира с молив, без да вдигаш ръка.'): WorksheetTask {
@@ -83,6 +99,7 @@ function soundTask(pics: Pic[]): WorksheetTask | null {
   const byLetter = new Map<string, Pic[]>();
   for (const p of pics) {
     const letter = p.w.charAt(0).toUpperCase();
+    if (NOT_ONE_SOUND.has(letter)) continue;
     byLetter.set(letter, [...(byLetter.get(letter) ?? []), p]);
   }
   const all = [...pics, ...otherThemePics('')];
@@ -111,7 +128,8 @@ function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): Wor
       // III–IV група: лабиринтът е очакван резултат („ориентира се … в квадратна мрежа, лабиринт“)
       return [countTask(pics, age), countMatchTask(pics, age), sequenceTask(pics, age), older && coin() ? mazeTask(pics, age) : oddTask(pics, theme.id, older ? 3 : 2)];
     case 'bel': {
-      const sound = older ? soundTask(pics) : null;
+      // „Определя звука в началото и в края на думата“ — очакван резултат за IV група
+      const sound = age === '4' ? soundTask(pics) : null;
       return [
         ...(sound ? [sound] : [oddTask(pics, theme.id, 2)]),
         traceTask(pics, age),
@@ -130,7 +148,7 @@ function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): Wor
     case 'pe':
       return [older && coin() ? mazeTask(pics, age) : traceTask(pics, age, 'Помогни да стигне до другата картинка — следвай пътечката.'), sequenceTask([...PATTERN_PICS.pe], age), countTask(pics, age), draw('Нарисувай любимата си игра навън.')];
     case 'bdp':
-      return [sequenceTask([...PATTERN_PICS.bdp], age), matchTask(MATCH_PAIRS.bdp, 'Свържи превозното средство с мястото, където се движи.', older ? 4 : 3), oddTask(themeFor('транспорт').pics, 'transport', 2), draw('Нарисувай светофар и оцвети светлините му в правилния ред.')];
+      return [sequenceTask([...PATTERN_PICS.bdp], age), matchTask(MATCH_PAIRS.bdp, 'Свържи всеки с мястото, където се движи.', older ? 4 : 3), oddTask(themeFor('транспорт').pics, 'transport', 2), draw('Нарисувай светофар и оцвети светлините му в правилния ред.')];
   }
 }
 
@@ -141,7 +159,7 @@ function answersNote(tasks: WorksheetTask[]): string[] {
     if (task.kind === 'count') out.push(`${n}. ${task.groups.map((g) => `${g.pic.w} — ${g.count}`).join(', ')}.`);
     if (task.kind === 'odd') out.push(`${n}. ${task.rows.map((r) => r.items[r.odd]!.w).join(', ')}.`);
     if (task.kind === 'sound') out.push(`${n}. ${task.pics.filter((p) => p.w.charAt(0).toUpperCase() === task.sound).map((p) => p.w).join(', ')}.`);
-    if (task.kind === 'match' && task.prompt.includes('число')) out.push(`${n}. Групите се свързват с числото, равно на броя на картинките.`);
+    if (task.kind === 'match' && (task.prompt.includes('число') || task.prompt.includes('точки'))) out.push(`${n}. Всяка група се свързва с картата със същия брой.`);
     if (task.kind === 'differences') out.push(`${n}. ${describeDifferences(task).join('; ')}.`);
   });
   return out;
@@ -173,7 +191,7 @@ function kindTask(kind: SheetKind, age: AgeGroup, direction: LessonDirection, to
     case 'trace':
       return traceTask(pics, age);
     case 'sound':
-      return older ? soundTask(pics) : null;
+      return age === '4' ? soundTask(pics) : null;
     case 'draw':
       return draw(`Нарисувай и оцвети любимия си момент от играта „${t}“.`);
     case 'maze':

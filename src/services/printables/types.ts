@@ -17,7 +17,7 @@ export type HalfShapeId = 'house' | 'tree' | 'heart' | 'butterfly' | 'apple' | '
 
 export type WorksheetTask =
   /** Преброй картинките и огради числото */
-  | { kind: 'count'; prompt: string; groups: { pic: Pic; count: number }[]; max: number }
+  | { kind: 'count'; prompt: string; groups: { pic: Pic; count: number }[]; max: number; dots?: boolean }
   /** Свържи с линия */
   | { kind: 'match'; prompt: string; pairs: { left: Pic; right: Pic }[] }
   /** Огради излишното във всеки ред */
@@ -135,7 +135,7 @@ export const SHEET_KIND_LABELS: Record<SheetKind, string> = {
   odd: 'Огради излишното',
   sequence: 'Продължи редицата',
   trace: 'По пунктира',
-  sound: 'Първият звук (III–IV гр.)',
+  sound: 'Първият звук (IV гр.)',
   draw: 'Нарисувай и оцвети',
   maze: 'Лабиринт',
   differences: 'Открий разликите',
