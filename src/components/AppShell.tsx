@@ -66,6 +66,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (loading && isShowcase) {
     return <GuestShell variant="showcase">{children}</GuestShell>;
   }
+  if (loading && pathname === "/") {
+    return <GuestShell footer="full">{children}</GuestShell>;
+  }
 
   // Докато не знаем дали има вход — без рамка, за да не премигва менюто
   if (loading) {

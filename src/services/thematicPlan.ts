@@ -113,11 +113,34 @@ function holidayDate(h: Holiday, schoolYear: number): Date | null {
     'den-na-zemyata': [4, 22],
     gergyovden: [5, 6],
     '24-mai': [5, 24],
+    '1-yuni': [6, 1],
   };
   // Лазаровден, Цветница и Великден — седмицата преди Великден
   if (h.id === 'velikden') return addDays(orthodoxEaster(y), -3);
   const f = fixed[h.id];
   return f ? utc(y, f[0], f[1]) : null;
+}
+
+/** Истинската дата за родителите: Коледа и Нова година се отбелязват в градината по-рано (в последната учебна седмица). */
+function realDate(h: Holiday, schoolYear: number): Date | null {
+  if (h.id === 'koleda') return utc(schoolYear, 12, 25);
+  if (h.id === 'nova-godina') return utc(schoolYear + 1, 1, 1);
+  return holidayDate(h, schoolYear);
+}
+
+/**
+ * Следващите празници с точната им дата (подвижните — изчислени), от днес нататък — за началната
+ * страница на родителите. Празник в учебната година, който е минал, отива в следващата.
+ */
+export function upcomingHolidayDates(count: number, now: Date = new Date()): { holiday: Holiday; date: string }[] {
+  const today = ymd(now);
+  const year = now.getUTCMonth() + 1 >= 9 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+  return [year, year + 1]
+    .flatMap((y) => HOLIDAYS.map((h) => ({ holiday: h, d: realDate(h, y) })))
+    .filter((x): x is { holiday: Holiday; d: Date } => x.d !== null && ymd(x.d) >= today)
+    .sort((a, b) => a.d.getTime() - b.d.getTime())
+    .slice(0, count)
+    .map((x) => ({ holiday: x.holiday, date: ymd(x.d) }));
 }
 
 /** Празниците през учебните седмици: празник в събота или неделя отива в седмицата преди него. */

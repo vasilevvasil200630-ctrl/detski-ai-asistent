@@ -5,10 +5,11 @@ import { LogoIcon, LogoWordmark } from "@/components/Logo";
 import { openFeedback } from "@/components/FeedbackWidget";
 import { KG, KG_SIGNATURE } from "@/config/kindergarten";
 
+/** Долната част за гостите (родителите): какво има за тях, входът за учители и правните страници. */
 const LINKS = [
-  { title: "Инструменти", items: [["/games", "Игри"], ["/materials", "Материали за печат"], ["/dos", "ДОС план-конспект"]] },
-  { title: "Детската градина", items: [["/hub", "Учителски хъб"], ["/library", "Моята библиотека"], ["/holidays", "Празници"]] },
-  { title: "Справочник", items: [["/naredba5", "Наредба № 5 и „Златно ключе“"], ["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
+  { title: "За родителите", items: [["/vitrina", "Дейности с децата"], ["/vitrina#teachers-title", "Нашите учители"], ["/", "Предстоящи празници"]] },
+  { title: "За учителите", items: [["/login", "Вход за учители"]] },
+  { title: "Справка", items: [["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
 ] as const;
 
 const FEEDBACK_BUTTON = "cursor-pointer text-left hover:text-slate-800 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
@@ -42,7 +43,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
             <LogoWordmark className="text-base" />
           </Link>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
-            Учителският облак на {KG.fullName}, {KG.village}. Материали за децата от нашите групи, съобразени с Наредба № 5.
+            {KG.fullName}, {KG.village}. Игри, дейности и празници от нашите групи — по Наредба № 5 за предучилищното образование.
           </p>
         </div>
         {LINKS.map((group) => (

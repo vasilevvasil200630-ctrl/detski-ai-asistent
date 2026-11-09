@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getMe, invalidateMe } from "@/lib/client/me";
+import { useSignupOpen } from "@/lib/client/signup";
 import { AuthShell, FormError, PasswordField, PrimaryButton, TextField } from "@/components/auth/AuthUI";
 
 // Копирано от МатураПлюс (src/app/login/page.tsx): пренасочване на вече влезли, „Запомни ме“,
@@ -15,6 +16,7 @@ function safeCallback(raw: string | null): string | null {
 }
 
 function LoginForm() {
+  const signupOpen = useSignupOpen();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallback(searchParams.get("callbackUrl"));
@@ -71,18 +73,30 @@ function LoginForm() {
 
   return (
     <AuthShell
-      title="Добре дошли отново!"
-      subtitle="Влезте, за да споделяте игри с колегите от вашата градина."
+      title="Вход за учители"
+      subtitle="Учителският облак на ДГ „Пролет“ — игри, материали и план-конспекти за децата."
       footer={
-        <>
-          Нямате профил?{" "}
-          <Link
-            href="/register"
-            className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
-          >
-            Регистрирайте се безплатно
-          </Link>
-        </>
+        signupOpen ? (
+          <>
+            Нов колега?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+            >
+              Регистрация с кода на градината
+            </Link>
+          </>
+        ) : (
+          <>
+            Родител или гост?{" "}
+            <Link
+              href="/"
+              className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+            >
+              Вижте какво правим с децата
+            </Link>
+          </>
+        )
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>

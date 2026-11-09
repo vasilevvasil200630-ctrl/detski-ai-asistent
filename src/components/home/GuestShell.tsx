@@ -4,11 +4,10 @@ import Link from "next/link";
 import { LogoIcon, LogoWordmark } from "@/components/Logo";
 import { KG } from "@/config/kindergarten";
 import { SiteFooter } from "./SiteFooter";
-import { useSignupOpen } from "@/lib/client/signup";
 
 /**
- * Рамката на сайта за посетители без профил: само марката на градината, „Вход“ и
- * „Регистрация“. Менюто с инструментите се показва едва след вход — облакът е затворен.
+ * Рамката на сайта за родителите и гостите: марката на градината, „Дейности“ и малка връзка
+ * „Вход за учители“. Менюто с инструментите се показва едва след вход — облакът е затворен.
  */
 export function GuestShell({
   children,
@@ -20,7 +19,7 @@ export function GuestShell({
   /** showcase — публичната витрина за родителите: без „Регистрация“, с връзка към витрината */
   variant?: "site" | "showcase";
 }) {
-  const signupOpen = useSignupOpen();
+  void variant;
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
       <header className="border-b border-slate-200 print:hidden">
@@ -29,40 +28,20 @@ export function GuestShell({
             <LogoIcon className="h-9 w-9" />
             <LogoWordmark className="text-lg" withVillage />
           </Link>
-          <nav aria-label="Профил" className="flex items-center gap-2">
-            {variant === "showcase" ? (
-              <>
-                <Link
-                  href="/vitrina"
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-[#0a4b82] transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
-                >
-                  Витрина
-                </Link>
-                <Link
-                  href="/login"
-                  className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
-                >
-                  За учителите
-                </Link>
-              </>
-            ) : (
-            <>
+          <nav aria-label="Основно меню" className="flex items-center gap-1 sm:gap-2">
+            <Link
+              href="/vitrina"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-[#0a4b82] transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+            >
+              Дейности
+            </Link>
             <Link
               href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
             >
-              Вход
+              <span className="sm:hidden">Вход</span>
+              <span className="hidden sm:inline">Вход за учители</span>
             </Link>
-            {signupOpen && (
-              <Link
-                href="/register"
-                className="rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
-              >
-                Регистрация
-              </Link>
-            )}
-            </>
-            )}
           </nav>
         </div>
       </header>
