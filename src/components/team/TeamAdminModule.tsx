@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/Toaster";
 import { GroupsSection } from "./GroupsSection";
+import { ParentLinkSection } from "./ParentLinkSection";
 import type { GroupView } from "@/lib/parents-shared";
 import { AGE_SHORT } from "@/services/materialText";
 
@@ -443,6 +444,8 @@ export function TeamAdminModule() {
       )}
 
       <GroupsSection groups={groups} onChange={load} />
+
+      <ParentLinkSection />
 
       <section aria-labelledby="team-title" className="mt-8">
         <h2 id="team-title" className="text-lg font-bold text-slate-900">

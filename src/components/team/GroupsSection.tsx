@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ExternalLink, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { ExternalLink, Loader2, Pencil, Plus, QrCode, Trash2, Users } from "lucide-react";
 import { toast } from "@/components/Toaster";
 import { AGE_LABEL, type GroupView } from "@/lib/parents-shared";
 
@@ -90,9 +90,14 @@ export function GroupsSection({ groups, onChange }: { groups: GroupView[]; onCha
                   </button>
                 </div>
               </div>
-              <Link href={`/grupi/${g.slug}`} target="_blank" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
-                <ExternalLink className="h-3.5 w-3.5" aria-hidden /> Страницата за родителите
-              </Link>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                <Link href={`/grupi/${g.slug}`} target="_blank" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden /> Страницата за родителите
+                </Link>
+                <Link href={`/showcase/qr?grupa=${g.slug}&ime=${encodeURIComponent(g.label)}`} className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                  <QrCode className="h-3.5 w-3.5" aria-hidden /> QR за групата
+                </Link>
+              </div>
             </li>
           ))}
         </ul>
