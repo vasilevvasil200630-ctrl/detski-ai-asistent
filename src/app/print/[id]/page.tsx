@@ -51,7 +51,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
   const printable = content && isPrintable(content.printable) ? content.printable : null;
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
+    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 print:p-0">
       <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link href="/library" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900">
           <ArrowLeft className="h-4 w-4" aria-hidden /> Библиотека

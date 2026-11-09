@@ -2,7 +2,8 @@ import { KG } from '../../config/kindergarten';
 import { AGE_GROUP_STANDARDS, DIRECTION_STANDARDS, naredba5PromptRules } from '../naredba5';
 import { BDP, bdpPromptRules } from '../bdp';
 import type { AgeGroup, LessonDirection } from '../../types';
-import { COUNT_MAX, buildDemoWorksheet } from './worksheets';
+import { COUNT_MAX, buildDemoWorksheet, buildStyledWorksheet } from './worksheets';
+import { HALF_SHAPE_IDS, solveMaze } from './drawings';
 import { buildDemoVerses } from './verses';
 import { buildDemoLetter, letterSignature } from './letters';
 import {
@@ -14,6 +15,7 @@ import {
   type PrintableRequest,
   type SheetKind,
   type VersesSheet,
+  type DiffCell,
   type Worksheet,
   type WorksheetTask,
 } from './types';
@@ -23,14 +25,18 @@ export * from './types';
 /* ───────────────────────── Вграден двигател ───────────────────────── */
 
 export function buildDemoPrintable(req: PrintableRequest): Printable {
-  if (req.type === 'worksheet') return buildDemoWorksheet(req.ageGroup, req.direction, req.topic);
+  if (req.type === 'worksheet') {
+    return req.style && req.style !== 'mixed'
+      ? buildStyledWorksheet(req.ageGroup, req.direction, req.topic, req.style)
+      : buildDemoWorksheet(req.ageGroup, req.direction, req.topic);
+  }
   if (req.type === 'verses') return buildDemoVerses(req.ageGroup, req.kind, req.topic);
   return buildDemoLetter(req);
 }
 
 /* ───────────────────────── Промпт към модела ───────────────────────── */
 
-export const SHEET_KIND_ORDER: SheetKind[] = ['count', 'match', 'odd', 'sequence', 'trace', 'sound', 'draw'];
+export const SHEET_KIND_ORDER: SheetKind[] = ['count', 'match', 'odd', 'sequence', 'trace', 'sound', 'draw', 'maze', 'differences', 'half'];
 
 /** Формата на всеки вид задача за модела (един ред на вид). */
 export const SHEET_KIND_SPECS: Record<SheetKind, string> = {
@@ -41,6 +47,10 @@ export const SHEET_KIND_SPECS: Record<SheetKind, string> = {
   trace: "\"trace\": {\"kind\":\"trace\",\"prompt\":\"…\",\"shape\":\"line|arches|wave|zigzag|loops\",\"start\":{картинка},\"end\":{картинка}} — подготовка за писане",
   sound: "\"sound\": {\"kind\":\"sound\",\"prompt\":\"Огради картинките, които започват със звука „С“.\",\"sound\":\"С\",\"pics\":[6 картинки]} — само за III и IV група",
   draw: "\"draw\": {\"kind\":\"draw\",\"prompt\":\"Нарисувай …\"}",
+  // Рисуваните задачи се правят от вградения двигател — моделът не ги получава
+  maze: '',
+  differences: '',
+  half: '',
 };
 
 
@@ -169,6 +179,47 @@ export function normalizeTask(raw: unknown, age: AgeGroup): WorksheetTask | null
   }
 }
 
+/* Рисуваните задачи от записан лист: само формата (без разбъркване), с граници за размерите. */
+
+function savedCell(v: unknown): DiffCell {
+  const c = pic(v);
+  return c ? { ...c, ...(obj(v).big === true ? { big: true } : {}) } : null;
+}
+
+/** Лабиринт, „Открий разликите“ и „Дорисувай половината“ от записан лист (библиотеката, комплекта). */
+export function savedDrawnTask(raw: unknown): WorksheetTask | null {
+  const t = obj(raw);
+  const prompt = str(t.prompt, 200);
+  if (!prompt) return null;
+  const size = (v: unknown, max: number) => {
+    const n = Math.round(Number(v));
+    return n >= 2 && n <= max ? n : 0;
+  };
+  if (t.kind === 'maze') {
+    const cols = size(t.cols, 12);
+    const rows = size(t.rows, 10);
+    const walls = str(t.walls, 200);
+    const start = pic(t.start);
+    const end = pic(t.end);
+    if (!cols || !rows || !start || !end || !/^[0-3]+$/.test(walls) || !solveMaze(cols, rows, walls)) return null;
+    return { kind: 'maze', prompt, cols, rows, walls, start, end };
+  }
+  if (t.kind === 'differences') {
+    const cols = size(t.cols, 6);
+    const rows = size(t.rows, 6);
+    const left = arr(t.left).map(savedCell);
+    const right = arr(t.right).map(savedCell);
+    const count = size(t.count, 10) || 1;
+    if (!cols || !rows || left.length !== cols * rows || right.length !== cols * rows) return null;
+    return { kind: 'differences', prompt, cols, rows, left, right, count };
+  }
+  if (t.kind === 'half') {
+    const shape = HALF_SHAPE_IDS.find((s) => s === t.shape);
+    return shape ? { kind: 'half', prompt, shape, mode: t.mode === 'trace' ? 'trace' : 'grid' } : null;
+  }
+  return null;
+}
+
 /** Слива отговора на модела с вградения резултат: невалидното се взима от `fallback`. */
 export function normalizePrintable(raw: unknown, req: PrintableRequest, fallback: Printable): Printable {
   const o = obj(raw);
@@ -224,6 +275,12 @@ export function printableToText(p: Printable): string {
         if (t.kind === 'sequence') body = `${pics(t.pattern)} ${pics(t.pattern)} …`;
         if (t.kind === 'trace') body = `${t.start.e} ┈┈┈┈ ${t.end.e}`;
         if (t.kind === 'sound') body = pics(t.pics);
+        if (t.kind === 'maze') body = `${t.start.e} → лабиринт ${t.cols}×${t.rows} → ${t.end.e}`;
+        if (t.kind === 'differences') {
+          const row = (cells: DiffCell[]) => cells.map((c) => c?.e ?? '·').join(' ');
+          body = `${row(t.left)}   |   ${row(t.right)}`;
+        }
+        if (t.kind === 'half') body = '(рисунката е в листа за печат)';
         return `${i + 1}. ${t.prompt}${body ? `\n   ${body}` : ''}`;
       }),
       '',

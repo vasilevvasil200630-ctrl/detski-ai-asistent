@@ -3,9 +3,10 @@ import { AGE_GROUP_STANDARDS, naredba5PromptRules } from '../naredba5';
 import { bdpPromptRules } from '../bdp';
 import { taskLine } from '../gameTasks';
 import type { AgeGroup, GameTask, GeneratedGame, LessonDirection } from '../../types';
-import { COUNT_MAX, buildWorksheetFromKinds } from './worksheets';
+import { COUNT_MAX, DRAWN_GOALS, buildWorksheetFromKinds } from './worksheets';
 import { themeFor } from './themes';
-import { SHEET_KIND_SPECS, normalizeTask, pic } from './index';
+import { SHEET_KIND_SPECS, normalizeTask, pic, savedDrawnTask } from './index';
+import { isDrawnKind } from './drawings';
 import type { GameKit, KitParentNote, KitPart, Pic, PictureCards, SheetKind, Worksheet, WorksheetTask } from './types';
 
 /**
@@ -80,11 +81,13 @@ export function buildKitPrompt(req: KitRequest): string {
   const g = AGE_GROUP_STANDARDS[req.ageGroup];
   const tasks = req.game.tasks ?? [];
   const want: string[] = [];
-  if (req.parts.includes('worksheet')) {
-    want.push(`"worksheet": {"title":"…","tasks":[…],"teacherNote":"цел по Наредба № 5 и отговорите"} — РАБОТЕН ЛИСТ точно с ${req.sheetKinds.length} задачи от тези видове и в този ред: ${req.sheetKinds.join(', ')}.
+  // Лабиринтът, разликите и половината се рисуват тук — моделът пише само останалите задачи
+  const modelKinds = req.sheetKinds.filter((k) => !isDrawnKind(k));
+  if (req.parts.includes('worksheet') && modelKinds.length) {
+    want.push(`"worksheet": {"title":"…","tasks":[…],"teacherNote":"цел по Наредба № 5 и отговорите"} — РАБОТЕН ЛИСТ точно с ${modelKinds.length} задачи от тези видове и в този ред: ${modelKinds.join(', ')}.
 Картинките са ЕДНО емоджи всяка (без текст), с дума за учителя. Числата за броене са от 1 до ${COUNT_MAX[req.ageGroup]}. Условията са кратки — учителят ги чете на глас.
 Формата на задачите:
-${req.sheetKinds.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}`);
+${modelKinds.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}`);
   }
   if (req.parts.includes('cards')) {
     want.push('"cards": {"title":"…","cards":[{"e":"🍎","w":"ябълка"}, …]} — точно 8 карти с картинки (едно емоджи + дума в именителен падеж), които се ползват В САМАТА игра.');
@@ -124,12 +127,27 @@ function list(v: unknown): unknown[] {
 
 function normalizeWorksheet(raw: unknown, req: KitRequest, fallback: Worksheet): Worksheet {
   const w = o(raw);
-  const tasks = list(w.tasks)
+  const modelKinds = req.sheetKinds.filter((k) => !isDrawnKind(k));
+  if (!modelKinds.length) return fallback;
+  const fromModel = list(w.tasks)
     .map((t) => normalizeTask(t, req.ageGroup))
-    .filter((t): t is WorksheetTask => t !== null)
+    .filter((t): t is WorksheetTask => t !== null);
+  if (fromModel.length < Math.min(2, modelKinds.length)) return fallback;
+  // Редът е изборът на учителя; рисуваните задачи идват от вградения лист
+  const used = new Set<WorksheetTask>();
+  const take = (list: WorksheetTask[], kind: string) => {
+    const t = list.find((x) => x.kind === kind && !used.has(x));
+    if (t) used.add(t);
+    return t;
+  };
+  const tasks = req.sheetKinds
+    .map((k) => (isDrawnKind(k) ? take(fallback.tasks, k) : (take(fromModel, k) ?? take(fallback.tasks, k))))
+    .filter((t): t is WorksheetTask => !!t)
     .slice(0, 4);
-  if (tasks.length < Math.min(2, req.sheetKinds.length)) return fallback;
-  return { ...fallback, title: s(w.title, 120) || fallback.title, tasks, teacherNote: s(w.teacherNote, 800) || fallback.teacherNote };
+  if (!tasks.length) return fallback;
+  const drawnNote = [...new Set(tasks.map((t) => DRAWN_GOALS[t.kind]).filter((g): g is string => !!g))];
+  const note = s(w.teacherNote, 800);
+  return { ...fallback, title: s(w.title, 120) || fallback.title, tasks, teacherNote: note ? [note, ...drawnNote].join(' ') : fallback.teacherNote };
 }
 
 function normalizeCards(raw: unknown, fallback: PictureCards): PictureCards {
@@ -235,6 +253,10 @@ function savedTask(raw: unknown, age: AgeGroup): WorksheetTask | null {
     }
     case 'draw':
       return { kind: 'draw', prompt };
+    case 'maze':
+    case 'differences':
+    case 'half':
+      return savedDrawnTask(raw);
     default:
       return null;
   }

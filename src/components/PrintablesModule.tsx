@@ -10,12 +10,14 @@ import { CERTIFICATE_LABELS, CERTIFICATE_REASONS, CertificateSheet, type Certifi
 import {
   LETTER_LABELS,
   VERSES_LABELS,
+  WORKSHEET_STYLE_LABELS,
   buildDemoPrintable,
   printableToText,
   type LetterKind,
   type Printable,
   type PrintableRequest,
   type VersesKind,
+  type WorksheetStyle,
 } from "@/services/printables";
 import type { AgeGroup, LessonDirection, SessionTeacher } from "@/types";
 
@@ -51,6 +53,14 @@ const chip = (active: boolean) =>
     active ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 const LABEL = "mb-2 block text-sm font-semibold text-slate-800";
+
+/** Подсказка под избора „Вид лист“. */
+const STYLE_HINTS: Record<WorksheetStyle, string> = {
+  mixed: "3–4 различни задачи по направлението и темата.",
+  maze: "Два лабиринта с картинки от темата — по-големи за по-големите деца.",
+  differences: "Две двойки картинки с 2–5 разлики според групата. Отговорите са за учителя.",
+  half: "Симетрични рисунки: по пунктира за I–II група, по точките в мрежа за III–IV група.",
+};
 const INPUT = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-[#0a4b82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]/20";
 
 /** Сървърът (Gemini с проверка), а без връзка — вграденият двигател в браузъра. */
@@ -85,6 +95,7 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(teacher?.ageGroup ?? "2");
   const [topic, setTopic] = useState("");
   const [direction, setDirection] = useState<LessonDirection>("math");
+  const [style, setStyle] = useState<WorksheetStyle>("mixed");
   const [versesKind, setVersesKind] = useState<VersesKind>("riddles");
   const [letterKind, setLetterKind] = useState<LetterKind>("invitation");
   const [date, setDate] = useState("");
@@ -115,12 +126,12 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
   }, [tab]);
 
   const request = useMemo<PrintableRequest | null>(() => {
-    if (tab === "worksheet") return { type: "worksheet", ageGroup, direction, topic };
+    if (tab === "worksheet") return { type: "worksheet", ageGroup, direction, topic, style };
     if (tab === "verses") return { type: "verses", ageGroup, kind: versesKind, topic };
     if (tab === "letter")
       return { type: "letter", ageGroup, kind: letterKind, topic, date, time, place, extra, groupName: teacher?.groupName || undefined };
     return null;
-  }, [tab, ageGroup, direction, topic, versesKind, letterKind, date, time, place, extra, teacher?.groupName]);
+  }, [tab, ageGroup, direction, topic, style, versesKind, letterKind, date, time, place, extra, teacher?.groupName]);
 
   async function generate() {
     if (!request) return;
@@ -170,6 +181,20 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
               ))}
             </div>
           </fieldset>
+
+          {tab === "worksheet" && (
+            <fieldset>
+              <legend className={LABEL}>Вид лист</legend>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(WORKSHEET_STYLE_LABELS) as WorksheetStyle[]).map((k) => (
+                  <button key={k} type="button" aria-pressed={style === k} onClick={() => setStyle(k)} className={chip(style === k)}>
+                    {WORKSHEET_STYLE_LABELS[k]}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-slate-500">{STYLE_HINTS[style]}</p>
+            </fieldset>
+          )}
 
           {tab === "worksheet" && (
             <fieldset>

@@ -12,7 +12,13 @@ const AGE = z.enum(["1", "2", "3", "4"]);
 const TOPIC = z.string().trim().max(120).default("");
 
 const Params = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("worksheet"), ageGroup: AGE, direction: z.enum(["bel", "world", "math", "art", "music", "construct", "pe", "bdp"]), topic: TOPIC }),
+  z.object({
+    type: z.literal("worksheet"),
+    ageGroup: AGE,
+    direction: z.enum(["bel", "world", "math", "art", "music", "construct", "pe", "bdp"]),
+    topic: TOPIC,
+    style: z.enum(["mixed", "maze", "differences", "half"]).default("mixed"),
+  }),
   z.object({ type: z.literal("verses"), ageGroup: AGE, kind: z.enum(["poem", "riddles", "counting", "tongue"]), topic: TOPIC }),
   z.object({
     type: z.literal("letter"),
@@ -35,6 +41,8 @@ export async function POST(request: Request) {
   const req = parsed.data as PrintableRequest;
   const demo = buildDemoPrintable(req);
 
+  // Лабиринтите, разликите и половините се рисуват само тук — без модела
+  if (req.type === "worksheet" && req.style && req.style !== "mixed") return NextResponse.json({ item: demo, source: "builtin" });
   if (!hasGeminiKey()) return NextResponse.json({ item: demo, source: "demo" });
   const rate = await checkAiRateLimit(request);
   if (!rate.allowed) return NextResponse.json({ item: demo, source: "demo", limited: true });
