@@ -48,6 +48,8 @@ model User {
   reviewedShowcaseItems     ShowcaseItem[]     @relation("ShowcaseReviewer")
   announcements             Announcement[]
   announcementReads         AnnouncementRead[]
+  thematicPlans             ThematicPlan[]     @relation("PlanAuthor")
+  approvedPlans             ThematicPlan[]     @relation("PlanApprover")
   /// Кратко представяне на учителя за публичната витрина (по желание)
   showcaseBio               String             @default("")
   createdAt                 DateTime           @default(now())
@@ -72,6 +74,7 @@ model Kindergarten {
   updatedAt     DateTime       @updatedAt
   showcaseItems ShowcaseItem[]
   announcements Announcement[]
+  thematicPlans ThematicPlan[]
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
@@ -335,4 +338,46 @@ model AnnouncementRead {
 
   @@id([announcementId, userId])
   @@index([userId])
+}
+
+/// Тематично разпределение на група за учебната година (чл. 29, ал. 4, т. 3 и чл. 30 от Наредба № 5):
+/// учебните седмици от 15 септември до 31 май с темата и ситуациите по направления.
+model ThematicPlan {
+  id             String         @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten   @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  authorId       String?
+  author         User?          @relation("PlanAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  ageGroup       String
+  groupName      String         @default("")
+  /// Годината, в която започва учебната година (2026 → 2026/2027)
+  schoolYear     Int
+  /// Колегите от градината могат да го видят и да си направят копие
+  shared         Boolean        @default(true)
+  /// Утвърдено от директора (чл. 23, ал. 4)
+  approvedAt     DateTime?
+  approvedById   String?
+  approvedBy     User?          @relation("PlanApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  weeks          ThematicWeek[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([authorId, ageGroup, schoolYear])
+  @@index([kindergartenId, schoolYear])
+}
+
+/// Една учебна седмица от разпределението: тема и педагогически ситуации по направления.
+model ThematicWeek {
+  id         String       @id @default(cuid())
+  planId     String
+  plan       ThematicPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  week       Int
+  startDate  DateTime
+  endDate    DateTime
+  theme      String       @default("")
+  notes      String       @default("")
+  /// [{ direction, core, topic, results: [очаквани резултати] }]
+  situations Json         @default("[]")
+
+  @@unique([planId, week])
 }

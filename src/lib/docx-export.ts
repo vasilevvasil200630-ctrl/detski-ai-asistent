@@ -5,6 +5,7 @@ import {
   Document,
   HeadingLevel,
   Packer,
+  PageOrientation,
   Paragraph,
   Table,
   TableCell,
@@ -173,4 +174,53 @@ export async function buildDocx(input: DocxInput): Promise<Buffer> {
 export function docxFileName(title: string): string {
   const clean = title.replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 80) || "material";
   return `${clean}.docx`;
+}
+
+/** Годишното тематично разпределение като Word: хоризонтален A4 с таблица по седмици и ситуации. */
+export async function buildPlanDocx(plan: import("@/services/thematicPlan").PlanView): Promise<Buffer> {
+  const { DIRECTION_STANDARDS } = await import("@/services/naredba5");
+  const dateBg = (ymd: string) => `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}`;
+  const rows: string[][] = [];
+  for (const w of plan.weeks) {
+    const head = `${w.week}. седмица\n${dateBg(w.startDate)} – ${dateBg(w.endDate)}${w.theme ? `\n„${w.theme}“` : ""}${w.holidays.length ? `\n${w.holidays.map((h) => h.name).join(", ")}` : ""}`;
+    if (w.situations.length === 0) {
+      rows.push([head, "", "", "", ""]);
+      continue;
+    }
+    w.situations.forEach((s, i) => {
+      rows.push([i === 0 ? head : "", DIRECTION_STANDARDS[s.direction].label, s.core, s.topic, s.results.join("\n")]);
+    });
+  }
+  const section: ISectionOptions = {
+    properties: { page: { size: { width: 16838, height: 11906, orientation: PageOrientation.LANDSCAPE }, margin: { top: 850, bottom: 850, left: 850, right: 850 } } },
+    children: [
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { after: 120 },
+        children: [new TextRun({ text: KG_SIGNATURE, size: 20, color: "555555" })],
+      }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 120 },
+        children: [new TextRun({ text: `ТЕМАТИЧНО РАЗПРЕДЕЛЕНИЕ · учебна ${plan.schoolYear}/${plan.schoolYear + 1} г.`, font: FONT, color: "000000" })],
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 240 },
+        children: [new TextRun({ text: `${plan.groupName || AGE_SHORT[plan.ageGroup]} · по Наредба № 5 за предучилищното образование` })],
+      }),
+      ...(plan.approvedAt
+        ? [p(`Утвърдено от: ${plan.approvedByName ?? "директора"}, ${new Date(plan.approvedAt).toLocaleDateString("bg-BG")}`, { italics: true })]
+        : [p("Утвърдил: ................................ (директор)", { after: 240 })]),
+      table(["Седмица и тема", "Образователно направление", "Образователно ядро", "Тема на ситуацията", "Очаквани резултати"], rows, [18, 16, 16, 20, 30]),
+    ],
+  };
+  const doc = new Document({
+    creator: KG_SIGNATURE,
+    title: `Тематично разпределение ${plan.schoolYear}/${plan.schoolYear + 1}`,
+    styles: { default: { document: { run: { font: FONT, size: 20 } } } },
+    sections: [section],
+  });
+  return Packer.toBuffer(doc);
 }
