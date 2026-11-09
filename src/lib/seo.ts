@@ -6,6 +6,7 @@
  */
 export const PRIVATE_PAGE_ROUTES = [
   "/za-roditelite",
+  "/otcheti",
   "/games",
   "/materials",
   "/dos",
