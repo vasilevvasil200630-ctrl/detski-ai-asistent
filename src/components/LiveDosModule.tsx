@@ -41,6 +41,7 @@ import { BDP, BDP_MIN_PER_YEAR, BDP_THEMES } from '../services/bdp';
 import { VoiceMic } from './VoiceMic';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { SaveMaterialBar } from './SaveMaterialBar';
+import { WordButton } from './WordButton';
 
 interface LiveDosModuleProps {
   /** Групата на влезлия учител (по подразбиране III група) */
@@ -591,6 +592,12 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 </button>
               </div>
 
+              <div className="flex flex-wrap gap-2">
+              <WordButton
+                source={{ kind: 'LESSON', title: plan.topic, ageGroup, direction, content: plan }}
+                label="Свали във Word"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-indigo-200 bg-white text-indigo-800 hover:bg-indigo-50 shadow-sm transition-all disabled:opacity-60"
+              />
               <button
                 type="button"
                 onClick={() => window.print()}
@@ -599,6 +606,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 <Printer className="w-4 h-4" />
                 <span>Принтирай всичко</span>
               </button>
+              </div>
             </div>
           </div>
 

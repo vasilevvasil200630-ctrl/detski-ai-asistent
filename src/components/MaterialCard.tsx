@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { BadgeCheck, Bookmark, Check, ChevronDown, Copy, Heart, Loader2, Printer, Share2, Store, Trash2, Undo2 } from "lucide-react";
 import { ProposeShowcaseDialog } from "@/components/showcase/ProposeShowcaseDialog";
+import { WordButton } from "@/components/WordButton";
 import type { SavedMaterial } from "@/types";
 import { AGE_SHORT, directionLabel, holidayLabel, KIND_LABELS, materialToText } from "@/services/materialText";
 import { copyMaterial, deleteMaterial, setMaterialShared, setMaterialTried, toggleMaterialLike } from "@/lib/client/materials";
@@ -185,6 +186,10 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
         <Link href={`/print/${m.id}`} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
           <Printer className="h-3.5 w-3.5" /> Принтирай
         </Link>
+        <WordButton
+          source={{ kind: m.kind, title: m.title, ageGroup: m.ageGroup, direction: m.direction, content: m.content }}
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+        />
 
         {view === "mine" && (
           <>
