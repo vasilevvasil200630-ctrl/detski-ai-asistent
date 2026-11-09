@@ -10,6 +10,7 @@ import { AGE_SHORT, directionLabel, materialToText } from "@/services/materialTe
 import { GameKitSheets } from "@/components/print/GameKitSheets";
 import { LessonPrint } from "@/components/print/LessonSheet";
 import { WordButton } from "@/components/WordButton";
+import { CloudSaveButton } from "@/components/CloudSaveButton";
 import type { GeneratedGame, GeneratedLessonPlan, SavedMaterial } from "@/types";
 
 /** Изглед за печат на всеки материал от библиотеката: игра, план-конспект или материал за печат. */
@@ -59,6 +60,10 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         <WordButton
           source={{ kind: material.kind, title: material.title, ageGroup: material.ageGroup, direction: material.direction, content: material.content }}
           label="Свали във Word"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+        />
+        <CloudSaveButton
+          source={{ source: "material", kind: material.kind, title: material.title, ageGroup: material.ageGroup, direction: material.direction, content: material.content }}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
         />
         <button

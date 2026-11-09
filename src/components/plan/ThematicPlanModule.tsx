@@ -11,6 +11,7 @@ import { schoolYearLabel, weeklySlots, type PlanSituation, type PlanSummary, typ
 import { schoolYearOf } from "@/lib/portfolio-shared";
 import type { AgeGroup } from "@/types";
 import { WeekEditor } from "./WeekEditor";
+import { CloudSaveButton } from "@/components/CloudSaveButton";
 
 async function api<T>(url: string, init?: RequestInit): Promise<T | null> {
   try {
@@ -256,6 +257,7 @@ export function ThematicPlanModule() {
               <button type="button" onClick={() => window.print()} className={btn}>
                 <Printer className="h-4 w-4" aria-hidden /> Отпечатай
               </button>
+              <CloudSaveButton key={`plan-cloud-${plan.id}`} source={{ source: "plan", planId: plan.id }} className={btn} />
               {plan.mine && (
                 <button type="button" onClick={() => patchPlan({ shared: !plan.shared }, plan.shared ? "Вече не е споделено." : "Колегите могат да го видят и да си направят копие.")} className={btn}>
                   <Share2 className="h-4 w-4" aria-hidden /> {plan.shared ? "Спри споделянето" : "Сподели с колегите"}

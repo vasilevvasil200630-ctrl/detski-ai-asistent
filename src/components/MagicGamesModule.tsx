@@ -10,6 +10,7 @@ import { GameTaskPicker } from './games/GameTaskPicker';
 import { GameKitDialog, KitPrintPortal, printKit } from './games/GameKitDialog';
 import { setMaterialKit } from '@/lib/client/materials';
 import { WordButton } from './WordButton';
+import { CloudSaveButton } from './CloudSaveButton';
 import type { GameKit } from '../services/printables/types';
 import { GAME_MODE_ORDER, GAME_MODES, isValidTask, taskLine, tasksError } from '../services/gameTasks';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
@@ -467,6 +468,12 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       <WordButton
                         source={{ kind: 'GAME', title: game.title, ageGroup: filters.ageGroup, direction: game.tasks?.[0]?.direction ?? (filters.direction && filters.direction !== 'mixed' ? filters.direction : null), content: game }}
                         className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center gap-1.5 disabled:opacity-60"
+                      />
+                      <CloudSaveButton
+                        source={{ source: 'material', kind: 'GAME', title: game.title, ageGroup: filters.ageGroup, direction: game.tasks?.[0]?.direction ?? (filters.direction && filters.direction !== 'mixed' ? filters.direction : null), content: game }}
+                        label="Облак"
+                        wrapperClassName="relative flex flex-1"
+                        className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center gap-1.5 disabled:opacity-60"
                       />
                     </div>
                   </div>

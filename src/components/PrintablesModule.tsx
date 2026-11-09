@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Award, FileText, Loader2, Mail, Music, Printer, RefreshCw, Sparkles } from "lucide-react";
 import { SaveMaterialBar } from "./SaveMaterialBar";
+import { CloudSaveButton } from "./CloudSaveButton";
 import { VoiceMic } from "./VoiceMic";
 import { PrintableSheet } from "./print/PrintableSheet";
 import { CERTIFICATE_LABELS, CERTIFICATE_REASONS, CertificateSheet, type CertificateKind } from "./print/CertificateSheet";
@@ -363,6 +364,11 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
                 meta: { printable: item.type, topic: topic || undefined },
                 content: { text: printableToText(item), printable: item },
               }}
+            />
+            <CloudSaveButton
+              key={`cloud-${item.title}-${JSON.stringify(item).length}`}
+              source={{ source: "material", kind: "MATERIAL", title: item.title, ageGroup, direction: saveDirection, content: { text: printableToText(item), printable: item } }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
             />
           </div>
           <div className={`print-area ${hideTeacherNote ? "print-hide-teacher" : ""}`}>
