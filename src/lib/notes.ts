@@ -2,13 +2,23 @@ import "server-only";
 import { z } from "zod";
 import type { Note } from "@/generated/prisma/client";
 import type { NoteItem } from "@/lib/notes-shared";
-import { NOTE_COLORS } from "@/lib/notes-shared";
+import { NOTE_COLORS, REMIND_DAYS } from "@/lib/notes-shared";
 
 const COLOR = z.enum(NOTE_COLORS);
 /** Дата „ГГГГ-ММ-ДД“ или null (без срок). */
 const DATE = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Невалидна дата.")
+  .nullable();
+/** Час „ЧЧ:ММ“ или null (без час). */
+const TIME = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Невалиден час.")
+  .nullable();
+const REMIND = z
+  .number()
+  .int()
+  .refine((n) => (REMIND_DAYS as readonly number[]).includes(n), "Невалидно напомняне.")
   .nullable();
 
 export const NoteCreateSchema = z
@@ -18,6 +28,8 @@ export const NoteCreateSchema = z
     color: COLOR.default("yellow"),
     pinned: z.boolean().default(false),
     dueDate: DATE.default(null),
+    dueTime: TIME.default(null),
+    remindDays: REMIND.default(null),
     done: z.boolean().default(false),
   })
   .refine((n) => n.title.trim() || n.body.trim(), { message: "Бележката е празна." });
@@ -28,6 +40,9 @@ export const NotePatchSchema = z.object({
   color: COLOR.optional(),
   pinned: z.boolean().optional(),
   dueDate: DATE.optional(),
+  dueTime: TIME.optional(),
+  remindDays: REMIND.optional(),
+  snoozedUntil: DATE.optional(),
   done: z.boolean().optional(),
 });
 
@@ -38,6 +53,8 @@ export function parseDueDate(value: string | null | undefined): Date | null | un
   return new Date(`${value}T12:00:00.000Z`);
 }
 
+const isoDay = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
+
 export function toNoteItem(n: Note): NoteItem {
   return {
     id: n.id,
@@ -45,7 +62,10 @@ export function toNoteItem(n: Note): NoteItem {
     body: n.body,
     color: (NOTE_COLORS as readonly string[]).includes(n.color) ? (n.color as NoteItem["color"]) : "yellow",
     pinned: n.pinned,
-    dueDate: n.dueDate ? n.dueDate.toISOString().slice(0, 10) : null,
+    dueDate: isoDay(n.dueDate),
+    dueTime: n.dueDate ? n.dueTime : null,
+    remindDays: n.dueDate ? n.remindDays : null,
+    snoozedUntil: isoDay(n.snoozedUntil),
     done: n.done,
     updatedAt: n.updatedAt.toISOString(),
   };

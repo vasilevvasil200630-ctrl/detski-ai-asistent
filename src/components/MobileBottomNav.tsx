@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Cloud, Dices, NotebookPen, Printer, Rocket } from "lucide-react";
+import { useReminders } from "@/lib/client/reminders";
 
 // Копирано от МатураПлюс (src/components/MobileBottomNav.tsx) — с разделите на детския сайт.
 
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const reminders = useReminders().reminders.length;
 
   return (
     <nav
@@ -38,6 +40,11 @@ export function MobileBottomNav() {
             >
               <div className="relative">
                 <Icon className={`h-4.5 w-4.5 mb-0.5 ${isActive ? "stroke-[2.2]" : "stroke-[1.75]"}`} />
+                {item.href === "/notebook" && reminders > 0 && (
+                  <span className="absolute -right-2.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-4 text-white" aria-label={`${reminders} напомняния`}>
+                    {reminders}
+                  </span>
+                )}
                 {isActive && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#16a34a] rounded-full shadow-2xs" />
                 )}

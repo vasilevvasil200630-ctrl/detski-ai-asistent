@@ -30,6 +30,7 @@ import {
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { performSignOut } from "@/lib/session-cache";
 import { useMe } from "@/lib/client/useMe";
+import { useReminders } from "@/lib/client/reminders";
 
 // Копирано от МатураПлюс (src/components/AppSidebar.tsx): групи с навигация, активен елемент
 // с плътен бранд цвят, сгъване до иконки, профилна карта / вход в долната част.
@@ -111,6 +112,9 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
     };
   }, [user?.kindergarten, pathname]);
 
+  // Напомнянията за днес от бележника (зарежда ги прозорецът „Напомняния“)
+  const reminders = useReminders().reminders.length;
+
   const width = collapsed ? "md:w-16" : "md:w-64";
 
   return (
@@ -185,6 +189,14 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
                           }`}
                         />
                         {!collapsed && <span className="truncate">{label}</span>}
+                        {href === "/notebook" && reminders > 0 && (
+                          <span
+                            className={`ml-auto grid min-w-5 place-items-center rounded-full bg-rose-500 px-1.5 text-xs font-bold text-white ${collapsed ? "absolute ml-6 -mt-6" : ""}`}
+                            aria-label={`${reminders} ${reminders === 1 ? "напомняне" : "напомняния"}`}
+                          >
+                            {reminders}
+                          </span>
+                        )}
                         {href === "/announcements" && unread > 0 && (
                           <span
                             className={`ml-auto grid min-w-5 place-items-center rounded-full bg-amber-500 px-1.5 text-xs font-bold text-white ${collapsed ? "absolute ml-6 -mt-6" : ""}`}

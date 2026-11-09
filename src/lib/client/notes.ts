@@ -3,7 +3,16 @@
 import { toast } from "@/components/Toaster";
 import type { NoteColor, NoteItem } from "@/lib/notes-shared";
 
-export type NoteDraft = { title: string; body: string; color: NoteColor; pinned: boolean; dueDate: string | null };
+export type NoteDraft = {
+  title: string;
+  body: string;
+  color: NoteColor;
+  pinned: boolean;
+  dueDate: string | null;
+  dueTime: string | null;
+  remindDays: number | null;
+};
+export type NotePatch = Partial<NoteDraft & { done: boolean; snoozedUntil: string | null }>;
 
 async function call<T>(url: string, init: RequestInit, fail: string): Promise<T | null> {
   try {
@@ -32,7 +41,7 @@ export async function createNote(d: NoteDraft): Promise<NoteItem | null> {
   return r?.note ?? null;
 }
 
-export async function updateNote(id: string, p: Partial<NoteDraft & { done: boolean }>): Promise<NoteItem | null> {
+export async function updateNote(id: string, p: NotePatch): Promise<NoteItem | null> {
   const r = await call<{ note: NoteItem }>(`/api/notes/${id}`, { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify(p) }, "Промяната не беше запазена.");
   return r?.note ?? null;
 }

@@ -33,6 +33,7 @@ export async function GET(request: Request) {
         kgRole: true,
         createdAt: true,
         kindergarten: { select: { name: true, city: true } },
+        calendarToken: true,
       },
     }),
     prisma.material.findMany({
@@ -81,7 +82,7 @@ export async function GET(request: Request) {
     prisma.note.findMany({
       where: { userId },
       orderBy: { createdAt: "asc" },
-      select: { title: true, body: true, color: true, pinned: true, dueDate: true, done: true, createdAt: true, updatedAt: true },
+      select: { title: true, body: true, color: true, pinned: true, dueDate: true, dueTime: true, remindDays: true, done: true, createdAt: true, updatedAt: true },
     }),
     prisma.feedback.findMany({
       where: { userId },
@@ -97,11 +98,12 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
 
   const origin = new URL(request.url).origin;
+  const { calendarToken, ...profile } = user;
   const data = {
     about:
       "Копие на данните ви от учителския облак на ДГ „Пролет“. Паролата не е включена (пази се само като необратим хеш). Файловете от облака се свалят от линковете, докато сте влезли в профила си.",
     exportedAt: new Date().toISOString(),
-    profile: user,
+    profile: { ...profile, calendarSubscription: calendarToken ? "включен (таен адрес за календара на телефона)" : "изключен" },
     materials,
     bankGames,
     likes: { materials: materialLikes.map((l) => ({ title: l.material.title, likedAt: l.createdAt })), bankGames: gameLikes.length },
