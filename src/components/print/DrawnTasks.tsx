@@ -42,10 +42,10 @@ export function MazeView({ task, compact }: { task: Extract<WorksheetTask, { kin
           <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
         ))}
       </g>
-      <text x={pad / 2} y={m + S / 2} fontSize={S * 0.85} textAnchor="middle" dominantBaseline="central">
+      <text className="print-emoji" x={pad / 2} y={m + S / 2} fontSize={S * 0.85} textAnchor="middle" dominantBaseline="central">
         {task.start.e}
       </text>
-      <text x={pad + W + pad / 2} y={m + H - S / 2} fontSize={S * 0.85} textAnchor="middle" dominantBaseline="central">
+      <text className="print-emoji" x={pad + W + pad / 2} y={m + H - S / 2} fontSize={S * 0.85} textAnchor="middle" dominantBaseline="central">
         {task.end.e}
       </text>
     </svg>
@@ -69,7 +69,7 @@ function Scene({ cells, cols, compact, label }: { cells: DiffCell[]; cols: numbe
           <span key={i} className={`grid place-items-center ${compact ? "h-9" : tall ? "h-[12.5mm]" : "h-[15mm]"}`}>
             {c && (
               <span
-                className={`inline-block leading-none ${c.big ? (compact ? "text-[2.2rem]" : "text-[3.4rem]") : compact ? "text-xl" : "text-[2.1rem]"}`}
+                className={`print-emoji inline-block leading-none ${c.big ? (compact ? "text-[2.2rem]" : "text-[3.4rem]") : compact ? "text-xl" : "text-[2.1rem]"}`}
                 style={{ transform: jitter(i) }}
                 aria-hidden
               >

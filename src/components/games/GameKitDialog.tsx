@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, Loader2, PackageOpen, Printer, RefreshCw, X } from 'lucide-react';
+import { PrintOptions } from '@/components/print/PrintOptions';
 import { GameKitSheets } from '@/components/print/GameKitSheets';
 import { DEFAULT_SHEET_KINDS } from '@/services/printables/kit';
 import { SHEET_KIND_ORDER } from '@/services/printables';
@@ -223,6 +224,7 @@ export function GameKitDialog({
             </>
           ) : (
             <>
+              <PrintOptions className="basis-full justify-end pb-1" />
               <button type="button" onClick={() => setEditing(true)} className="mr-auto inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
                 <RefreshCw className="h-4 w-4" aria-hidden /> Промени
               </button>

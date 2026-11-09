@@ -43,6 +43,7 @@ import { speak, stopSpeaking } from '@/lib/speech';
 import { SaveMaterialBar } from './SaveMaterialBar';
 import { WordButton } from './WordButton';
 import { CloudSaveButton } from './CloudSaveButton';
+import { PrintOptions } from './print/PrintOptions';
 
 interface LiveDosModuleProps {
   /** Групата на влезлия учител (по подразбиране III група) */
@@ -626,6 +627,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                 <Printer className="w-4 h-4" />
                 <span>Принтирай всичко</span>
               </button>
+              <PrintOptions className="basis-full" />
               </div>
             </div>
           </div>

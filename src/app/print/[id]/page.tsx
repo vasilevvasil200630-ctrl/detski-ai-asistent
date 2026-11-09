@@ -11,6 +11,7 @@ import { GameKitSheets } from "@/components/print/GameKitSheets";
 import { LessonPrint } from "@/components/print/LessonSheet";
 import { WordButton } from "@/components/WordButton";
 import { CloudSaveButton } from "@/components/CloudSaveButton";
+import { PrintOptions } from "@/components/print/PrintOptions";
 import type { GeneratedGame, GeneratedLessonPlan, SavedMaterial } from "@/types";
 
 /** Изглед за печат на всеки материал от библиотеката: игра, план-конспект или материал за печат. */
@@ -73,6 +74,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         >
           <Printer className="h-4 w-4" aria-hidden /> {material.kind === "GAME" && content?.kit ? "Печат на всичко" : "Принтирай"}
         </button>
+        <PrintOptions className="basis-full justify-end" />
         </div>
       </div>
 

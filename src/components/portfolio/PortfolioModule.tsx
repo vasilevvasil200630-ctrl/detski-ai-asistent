@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BadgeCheck, BookOpenCheck, Heart, Loader2, Printer, Store } from "lucide-react";
+import { PrintOptions } from "@/components/print/PrintOptions";
 import { KG_SIGNATURE } from "@/config/kindergarten";
 import { AGE_SHORT, directionLabel, KIND_LABELS } from "@/services/materialText";
 import { schoolYearLabel, schoolYearOf, type PortfolioData } from "@/lib/portfolio-shared";
@@ -69,6 +70,7 @@ export function PortfolioModule() {
           >
             <Printer className="h-4 w-4" aria-hidden /> Отпечатай
           </button>
+          <PrintOptions className="basis-full justify-end" />
         </div>
       </div>
 
