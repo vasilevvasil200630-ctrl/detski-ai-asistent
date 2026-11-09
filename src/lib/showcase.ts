@@ -50,6 +50,7 @@ export function toShowcaseView(row: Row, opts: { forPublic: boolean }): Showcase
     holiday: row.holiday,
     content: opts.forPublic ? publicContent(row.kind, row.content) : row.content,
     images: row.imageIds.map((fileId) => ({ id: fileId, url: `/api/showcase/${row.id}/images/${fileId}` })),
+    activity: Boolean(row.content && typeof row.content === "object" && !Array.isArray(row.content) && (row.content as Record<string, unknown>).activity === true),
     allowPrint: row.allowPrint,
     status: row.status,
     reviewNote: opts.forPublic ? null : row.reviewNote,

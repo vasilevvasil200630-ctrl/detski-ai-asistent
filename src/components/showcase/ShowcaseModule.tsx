@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, ChevronDown, ExternalLink, Loader2, Pencil, Store, Trash2, Undo2 } from "lucide-react";
+import { Camera, Check, ChevronDown, ExternalLink, Loader2, Pencil, Store, Trash2, Undo2 } from "lucide-react";
 import { useMe } from "@/lib/client/useMe";
 import { toast } from "@/components/Toaster";
-import { AGE_SHORT, directionLabel, KIND_LABELS } from "@/services/materialText";
-import { SHOWCASE_STATUS_LABELS, type ShowcaseItemView } from "@/lib/showcase-shared";
+import { AGE_SHORT, directionLabel } from "@/services/materialText";
+import { SHOWCASE_STATUS_LABELS, showcaseKind, type ShowcaseItemView } from "@/lib/showcase-shared";
 import { ProposeShowcaseDialog } from "./ProposeShowcaseDialog";
 import { ShowcaseItemBody } from "./ShowcaseItemBody";
 
@@ -41,6 +41,15 @@ export function ShowcaseModule() {
   const [mine, setMine] = useState<ShowcaseItemView[] | null>(null);
   const [review, setReview] = useState<{ pending: ShowcaseItemView[]; published: ShowcaseItemView[] } | null>(null);
   const [editing, setEditing] = useState<ShowcaseItemView | null>(null);
+  const [newActivity, setNewActivity] = useState(false);
+
+  // „Днес в групата“ от началната страница: /showcase?new=1 отваря прозореца веднага
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("new") === "1") {
+      setNewActivity(true);
+      window.history.replaceState(null, "", "/showcase");
+    }
+  }, []);
 
   const loadMine = useCallback(async () => {
     const data = await api<{ items: ShowcaseItemView[] }>("/api/showcase");
@@ -96,17 +105,27 @@ export function ShowcaseModule() {
             <Store className="h-7 w-7 text-[#0a4b82]" aria-hidden /> Витрина за родители
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
-            Най-хубавото, което сте правили с децата, може да се покаже на родителите. Предложете материал от „Моята библиотека“ с бутона
-            „За витрината“ — директорът го одобрява, преди да стане публичен. Без снимки с деца.
+            Най-хубавото, което сте правили с децата, може да се покаже на родителите. Снимайте рисунките и изработеното с „Днес в групата“
+            или предложете материал от „Моята библиотека“ с бутона „За витрината“. Директорът одобрява, преди да стане публично. Без снимки
+            с деца.
           </p>
         </div>
-        <Link
-          href="/vitrina"
-          target="_blank"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#0a4b82] hover:bg-slate-50"
-        >
-          Публичната витрина <ExternalLink className="h-4 w-4" aria-hidden />
-        </Link>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setNewActivity(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
+          >
+            <Camera className="h-4 w-4" aria-hidden /> Днес в групата
+          </button>
+          <Link
+            href="/vitrina"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#0a4b82] hover:bg-slate-50"
+          >
+            Публичната витрина <ExternalLink className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
       </div>
 
       {isAdmin && (
@@ -215,6 +234,19 @@ export function ShowcaseModule() {
         </section>
       )}
 
+      {newActivity && user && (
+        <ProposeShowcaseDialog
+          activityAgeGroup={user.ageGroup}
+          onClose={() => setNewActivity(false)}
+          onDone={() => {
+            setNewActivity(false);
+            setTab("mine");
+            void loadMine();
+            if (isAdmin) void loadReview();
+          }}
+        />
+      )}
+
       {editing && (
         <ProposeShowcaseDialog
           item={editing}
@@ -240,7 +272,7 @@ function ItemRow({ item, showAuthor = false, open = false, children }: { item: S
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-slate-500">
-            {KIND_LABELS[item.kind].label} · {AGE_SHORT[item.ageGroup]}
+            {showcaseKind(item).label} · {AGE_SHORT[item.ageGroup]}
             {dir ? ` · ${dir}` : ""}
             {showAuthor ? ` · ${item.author.avatar} ${item.author.name}` : ""}
           </p>

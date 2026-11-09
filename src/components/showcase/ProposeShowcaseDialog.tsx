@@ -1,12 +1,26 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { Check, ImageIcon, Loader2, Store, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Camera, Check, ImageIcon, Loader2, Store, X } from "lucide-react";
 import { VoiceMic } from "@/components/VoiceMic";
 import { cloudDownloadUrl, listCloudFiles } from "@/lib/client/cloud";
 import type { CloudFileItem } from "@/lib/cloud/folders";
 import { STORY_MAX, STORY_MIN, type ShowcaseItemView } from "@/lib/showcase-shared";
 import { toast } from "@/components/Toaster";
+import { uploadActivityPhoto } from "@/lib/client/photos";
+import { AGE_SHORT } from "@/services/materialText";
+import type { AgeGroup, LessonDirection } from "@/types";
+
+const DIRECTIONS: { id: LessonDirection; label: string }[] = [
+  { id: "bel", label: "БЕЛ" },
+  { id: "math", label: "Математика" },
+  { id: "world", label: "Околен свят" },
+  { id: "art", label: "Изобразително изкуство" },
+  { id: "music", label: "Музика" },
+  { id: "construct", label: "Конструиране" },
+  { id: "pe", label: "Физическа култура" },
+  { id: "bdp", label: "БДП" },
+];
 
 const MAX_IMAGES = 4;
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -20,12 +34,15 @@ export function ProposeShowcaseDialog({
   materialId,
   defaultTitle,
   item,
+  activityAgeGroup,
   onClose,
   onDone,
 }: {
   materialId?: string;
   defaultTitle?: string;
   item?: ShowcaseItemView;
+  /** „Днес в групата“: нова дейност от деня без материал (групата по подразбиране е на учителя) */
+  activityAgeGroup?: AgeGroup;
   onClose: () => void;
   onDone: (item: ShowcaseItemView) => void;
 }) {
@@ -35,6 +52,12 @@ export function ProposeShowcaseDialog({
   const [imageIds, setImageIds] = useState<string[]>(item?.images.map((i) => i.id) ?? []);
   const [noChildren, setNoChildren] = useState(Boolean(item?.images.length));
   const [allowPrint, setAllowPrint] = useState(item?.allowPrint ?? true);
+  const isActivity = Boolean(activityAgeGroup) || Boolean(item?.activity);
+  const isNewActivity = Boolean(activityAgeGroup) && !item;
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>(activityAgeGroup ?? "2");
+  const [direction, setDirection] = useState<LessonDirection | null>(null);
+  const [uploading, setUploading] = useState<number | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<CloudFileItem[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +74,26 @@ export function ProposeShowcaseDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [busy, onClose]);
 
+  /** Снимки направо от телефона: намаляват се, качват се в моя облак и се отбелязват за дейността. */
+  const addPhotos = async (files: FileList | null) => {
+    const list = [...(files ?? [])].slice(0, Math.max(0, MAX_IMAGES - imageIds.length));
+    if (!list.length) return;
+    setError(null);
+    for (const file of list) {
+      setUploading(0);
+      try {
+        const uploaded = await uploadActivityPhoto(file, title || "Снимка от дейност", setUploading);
+        setImages((prev) => [uploaded, ...(prev ?? [])]);
+        setImageIds((prev) => (prev.length >= MAX_IMAGES ? prev : [...prev, uploaded.id]));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Снимката не беше качена.");
+        break;
+      }
+    }
+    setUploading(null);
+    if (fileInput.current) fileInput.current.value = "";
+  };
+
   const toggleImage = (id: string) =>
     setImageIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= MAX_IMAGES ? prev : [...prev, id]));
 
@@ -62,17 +105,28 @@ export function ProposeShowcaseDialog({
         ? `Разкажете с поне ${STORY_MIN} знака какво направихте с децата.`
         : imageIds.length > 0 && !noChildren
           ? "Потвърдете, че на снимките няма деца."
-          : null;
+          : uploading !== null
+            ? "Изчакайте снимката да се качи."
+            : null;
 
   const submit = async () => {
     if (problem || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(item ? `/api/showcase/${item.id}` : "/api/showcase", {
+      const url = item ? `/api/showcase/${item.id}` : isNewActivity ? "/api/showcase/activity" : "/api/showcase";
+      const res = await fetch(url, {
         method: item ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...(item ? {} : { materialId }), title, story, imageIds, noChildren, allowPrint }),
+        body: JSON.stringify({
+          ...(item || isNewActivity ? {} : { materialId }),
+          ...(isNewActivity ? { ageGroup, direction } : {}),
+          title,
+          story,
+          imageIds,
+          noChildren,
+          allowPrint: isActivity ? false : allowPrint,
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as { item?: ShowcaseItemView; error?: string };
       if (!res.ok || !data.item) throw new Error(data.error ?? "Предложението не беше изпратено.");
@@ -90,7 +144,7 @@ export function ProposeShowcaseDialog({
         <header className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div>
             <h2 id={titleId} className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <Store className="h-5 w-5 text-[#0a4b82]" aria-hidden /> {item ? "Промени дейността" : "Предложи за витрината"}
+              <Store className="h-5 w-5 text-[#0a4b82]" aria-hidden /> {item ? "Промени дейността" : isNewActivity ? "Днес в групата" : "Предложи за витрината"}
             </h2>
             <p className="mt-0.5 text-sm text-slate-500">Родителите ще я видят, след като директорът я одобри.</p>
           </div>
@@ -100,6 +154,39 @@ export function ProposeShowcaseDialog({
         </header>
 
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
+          {isNewActivity && (
+            <div className="space-y-3">
+              <fieldset>
+                <legend className="mb-1.5 text-sm font-semibold text-slate-800">Група</legend>
+                <div className="flex flex-wrap gap-2">
+                  {(["1", "2", "3", "4"] as AgeGroup[]).map((g) => (
+                    <button key={g} type="button" aria-pressed={ageGroup === g} onClick={() => setAgeGroup(g)} className={chip(ageGroup === g)}>
+                      {AGE_SHORT[g]}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className="mb-1.5 text-sm font-semibold text-slate-800">
+                  Направление <span className="font-normal text-slate-500">(по желание)</span>
+                </legend>
+                <div className="flex flex-wrap gap-2">
+                  {DIRECTIONS.map((d) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      aria-pressed={direction === d.id}
+                      onClick={() => setDirection((cur) => (cur === d.id ? null : d.id))}
+                      className={chip(direction === d.id)}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          )}
+
           <label className="block">
             <span className="mb-1.5 block text-sm font-semibold text-slate-800">Заглавие</span>
             <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm" />
@@ -131,12 +218,31 @@ export function ProposeShowcaseDialog({
               <ImageIcon className="h-4 w-4 text-[#0a4b82]" aria-hidden /> Снимки без деца <span className="font-normal text-slate-500">(по желание, до {MAX_IMAGES})</span>
             </legend>
             <p className="mb-2 text-xs text-slate-500">
-              Рисунки, изработени предмети, украсата на групата. Избират се от снимките, които сте качили в общия облак (JPG, PNG, WebP).
+              Рисунки, изработени предмети, украсата на групата. Снимайте сега или изберете от снимките, които сте качили в облака.
             </p>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/*"
+              capture="environment"
+              multiple
+              className="sr-only"
+              onChange={(e) => void addPhotos(e.target.files)}
+              aria-label="Снимай или качи снимка"
+            />
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              disabled={uploading !== null || imageIds.length >= MAX_IMAGES}
+              className="mb-3 inline-flex items-center gap-2 rounded-xl border border-[#0a4b82] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a4b82] hover:bg-sky-50 disabled:opacity-50"
+            >
+              {uploading !== null ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Camera className="h-4 w-4" aria-hidden />}
+              {uploading !== null ? `Качване… ${uploading}%` : "Снимай или качи снимка"}
+            </button>
             {images === null ? (
               <Loader2 className="h-5 w-5 animate-spin text-slate-400" aria-label="Зареждане" />
             ) : images.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600">Още нямате качени снимки в общия облак.</p>
+              <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600">Още нямате снимки в облака — снимайте с бутона по-горе.</p>
             ) : (
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {images.map((f) => {
@@ -171,10 +277,12 @@ export function ProposeShowcaseDialog({
             )}
           </fieldset>
 
+          {!isActivity && (
           <label className="flex items-start gap-2 text-sm text-slate-700">
             <input type="checkbox" checked={allowPrint} onChange={(e) => setAllowPrint(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]" />
             Родителите могат да отпечатат играта и листовете за игра вкъщи (по желание на семейството)
           </label>
+          )}
 
           {error && (
             <p role="alert" className="text-sm text-rose-700">
@@ -201,3 +309,6 @@ export function ProposeShowcaseDialog({
     </div>
   );
 }
+
+const chip = (on: boolean) =>
+  `rounded-xl border px-3 py-1.5 text-sm font-semibold transition-colors ${on ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`;

@@ -5,7 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { publicShowcaseWhere, SHOWCASE_INCLUDE, toShowcaseView } from "@/lib/showcase";
 import { ShowcaseItemBody } from "@/components/showcase/ShowcaseItemBody";
-import { AGE_SHORT, directionLabel, KIND_LABELS } from "@/services/materialText";
+import { AGE_SHORT, directionLabel } from "@/services/materialText";
+import { showcaseKind } from "@/lib/showcase-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function ShowcaseItemPage({ params }: { params: Promise<{ i
         <ArrowLeft className="h-4 w-4" aria-hidden /> Витрината
       </Link>
       <p className="mt-5 text-sm font-semibold text-[#0a4b82]">
-        {KIND_LABELS[item.kind].label} · {AGE_SHORT[item.ageGroup]}
+        {showcaseKind(item).label} · {AGE_SHORT[item.ageGroup]}
         {dir ? ` · ${dir}` : ""}
       </p>
       <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{item.title}</h1>

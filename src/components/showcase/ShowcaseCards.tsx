@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { AGE_SHORT, directionLabel, KIND_LABELS } from "@/services/materialText";
-import type { ShowcaseItemView, ShowcaseTeacher } from "@/lib/showcase-shared";
+import { AGE_SHORT, directionLabel } from "@/services/materialText";
+import { showcaseKind, type ShowcaseItemView, type ShowcaseTeacher } from "@/lib/showcase-shared";
 
 /** Карта на учител на публичната витрина. */
 export function TeacherCard({ teacher, count }: { teacher: ShowcaseTeacher; count: number }) {
@@ -37,11 +37,12 @@ export function ShowcaseCard({ item, showAuthor = true }: { item: ShowcaseItemVi
         <img src={cover.url} alt="" className="aspect-[4/3] w-full object-cover" loading="lazy" />
       ) : (
         <div className="grid aspect-[4/3] w-full place-items-center bg-gradient-to-br from-sky-50 to-amber-50 text-6xl" aria-hidden>
-          {KIND_LABELS[item.kind].emoji}
+          {showcaseKind(item).emoji}
         </div>
       )}
       <div className="flex flex-1 flex-col p-4">
         <p className="text-xs font-semibold text-slate-500">
+          {item.activity ? "Днес в групата · " : ""}
           {AGE_SHORT[item.ageGroup]}
           {dir ? ` · ${dir}` : ""}
         </p>
