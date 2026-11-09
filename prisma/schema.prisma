@@ -52,6 +52,8 @@ model User {
   approvedPlans             ThematicPlan[]     @relation("PlanApprover")
   /// Кратко представяне на учителя за публичната витрина (по желание)
   showcaseBio               String             @default("")
+  /// Таен адрес за абонамент на календара на телефона със задачите от бележника (null — изключен)
+  calendarToken             String?            @unique
   createdAt                 DateTime           @default(now())
   updatedAt                 DateTime           @updatedAt
 
@@ -255,10 +257,17 @@ model Note {
   /// Дата за напомняне/срок (само дата) — тогава бележката е и задача
   dueDate   DateTime?
   done      Boolean   @default(false)
+  /// Час на задачата „ЧЧ:ММ“ (по желание)
+  dueTime   String?
+  /// Напомняне: колко дни преди срока (0 — в деня); null — без напомняне
+  remindDays Int?
+  /// „Утре пак“: напомнянето се показва отново от този ден
+  snoozedUntil DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
   @@index([userId, updatedAt])
+  @@index([userId, done, dueDate])
 }
 
 /// Състояние на дейност за публичната витрина: учителят предлага, директорът одобрява.

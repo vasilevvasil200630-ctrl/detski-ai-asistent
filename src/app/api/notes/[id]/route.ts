@@ -20,10 +20,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const existing = await prisma.note.findUnique({ where: { id }, select: { userId: true } });
   if (!existing || existing.userId !== session.userId) return NextResponse.json(NOT_FOUND, { status: 404 });
 
-  const { dueDate, ...rest } = parsed.data;
+  const { dueDate, snoozedUntil, ...rest } = parsed.data;
   const row = await prisma.note.update({
     where: { id },
-    data: { ...rest, ...(dueDate !== undefined ? { dueDate: parseDueDate(dueDate) } : {}) },
+    data: {
+      ...rest,
+      ...(dueDate !== undefined ? { dueDate: parseDueDate(dueDate) } : {}),
+      // Нов срок или отметка „изпълнена“ започват напомнянето отначало
+      ...(snoozedUntil !== undefined ? { snoozedUntil: parseDueDate(snoozedUntil) } : dueDate !== undefined || rest.done !== undefined ? { snoozedUntil: null } : {}),
+    },
   });
   return NextResponse.json({ note: toNoteItem(row) });
 }

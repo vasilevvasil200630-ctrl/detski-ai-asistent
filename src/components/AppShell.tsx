@@ -11,6 +11,7 @@ import { FeedbackWidget } from "./FeedbackWidget";
 import { PwaProvider } from "./pwa/PwaProvider";
 import { useMe } from "@/lib/client/useMe";
 import { GuestShell } from "./home/GuestShell";
+import { ReminderCenter } from "./notebook/ReminderCenter";
 import { SignInGate } from "./home/SignInGate";
 import Link from "next/link";
 import { KeyRound, Loader2 } from "lucide-react";
@@ -118,6 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <MobileBottomNav />
+      <ReminderCenter />
       <Toaster />
       <FeedbackWidget />
       <PwaProvider />

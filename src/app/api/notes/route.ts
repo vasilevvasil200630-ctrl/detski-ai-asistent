@@ -38,6 +38,8 @@ export async function POST(request: Request) {
       color: d.color,
       pinned: d.pinned,
       dueDate: parseDueDate(d.dueDate) ?? null,
+      dueTime: d.dueDate ? d.dueTime : null,
+      remindDays: d.dueDate ? d.remindDays : null,
       done: d.done,
     },
   });

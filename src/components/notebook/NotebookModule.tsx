@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CalendarClock, Check, FolderLock, Library, Loader2, Lock, Pencil, Pin, PinOff, Search, Trash2, X } from "lucide-react";
+import { Bell, BellOff, BellRing, CalendarClock, CalendarPlus, Check, Clock, FolderLock, Library, Loader2, Lock, Pencil, Pin, PinOff, Search, Trash2, X } from "lucide-react";
 import { toast } from "@/components/Toaster";
 import { VoiceMic } from "@/components/VoiceMic";
-import { NOTE_COLORS, type NoteColor, type NoteItem } from "@/lib/notes-shared";
-import { createNote, deleteNote, listNotes, updateNote, type NoteDraft } from "@/lib/client/notes";
-import { dueInfo, sortNotes } from "./noteDates";
+import { DEFAULT_REMIND_DAYS, isReminderActive, NOTE_COLORS, REMIND_OPTIONS, remindLabel, type NoteColor, type NoteItem } from "@/lib/notes-shared";
+import { createNote, deleteNote, listNotes, updateNote, type NoteDraft, type NotePatch } from "@/lib/client/notes";
+import { notesChanged } from "@/lib/client/reminders";
+import { dueInfo, shortDate, sortNotes, todayIso } from "./noteDates";
+import { ReminderSettings } from "./ReminderSettings";
 
 const COLOR_STYLE: Record<NoteColor, { card: string; dot: string; name: string }> = {
   yellow: { card: "bg-amber-50 border-amber-200", dot: "bg-amber-300", name: "жълто" },
@@ -17,7 +19,7 @@ const COLOR_STYLE: Record<NoteColor, { card: string; dot: string; name: string }
   violet: { card: "bg-violet-50 border-violet-200", dot: "bg-violet-300", name: "лилаво" },
 };
 
-const EMPTY: NoteDraft = { title: "", body: "", color: "yellow", pinned: false, dueDate: null };
+const EMPTY: NoteDraft = { title: "", body: "", color: "yellow", pinned: false, dueDate: null, dueTime: null, remindDays: null };
 
 const TABS = [
   { id: "all", label: "Всички" },
@@ -119,10 +121,43 @@ function NoteEditor({
           <input
             type="date"
             value={d.dueDate ?? ""}
-            onChange={(e) => setD({ ...d, dueDate: e.target.value || null })}
+            onChange={(e) => {
+              const v = e.target.value || null;
+              // Нова задача напомня по подразбиране денят преди; без срок — без час и напомняне
+              setD({ ...d, dueDate: v, dueTime: v ? d.dueTime : null, remindDays: v ? (d.dueDate ? d.remindDays : DEFAULT_REMIND_DAYS) : null });
+            }}
             className="rounded-md border border-black/10 bg-white/70 px-2 py-1 text-sm text-slate-800"
           />
         </label>
+        {d.dueDate && (
+          <>
+            <label className="flex items-center gap-1.5 text-sm text-slate-600">
+              <Clock className="h-4 w-4" aria-hidden />
+              <span>Час</span>
+              <input
+                type="time"
+                value={d.dueTime ?? ""}
+                onChange={(e) => setD({ ...d, dueTime: e.target.value || null })}
+                className="rounded-md border border-black/10 bg-white/70 px-2 py-1 text-sm text-slate-800"
+              />
+            </label>
+            <label className="flex items-center gap-1.5 text-sm text-slate-600">
+              <Bell className="h-4 w-4" aria-hidden />
+              <span>Напомни</span>
+              <select
+                value={d.remindDays === null ? "" : String(d.remindDays)}
+                onChange={(e) => setD({ ...d, remindDays: e.target.value === "" ? null : Number(e.target.value) })}
+                className="rounded-md border border-black/10 bg-white/70 px-2 py-1 text-sm text-slate-800"
+              >
+                {REMIND_OPTIONS.map((o) => (
+                  <option key={String(o.value)} value={o.value === null ? "" : String(o.value)}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
         <button
           type="button"
           onClick={() => setD({ ...d, pinned: !d.pinned })}
@@ -165,8 +200,11 @@ function NoteCard({
   onDelete: () => void;
 }) {
   const due = note.dueDate ? dueInfo(note.dueDate, note.done) : null;
+  const today = todayIso();
+  const ringing = isReminderActive(note, today);
+  const snoozed = !note.done && note.snoozedUntil && note.snoozedUntil > today ? note.snoozedUntil : null;
   return (
-    <article className={`group mb-4 break-inside-avoid rounded-2xl border p-4 ${COLOR_STYLE[note.color].card} ${note.done ? "opacity-70" : ""}`}>
+    <article className={`group mb-4 break-inside-avoid rounded-2xl border p-4 ${COLOR_STYLE[note.color].card} ${note.done ? "opacity-70" : ""} ${ringing ? "ring-2 ring-amber-400" : ""}`}>
       <div className="flex items-start gap-3">
         {note.dueDate && (
           <button
@@ -195,9 +233,31 @@ function NoteCard({
         {due && (
           <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${due.tone}`}>
             <CalendarClock className="h-3.5 w-3.5" aria-hidden /> {due.label}
+            {note.dueTime && `, ${note.dueTime}`}
+          </span>
+        )}
+        {note.dueDate && !note.done && (
+          <span
+            className={`inline-flex items-center gap-1 text-xs ${ringing ? "font-semibold text-amber-800" : "text-slate-500"}`}
+            title={note.remindDays === null ? "Без напомняне" : `Напомня ${remindLabel(note.remindDays)}`}
+          >
+            {ringing ? (
+              <><BellRing className="h-3.5 w-3.5" aria-hidden /> напомня</>
+            ) : snoozed ? (
+              <><Clock className="h-3.5 w-3.5" aria-hidden /> пак на {shortDate(snoozed)}</>
+            ) : note.remindDays === null ? (
+              <BellOff className="h-3.5 w-3.5" aria-label="Без напомняне" />
+            ) : (
+              <><Bell className="h-3.5 w-3.5" aria-hidden /> {remindLabel(note.remindDays)}</>
+            )}
           </span>
         )}
         <div className="ml-auto flex items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+          {note.dueDate && !note.done && (
+            <a href={`/api/notes/${note.id}/ics`} download aria-label="В календара" title="Добави в календара на телефона или компютъра" className="rounded-md p-1.5 text-slate-600 hover:bg-black/5">
+              <CalendarPlus className="h-4 w-4" aria-hidden />
+            </a>
+          )}
           <button type="button" onClick={onTogglePin} aria-label={note.pinned ? "Откачи" : "Закачи горе"} className="rounded-md p-1.5 text-slate-600 hover:bg-black/5">
             {note.pinned ? <PinOff className="h-4 w-4" aria-hidden /> : <Pin className="h-4 w-4" aria-hidden />}
           </button>
@@ -226,16 +286,20 @@ export function NotebookModule() {
 
   const replace = (n: NoteItem) => setNotes((prev) => prev?.map((x) => (x.id === n.id ? n : x)) ?? null);
 
-  async function patch(note: NoteItem, p: Partial<NoteDraft & { done: boolean }>) {
+  async function patch(note: NoteItem, p: NotePatch) {
     replace({ ...note, ...p }); // веднага, после — отговорът от сървъра
     const saved = await updateNote(note.id, p);
     replace(saved ?? note);
+    if (saved) notesChanged();
     return Boolean(saved);
   }
 
   async function remove(note: NoteItem) {
     if (!window.confirm(`Да изтрия ли бележката${note.title ? ` „${note.title}“` : ""}?`)) return;
-    if (await deleteNote(note.id)) setNotes((prev) => prev?.filter((x) => x.id !== note.id) ?? null);
+    if (await deleteNote(note.id)) {
+      setNotes((prev) => prev?.filter((x) => x.id !== note.id) ?? null);
+      notesChanged();
+    }
   }
 
   const counts = useMemo(() => {
@@ -282,12 +346,14 @@ export function NotebookModule() {
             const n = await createNote(d);
             if (!n) return false;
             setNotes((prev) => [n, ...(prev ?? [])]);
+            notesChanged();
             if (tab === "done") setTab("all");
             return true;
           }}
         />
-        <p className="mt-1.5 text-xs text-slate-500">Ctrl + Enter запазва. Бележка със срок става задача, която отмятате.</p>
+        <p className="mt-1.5 text-xs text-slate-500">Ctrl + Enter запазва. Бележка със срок става задача, която отмятате и която ви напомня.</p>
       </div>
+      <ReminderSettings />
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div role="tablist" aria-label="Филтър" className="inline-flex rounded-xl border border-slate-200 bg-white p-1">
@@ -344,7 +410,7 @@ export function NotebookModule() {
                 <NoteEditor
                   idPrefix={`edit-${n.id}`}
                   autoFocus
-                  initial={{ title: n.title, body: n.body, color: n.color, pinned: n.pinned, dueDate: n.dueDate }}
+                  initial={{ title: n.title, body: n.body, color: n.color, pinned: n.pinned, dueDate: n.dueDate, dueTime: n.dueTime, remindDays: n.remindDays }}
                   onCancel={() => setEditingId(null)}
                   onSave={async (d) => {
                     const ok = await patch(n, d);
