@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   if (!rate.allowed) return NextResponse.json({ error: "Твърде много опити. Опитайте пак след минута." }, { status: 429 });
 
   const userId = session.userId;
-  const [user, materials, bankGames, materialLikes, gameLikes, files, notes, feedback, reads, plans] = await Promise.all([
+  const [user, materials, bankGames, materialLikes, gameLikes, files, notes, feedback, reads, plans, parentPosts] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -92,7 +92,12 @@ export async function GET(request: Request) {
     prisma.announcementRead.findMany({ where: { userId }, select: { readAt: true, announcement: { select: { title: true } } } }),
     prisma.thematicPlan.findMany({
       where: { authorId: userId },
-      select: { ageGroup: true, groupName: true, schoolYear: true, shared: true, approvedAt: true, weeks: { orderBy: { week: "asc" }, select: { week: true, startDate: true, endDate: true, theme: true, notes: true, situations: true } } },
+      select: { ageGroup: true, groupName: true, schoolYear: true, shared: true, showToParents: true, approvedAt: true, weeks: { orderBy: { week: "asc" }, select: { week: true, startDate: true, endDate: true, theme: true, notes: true, situations: true } } },
+    }),
+    prisma.parentPost.findMany({
+      where: { authorId: userId },
+      orderBy: { createdAt: "asc" },
+      select: { kind: true, title: true, body: true, eventDate: true, status: true, publishedAt: true, createdAt: true, group: { select: { name: true } } },
     }),
   ]);
   if (!user) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
@@ -116,6 +121,7 @@ export async function GET(request: Request) {
     feedback,
     announcementsRead: reads.map((r) => ({ title: r.announcement.title, readAt: r.readAt })),
     thematicPlans: plans,
+    parentPosts,
   };
 
   const day = new Date().toISOString().slice(0, 10);

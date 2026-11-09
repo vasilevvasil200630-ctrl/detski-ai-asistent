@@ -20,6 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 const PatchBody = z.object({
   shared: z.boolean().optional(),
   groupName: z.string().trim().max(80).optional(),
+  showToParents: z.boolean().optional(),
   /** Само директорът: утвърждава (true) или сваля утвърждаването (false) */
   approve: z.boolean().optional(),
 });

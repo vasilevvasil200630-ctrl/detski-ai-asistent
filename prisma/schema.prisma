@@ -50,6 +50,11 @@ model User {
   announcementReads         AnnouncementRead[]
   thematicPlans             ThematicPlan[]     @relation("PlanAuthor")
   approvedPlans             ThematicPlan[]     @relation("PlanApprover")
+  /// Групата на учителя (директорът я задава) — за страницата на групата за родителите
+  groupId                   String?
+  group                     Group?             @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  parentPosts               ParentPost[]       @relation("ParentPostAuthor")
+  reviewedParentPosts       ParentPost[]       @relation("ParentPostReviewer")
   /// Кратко представяне на учителя за публичната витрина (по желание)
   showcaseBio               String             @default("")
   /// Таен адрес за абонамент на календара на телефона със задачите от бележника (null — изключен)
@@ -79,6 +84,8 @@ model Kindergarten {
   showcaseItems ShowcaseItem[]
   announcements Announcement[]
   thematicPlans ThematicPlan[]
+  groups        Group[]
+  parentPosts   ParentPost[]
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
@@ -365,6 +372,8 @@ model ThematicPlan {
   schoolYear     Int
   /// Колегите от градината могат да го видят и да си направят копие
   shared         Boolean        @default(true)
+  /// Темата на седмицата се вижда на страницата на групата (само ако разпределението е утвърдено)
+  showToParents  Boolean        @default(false)
   /// Утвърдено от директора (чл. 23, ал. 4)
   approvedAt     DateTime?
   approvedById   String?
@@ -391,4 +400,69 @@ model ThematicWeek {
   situations Json         @default("[]")
 
   @@unique([planId, week])
+}
+
+/// Група в детската градина (напр. II група „Пчелички“): директорът я създава и слага учителите в нея.
+/// Има публична страница за родителите с одобреното от директора.
+model Group {
+  id             String       @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  /// Името без възрастта, напр. „Пчелички“
+  name           String
+  /// Възрастова група „1“…„4“
+  ageGroup       String
+  /// Адресът на страницата: /grupi/<slug>
+  slug           String
+  sortOrder      Int          @default(0)
+  teachers       User[]
+  parentPosts    ParentPost[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([kindergartenId, slug])
+}
+
+/// Вид публикация за родителите.
+enum ParentPostKind {
+  /// Обява (събитие, среща, напомняне)
+  NOTICE
+  /// Покана или писмо до родителите
+  LETTER
+  /// Стихче или песен, които учим (за вкъщи по желание)
+  VERSES
+}
+
+/// Публикация за родителите на страницата на групата (или на цялата градина, ако groupId е празно).
+/// Учителят я предлага, директорът одобрява (публикациите на директора се одобряват веднага);
+/// вижда се публично само когато е одобрена и авторът е в екипа.
+model ParentPost {
+  id             String         @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten   @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  /// Празно — за цялата градина (началната страница за родителите)
+  groupId        String?
+  group          Group?         @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  authorId       String
+  author         User           @relation("ParentPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  kind           ParentPostKind
+  title          String
+  /// Текстът (за писмата и стихчетата — копие на материала към момента на предлагането)
+  body           String
+  /// Материалът за печат, ако е от „Материали за печат“ (писмо или стихчета) — за хубав печат
+  printable      Json?
+  /// Дата на събитието (за обявите и поканите), ако има
+  eventDate      DateTime?
+  status         ShowcaseStatus @default(PENDING)
+  reviewNote     String?
+  reviewedById   String?
+  reviewedBy     User?          @relation("ParentPostReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt     DateTime?
+  publishedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([kindergartenId, status])
+  @@index([groupId, status])
+  @@index([authorId])
 }

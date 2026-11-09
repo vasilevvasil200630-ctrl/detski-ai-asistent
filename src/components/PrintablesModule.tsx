@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Award, FileText, Loader2, Mail, Music, Printer, RefreshCw, Sparkles } from "lucide-react";
+import { Award, FileText, HeartHandshake, Loader2, Mail, Music, Printer, RefreshCw, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { PARENT_DRAFT_KEY, type ParentDraft } from "./parents/ParentPostsModule";
 import { SaveMaterialBar } from "./SaveMaterialBar";
 import { CloudSaveButton } from "./CloudSaveButton";
 import { VoiceMic } from "./VoiceMic";
@@ -92,6 +94,7 @@ function todayBg(): string {
 }
 
 export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }) {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("worksheet");
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(teacher?.ageGroup ?? "2");
   const [topic, setTopic] = useState("");
@@ -398,6 +401,24 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
               source={{ source: "material", kind: "MATERIAL", title: item.title, ageGroup, direction: saveDirection, content: { text: printableToText(item), printable: item } }}
               className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
             />
+            {(item.type === "letter" || item.type === "verses") && (
+              <button
+                type="button"
+                onClick={() => {
+                  const draft: ParentDraft = { kind: item.type === "letter" ? "LETTER" : "VERSES", title: item.title, body: printableToText(item), printable: item };
+                  try {
+                    sessionStorage.setItem(PARENT_DRAFT_KEY, JSON.stringify(draft));
+                  } catch {
+                    // без памет в браузъра — страницата се отваря празна
+                  }
+                  router.push("/za-roditelite");
+                }}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-900 hover:bg-emerald-100"
+                title="Изпрати на директора за страницата на групата"
+              >
+                <HeartHandshake className="h-3.5 w-3.5" aria-hidden /> Покажи на родителите
+              </button>
+            )}
           </div>
           <div className={`print-area ${hideTeacherNote ? "print-hide-teacher" : ""}`}>
             <PrintableSheet item={item} />

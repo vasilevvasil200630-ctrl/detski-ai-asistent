@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, CalendarHeart, Images, Newspaper, ShieldCheck } from "lucide-react";
+import { ArrowRight, CalendarHeart, Images, Megaphone, Newspaper, ShieldCheck, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { KG } from "@/config/kindergarten";
 import { monthLabel, publicShowcaseWhere, SHOWCASE_INCLUDE, showcaseMonths, showcaseTeachers, toShowcaseView } from "@/lib/showcase";
 import { ShowcaseCard, TeacherCard } from "@/components/showcase/ShowcaseCards";
 import { upcomingHolidayDates } from "@/services/thematicPlan";
+import { PARENT_POST_INCLUDE, publicGroups, publicPostsWhere, toParentPostView } from "@/lib/parents";
+import { ParentPostCard } from "@/components/parents/ParentPostCard";
 
 /** Дата като „3 март, вторник“. */
 function dayLabel(iso: string, plusDays = 0): string {
@@ -19,11 +21,15 @@ function dayLabel(iso: string, plusDays = 0): string {
  * без регистрация и без лични данни на посетителя; входът за учители е малка връзка.
  */
 export async function ParentHome() {
-  const [teachers, months, rows] = await Promise.all([
+  const [teachers, months, rows, groups, kgPosts] = await Promise.all([
     showcaseTeachers(),
     showcaseMonths(),
     prisma.showcaseItem.findMany({ where: publicShowcaseWhere(), include: SHOWCASE_INCLUDE, orderBy: { publishedAt: "desc" }, take: 6 }),
+    publicGroups(),
+    // Обявите на директора за цялата градина
+    prisma.parentPost.findMany({ where: publicPostsWhere({ groupId: null }), include: PARENT_POST_INCLUDE, orderBy: [{ eventDate: "asc" }, { publishedAt: "desc" }], take: 5 }),
   ]);
+  const notices = kgPosts.map((p) => toParentPostView(p, null));
   const items = rows.map((r) => toShowcaseView(r, { forPublic: true }));
   const holidays = upcomingHolidayDates(4);
   const latestMonth = months[0];
@@ -62,8 +68,45 @@ export async function ParentHome() {
       </section>
 
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_20rem]">
-        <section aria-labelledby="latest-title" className="min-w-0">
-          <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          {groups.length > 0 && (
+            <section aria-labelledby="groups-title" className="mb-12">
+              <h2 id="groups-title" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
+                <Users className="h-6 w-6 text-slate-400" aria-hidden /> Нашите групи
+              </h2>
+              <p className="mt-1 text-slate-600">Темата на седмицата, обявите и стихчетата на групата на детето.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {groups.map((g) => (
+                  <Link
+                    key={g.id}
+                    href={`/grupi/${g.slug}`}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-[#0a4b82]/40 hover:bg-sky-50/40"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-bold text-slate-900">{g.label}</span>
+                      <span className="block truncate text-sm text-slate-600">{g.teachers.map((t) => t.name).join(", ") || "Учителите скоро"}</span>
+                    </span>
+                    <ArrowRight className="h-5 w-5 shrink-0 text-[#0a4b82]" aria-hidden />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {notices.length > 0 && (
+            <section aria-labelledby="kg-notices-title" className="mb-12">
+              <h2 id="kg-notices-title" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
+                <Megaphone className="h-6 w-6 text-slate-400" aria-hidden /> Обяви от градината
+              </h2>
+              <div className="mt-4 space-y-4">
+                {notices.map((p) => (
+                  <ParentPostCard key={p.id} post={p} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className="flex items-end justify-between gap-3" aria-labelledby="latest-title">
             <h2 id="latest-title" className="text-2xl font-bold tracking-tight text-slate-900">
               Последни дейности
             </h2>
@@ -97,7 +140,7 @@ export async function ParentHome() {
               </div>
             </section>
           )}
-        </section>
+        </div>
 
         <aside className="space-y-6">
           <section aria-labelledby="holidays-title" className="rounded-2xl border border-slate-200 bg-white p-5">

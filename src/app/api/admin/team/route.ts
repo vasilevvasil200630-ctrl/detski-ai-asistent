@@ -30,6 +30,7 @@ export async function GET() {
     jobTitle: u.jobTitle,
     ageGroup: u.ageGroup,
     groupName: u.groupName,
+    groupId: u.groupId,
     role: u.kgRole,
     me: u.id === me.id,
     mustChangePassword: u.mustChangePassword,
