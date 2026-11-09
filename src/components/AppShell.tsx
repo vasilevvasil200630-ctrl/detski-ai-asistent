@@ -56,6 +56,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Публичната витрина за родителите е отворена за всички
+  const isShowcase = pathname === "/vitrina" || pathname.startsWith("/vitrina/");
+
+  // Витрината се рисува веднага (за родителите и търсачките): съдържанието е в HTML-а,
+  // а липсваща дейност връща истински код 404. Учителят после вижда менюто си.
+  if (loading && isShowcase) {
+    return <GuestShell variant="showcase">{children}</GuestShell>;
+  }
+
   // Докато не знаем дали има вход — без рамка, за да не премигва менюто
   if (loading) {
     return (
@@ -67,8 +76,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Посетител: само страницата на градината, входът и правните страници; останалото е заключено
   if (!user) {
-    // Публичната витрина за родителите е отворена за всички
-    const isShowcase = pathname === "/vitrina" || pathname.startsWith("/vitrina/");
     const isPublic = PUBLIC_PATHS.includes(pathname) || isShowcase;
     return (
       <>
