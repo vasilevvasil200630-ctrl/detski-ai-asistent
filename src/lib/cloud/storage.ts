@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { del, get, head } from "@vercel/blob";
+import { del, get, head, put } from "@vercel/blob";
 import { generateClientTokenFromReadWriteToken } from "@vercel/blob/client";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -75,6 +75,11 @@ export async function blobInfo(pathname: string) {
 export async function openBlob(pathname: string) {
   const res = await get(pathname, { access: "private" });
   return res && res.statusCode === 200 ? res : null;
+}
+
+/** Записва файл, създаден от сървъра (напр. Word от генератора), направо в частното хранилище. */
+export async function putBlob(pathname: string, bytes: Uint8Array, contentType: string): Promise<void> {
+  await put(pathname, Buffer.from(bytes), { access: "private", contentType, addRandomSuffix: false, allowOverwrite: false });
 }
 
 /** Изтрива файлове от Blob; грешка не спира изтриването на записа в базата. */
