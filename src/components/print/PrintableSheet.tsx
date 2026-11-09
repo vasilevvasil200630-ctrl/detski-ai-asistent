@@ -20,7 +20,7 @@ export function PrintableSheet({ item }: { item: Printable }) {
 /* ─────────────────────────── Работен лист ─────────────────────────── */
 
 const Emoji = ({ pic, size = "text-4xl" }: { pic: Pic; size?: string }) => (
-  <span role="img" aria-label={pic.w} className={`${size} leading-none`}>
+  <span role="img" aria-label={pic.w} className={`print-emoji ${size} leading-none`}>
     {pic.e}
   </span>
 );
@@ -29,7 +29,7 @@ function TaskBox({ n, prompt, children }: { n: number; prompt: string; children:
   return (
     <section className="print-task break-inside-avoid rounded-2xl border-2 border-slate-300 p-4">
       <h3 className="flex items-start gap-2 text-base font-bold">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-900 text-sm text-white">{n}</span>
+        <span className="print-num grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-900 text-sm text-white">{n}</span>
         <span className="pt-0.5">{prompt}</span>
       </h3>
       <div className="mt-4">{children}</div>
@@ -76,7 +76,7 @@ function TaskBody({ task, compact }: { task: WorksheetTask; compact?: boolean })
           {task.pairs.map((p, i) => (
             <div key={i} className="contents">
               <div className="flex items-center justify-end gap-3">
-                <span className="break-all text-right text-3xl leading-tight">{p.left.e}</span>
+                <span className="print-emoji break-all text-right text-3xl leading-tight">{p.left.e}</span>
                 <span className="h-3 w-3 shrink-0 rounded-full bg-slate-800" aria-hidden />
               </div>
               <div className="flex items-center gap-3">

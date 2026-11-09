@@ -2,17 +2,21 @@
 
 import { Printer } from "lucide-react";
 import { QrCode, useAbsoluteUrl } from "./QrCode";
+import { PrintOptions } from "@/components/print/PrintOptions";
 
 /** Бутон за печат на бюлетина (само на екрана). */
 export function PrintButton({ label = "Отпечатай за таблото" }: { label?: string }) {
   return (
-    <button
-      type="button"
-      onClick={() => window.print()}
-      className="no-print inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
-    >
-      <Printer className="h-4 w-4" aria-hidden /> {label}
-    </button>
+    <div className="no-print flex flex-wrap items-center gap-x-4 gap-y-2">
+      <button
+        type="button"
+        onClick={() => window.print()}
+        className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
+      >
+        <Printer className="h-4 w-4" aria-hidden /> {label}
+      </button>
+      <PrintOptions />
+    </div>
   );
 }
 

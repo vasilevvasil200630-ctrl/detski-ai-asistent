@@ -388,3 +388,55 @@ html.projector-mode {
   size: A4;
   margin: 12mm;
 }
+
+/*
+ * „Пестелив печат“ (html.print-eco): черно-бяло, без фонове и цветни плочки, по-светли рамки;
+ * картинките (емоджи) в светлосиво — по-малко мастило, а децата могат да ги оцветят.
+ * „Едър шрифт“ (html.print-large): по-едри условия, стихчета и текстове в листовете.
+ * Настройват се с отметките до „Принтирай“ (PrintOptions) и важат само на хартия.
+ */
+@media print {
+  html.print-eco body,
+  html.print-eco body * {
+    color: #000 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  html.print-eco body * {
+    border-color: #a3a3a3 !important;
+  }
+  html.print-eco .print-num {
+    border: 2px solid #000 !important;
+  }
+  html.print-eco .print-emoji,
+  html.print-eco .print-sheet span[role="img"] {
+    filter: grayscale(1) contrast(0.55) brightness(1.3);
+  }
+  html.print-eco img {
+    filter: grayscale(1);
+  }
+
+  html.print-large .print-sheet h3 {
+    font-size: 1.3rem !important;
+    line-height: 1.35 !important;
+  }
+  html.print-large .print-sheet .text-sm:not(.print-teacher-note) {
+    font-size: 1.05rem !important;
+  }
+  html.print-large .print-sheet .text-base {
+    font-size: 1.2rem !important;
+  }
+  html.print-large .print-sheet .text-lg {
+    font-size: 1.4rem !important;
+  }
+  html.print-large .print-sheet .text-xl {
+    font-size: 1.6rem !important;
+  }
+  html.print-large .print-sheet .text-\[15px\],
+  html.print-large .print-sheet .text-\[16px\],
+  html.print-large .print-sheet .text-\[17px\] {
+    font-size: 20px !important;
+  }
+}

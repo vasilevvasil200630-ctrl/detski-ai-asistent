@@ -6,6 +6,7 @@ import { SaveMaterialBar } from "./SaveMaterialBar";
 import { CloudSaveButton } from "./CloudSaveButton";
 import { VoiceMic } from "./VoiceMic";
 import { PrintableSheet } from "./print/PrintableSheet";
+import { PrintOptions } from "./print/PrintOptions";
 import { CERTIFICATE_LABELS, CERTIFICATE_REASONS, CertificateSheet, type CertificateKind } from "./print/CertificateSheet";
 import {
   LETTER_LABELS,
@@ -351,6 +352,7 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
             <Printer className="h-4 w-4" aria-hidden />
             {certNames.length > 1 ? `Принтирай всички (${certNames.length})` : "Принтирай"}
           </button>
+          <PrintOptions />
           <p className="text-xs text-slate-500">Без имена се печата празна грамота — името се попълва на ръка.</p>
         </div>
       )}
@@ -377,6 +379,7 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
                 Без бележката за учителя при печат
               </label>
             )}
+            <PrintOptions />
             <SaveMaterialBar
               key={item.title + item.type + JSON.stringify(item).length}
               compact

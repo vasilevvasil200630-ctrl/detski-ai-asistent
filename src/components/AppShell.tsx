@@ -12,6 +12,7 @@ import { PwaProvider } from "./pwa/PwaProvider";
 import { useMe } from "@/lib/client/useMe";
 import { GuestShell } from "./home/GuestShell";
 import { ReminderCenter } from "./notebook/ReminderCenter";
+import { PrintPrefsSync } from "./print/PrintOptions";
 import { SignInGate } from "./home/SignInGate";
 import Link from "next/link";
 import { KeyRound, Loader2 } from "lucide-react";
@@ -81,6 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <>
         <GuestShell footer={pathname === "/" ? "full" : "compact"} variant={isShowcase ? "showcase" : "site"}>{isPublic ? children : <SignInGate path={pathname} />}</GuestShell>
+        <PrintPrefsSync />
         <Toaster />
         <FeedbackWidget />
         <PwaProvider />
@@ -120,6 +122,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <MobileBottomNav />
       <ReminderCenter />
+      <PrintPrefsSync />
       <Toaster />
       <FeedbackWidget />
       <PwaProvider />
