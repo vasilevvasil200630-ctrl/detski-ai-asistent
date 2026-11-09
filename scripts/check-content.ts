@@ -98,6 +98,12 @@ for (const a of AGES) {
   }
 }
 
+/* 5б. Имената на направленията — с главна буква */
+for (const d of DIRECTION_ORDER) {
+  const ws = buildDemoWorksheet('2', d, '');
+  ok(`${d}: worksheet title keeps the capital letter`, ws.title.includes(DIRECTION_STANDARDS[d].label), ws.title);
+}
+
 /* 6. Стихчета и гатанки: гатанките имат отговор, броят е по групата */
 for (const a of AGES) {
   for (const kind of ['poem', 'riddles', 'counting', 'tongue'] as const) {

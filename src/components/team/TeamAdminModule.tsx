@@ -6,6 +6,8 @@ import {
   Copy,
   KeyRound,
   Loader2,
+  Lock,
+  LockOpen,
   MoreHorizontal,
   Pencil,
   RefreshCw,
@@ -37,7 +39,7 @@ type Member = {
 };
 
 type TeamData = {
-  kindergarten: { name: string; joinCode: string } | null;
+  kindergarten: { name: string; joinCode: string; teacherSignupOpen: boolean } | null;
   members: Member[];
   removed: Member[];
 };
@@ -284,6 +286,23 @@ export function TeamAdminModule() {
     }
   }
 
+  async function setSignup(open: boolean) {
+    setBusy(true);
+    try {
+      const res = await api<{ open: boolean }>("/api/admin/signup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ open }),
+      });
+      setData((d) => (d && d.kindergarten ? { ...d, kindergarten: { ...d.kindergarten, teacherSignupOpen: res.open } } : d));
+      toast(res.open ? "Регистрацията на нови учители е отворена." : "Регистрацията е затворена. Нови учители не могат да се регистрират.", "success");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Не успях да сменя настройката.", "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function newCode() {
     setBusy(true);
     try {
@@ -376,6 +395,43 @@ export function TeamAdminModule() {
           </button>
         </div>
       </section>
+
+      {data.kindergarten && (
+        <section
+          aria-labelledby="signup-title"
+          className={`mt-4 flex flex-col gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:justify-between ${
+            data.kindergarten.teacherSignupOpen ? "border-slate-200 bg-white" : "border-amber-200 bg-amber-50"
+          }`}
+        >
+          <div className="max-w-2xl">
+            <h2 id="signup-title" className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+              {data.kindergarten.teacherSignupOpen ? <LockOpen className="h-4 w-4" aria-hidden /> : <Lock className="h-4 w-4" aria-hidden />}
+              Приемане на нови учители
+            </h2>
+            <p className="mt-1.5 text-lg font-bold text-slate-900">
+              {data.kindergarten.teacherSignupOpen ? "Включено — нови колеги се регистрират с кода" : "Изключено — регистрацията е затворена"}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">
+              {data.kindergarten.teacherSignupOpen
+                ? "Когато всички учители са се регистрирали, изключете — тогава никой не може да създаде учителски профил, дори с кода."
+                : "Бутонът „Регистрация“ не се показва на сайта, а кодът не работи. Включете отново, когато дойде нов колега."}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void setSignup(!data.kindergarten!.teacherSignupOpen)}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 ${
+              data.kindergarten.teacherSignupOpen
+                ? "bg-[#0a4b82] text-white hover:bg-[#083861]"
+                : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+            }`}
+          >
+            {data.kindergarten.teacherSignupOpen ? <Lock className="h-4 w-4" aria-hidden /> : <LockOpen className="h-4 w-4" aria-hidden />}
+            {data.kindergarten.teacherSignupOpen ? "Затвори регистрацията" : "Отвори регистрацията"}
+          </button>
+        </section>
+      )}
 
       <section aria-labelledby="team-title" className="mt-8">
         <h2 id="team-title" className="text-lg font-bold text-slate-900">

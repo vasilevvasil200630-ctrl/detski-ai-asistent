@@ -9,7 +9,7 @@ export async function GET() {
   const { me } = auth;
 
   const [kg, members, removed] = await Promise.all([
-    prisma.kindergarten.findUnique({ where: { id: me.kindergartenId }, select: { name: true, joinCode: true } }),
+    prisma.kindergarten.findUnique({ where: { id: me.kindergartenId }, select: { name: true, joinCode: true, teacherSignupOpen: true } }),
     prisma.user.findMany({
       where: { kindergartenId: me.kindergartenId },
       select: TEAM_MEMBER_SELECT,

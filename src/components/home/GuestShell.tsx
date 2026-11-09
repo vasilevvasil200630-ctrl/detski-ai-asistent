@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { LogoIcon, LogoWordmark } from "@/components/Logo";
 import { KG } from "@/config/kindergarten";
 import { SiteFooter } from "./SiteFooter";
+import { useSignupOpen } from "@/lib/client/signup";
 
 /**
  * Рамката на сайта за посетители без профил: само марката на градината, „Вход“ и
@@ -17,6 +20,7 @@ export function GuestShell({
   /** showcase — публичната витрина за родителите: без „Регистрация“, с връзка към витрината */
   variant?: "site" | "showcase";
 }) {
+  const signupOpen = useSignupOpen();
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
       <header className="border-b border-slate-200 print:hidden">
@@ -49,12 +53,14 @@ export function GuestShell({
             >
               Вход
             </Link>
-            <Link
-              href="/register"
-              className="rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
-            >
-              Регистрация
-            </Link>
+            {signupOpen && (
+              <Link
+                href="/register"
+                className="rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+              >
+                Регистрация
+              </Link>
+            )}
             </>
             )}
           </nav>
