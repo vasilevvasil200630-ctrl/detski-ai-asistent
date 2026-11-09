@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -23,6 +24,7 @@ import {
   type LucideIcon,
   Store,
   FolderHeart,
+  Megaphone,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { performSignOut } from "@/lib/session-cache";
@@ -58,6 +60,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "ДЕТСКАТА ГРАДИНА",
     items: [
+      { href: "/announcements", label: "Обяви", icon: Megaphone },
       { href: "/cloud", label: "Общ облак", icon: Cloud },
       { href: "/notebook", label: "Моят бележник", icon: NotebookPen },
       { href: "/hub", label: "Учителски хъб и банка", icon: Building2 },
@@ -87,6 +90,24 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
   const kgName = user?.kindergarten?.name ?? null;
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+
+  // Брой непрочетени обяви — при смяна на страницата и след „Прочетох“
+  const [unread, setUnread] = useState(0);
+  useEffect(() => {
+    if (!user?.kindergarten) return;
+    let active = true;
+    const refresh = () =>
+      fetch("/api/announcements?unread=1", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : { unread: 0 }))
+        .then((d: { unread?: number }) => active && setUnread(d.unread ?? 0))
+        .catch(() => undefined);
+    void refresh();
+    window.addEventListener("detski-announcements-changed", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("detski-announcements-changed", refresh);
+    };
+  }, [user?.kindergarten, pathname]);
 
   const width = collapsed ? "md:w-16" : "md:w-64";
 
@@ -162,6 +183,14 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
                           }`}
                         />
                         {!collapsed && <span className="truncate">{label}</span>}
+                        {href === "/announcements" && unread > 0 && (
+                          <span
+                            className={`ml-auto grid min-w-5 place-items-center rounded-full bg-amber-500 px-1.5 text-xs font-bold text-white ${collapsed ? "absolute ml-6 -mt-6" : ""}`}
+                            aria-label={`${unread} непрочетени`}
+                          >
+                            {unread}
+                          </span>
+                        )}
                       </Link>
                     </li>
                   );

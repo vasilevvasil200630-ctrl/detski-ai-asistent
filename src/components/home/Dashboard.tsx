@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnnouncementsCard } from "@/components/announcements/AnnouncementsCard";
 import Link from "next/link";
 import { ArrowRight, CalendarClock, CalendarHeart, Camera, Cloud, CloudUpload, Dices, Download, FileText, KeyRound, Loader2, NotebookPen, Printer } from "lucide-react";
 import type { SavedMaterial, SessionTeacher } from "@/types";
@@ -176,6 +177,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
         </div>
 
         <aside className="min-w-0 space-y-6">
+          {user.kindergarten && <AnnouncementsCard isAdmin={user.kgRole === "ADMIN"} />}
           <section aria-labelledby="dash-notes" className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 id="dash-notes" className="flex items-center gap-2 text-sm font-semibold text-slate-500">
               <NotebookPen className="h-4 w-4" aria-hidden /> Моят бележник

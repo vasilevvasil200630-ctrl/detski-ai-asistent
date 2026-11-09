@@ -19,37 +19,39 @@ enum KgRole {
 
 /// Учител (потребителски профил). Вход с имейл и парола (bcrypt + JWT бисквитка).
 model User {
-  id                        String         @id @default(cuid())
-  email                     String         @unique
+  id                        String             @id @default(cuid())
+  email                     String             @unique
   passwordHash              String
   name                      String
-  avatar                    String         @default("👩‍🏫")
+  avatar                    String             @default("👩‍🏫")
   /// Длъжност, напр. „Старши учител“
-  jobTitle                  String         @default("Учител")
+  jobTitle                  String             @default("Учител")
   /// Възрастова група „1“…„4“ (I–IV група)
-  ageGroup                  String         @default("2")
+  ageGroup                  String             @default("2")
   /// Име на групата, напр. „II група „Пчелички“ (4–5 г.)“
-  groupName                 String         @default("")
-  kgRole                    KgRole         @default(TEACHER)
+  groupName                 String             @default("")
+  kgRole                    KgRole             @default(TEACHER)
   /// Влязла е с временна парола от директора — сайтът я подканва да си сложи своя
-  mustChangePassword        Boolean        @default(false)
+  mustChangePassword        Boolean            @default(false)
   /// Премахната от екипа от директора: без достъп, споделеното от нея остава в градината
   removedAt                 DateTime?
   removedFromKindergartenId String?
   kindergartenId            String?
-  kindergarten              Kindergarten?  @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
+  kindergarten              Kindergarten?      @relation(fields: [kindergartenId], references: [id], onDelete: SetNull)
   bankGames                 BankGame[]
   likes                     BankGameLike[]
   materials                 Material[]
   materialLikes             MaterialLike[]
   cloudFiles                CloudFile[]
   notes                     Note[]
-  showcaseItems             ShowcaseItem[] @relation("ShowcaseAuthor")
-  reviewedShowcaseItems     ShowcaseItem[] @relation("ShowcaseReviewer")
+  showcaseItems             ShowcaseItem[]     @relation("ShowcaseAuthor")
+  reviewedShowcaseItems     ShowcaseItem[]     @relation("ShowcaseReviewer")
+  announcements             Announcement[]
+  announcementReads         AnnouncementRead[]
   /// Кратко представяне на учителя за публичната витрина (по желание)
-  showcaseBio               String         @default("")
-  createdAt                 DateTime       @default(now())
-  updatedAt                 DateTime       @updatedAt
+  showcaseBio               String             @default("")
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
 
   @@index([kindergartenId])
 }
@@ -69,6 +71,7 @@ model Kindergarten {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   showcaseItems ShowcaseItem[]
+  announcements Announcement[]
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
@@ -298,4 +301,38 @@ model ShowcaseItem {
 
   @@index([kindergartenId, status, publishedAt])
   @@index([authorId, createdAt])
+}
+
+/// Обява от директора към екипа (напр. педагогически съвет, срок за документи, празник).
+model Announcement {
+  id             String             @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten       @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  authorId       String?
+  author         User?              @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  title          String
+  body           String
+  /// „Важно“ — учителите потвърждават, че са прочели
+  important      Boolean            @default(false)
+  /// Закачена най-горе
+  pinned         Boolean            @default(false)
+  /// Дата на събитието или срока (по желание)
+  eventDate      DateTime?
+  reads          AnnouncementRead[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([kindergartenId, createdAt])
+}
+
+/// Кой учител е прочел обявата и кога.
+model AnnouncementRead {
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime     @default(now())
+
+  @@id([announcementId, userId])
+  @@index([userId])
 }
