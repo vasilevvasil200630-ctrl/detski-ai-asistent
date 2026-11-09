@@ -9,6 +9,7 @@ import { isPrintable } from "@/services/printables";
 import { AGE_SHORT, directionLabel, materialToText } from "@/services/materialText";
 import { GameKitSheets } from "@/components/print/GameKitSheets";
 import { LessonPrint } from "@/components/print/LessonSheet";
+import { WordButton } from "@/components/WordButton";
 import type { GeneratedGame, GeneratedLessonPlan, SavedMaterial } from "@/types";
 
 /** Изглед за печат на всеки материал от библиотеката: игра, план-конспект или материал за печат. */
@@ -54,6 +55,12 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         <Link href="/library" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900">
           <ArrowLeft className="h-4 w-4" aria-hidden /> Библиотека
         </Link>
+        <div className="flex flex-wrap gap-2">
+        <WordButton
+          source={{ kind: material.kind, title: material.title, ageGroup: material.ageGroup, direction: material.direction, content: material.content }}
+          label="Свали във Word"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+        />
         <button
           type="button"
           onClick={() => window.print()}
@@ -61,6 +68,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         >
           <Printer className="h-4 w-4" aria-hidden /> {material.kind === "GAME" && content?.kit ? "Печат на всичко" : "Принтирай"}
         </button>
+        </div>
       </div>
 
       {printable ? (

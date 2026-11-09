@@ -9,6 +9,7 @@ import { AgeGroup, GameFilterState, GameMode, GeneratedGame, GroupMood, PlayDura
 import { GameTaskPicker } from './games/GameTaskPicker';
 import { GameKitDialog, KitPrintPortal, printKit } from './games/GameKitDialog';
 import { setMaterialKit } from '@/lib/client/materials';
+import { WordButton } from './WordButton';
 import type { GameKit } from '../services/printables/types';
 import { GAME_MODE_ORDER, GAME_MODES, isValidTask, taskLine, tasksError } from '../services/gameTasks';
 import { AGE_GROUP_LABELS, AiSource, buildStructuredGameUserPrompt, DURATION_LABELS, generateKindergartenGames, LOCATION_LABELS, MOOD_LABELS, RESOURCE_LABELS } from '../services/aiEngine';
@@ -463,6 +464,10 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                         {copiedId === game.id ? <><Check className="w-3.5 h-3.5" /> Копирано!</> : <><Copy className="w-3.5 h-3.5" /> Копирай</>}
                       </button>
                       <button type="button" onClick={() => window.print()} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-indigo-800 border border-indigo-200 flex items-center justify-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Принтирай</button>
+                      <WordButton
+                        source={{ kind: 'GAME', title: game.title, ageGroup: filters.ageGroup, direction: game.tasks?.[0]?.direction ?? (filters.direction && filters.direction !== 'mixed' ? filters.direction : null), content: game }}
+                        className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center gap-1.5 disabled:opacity-60"
+                      />
                     </div>
                   </div>
                 </article>
