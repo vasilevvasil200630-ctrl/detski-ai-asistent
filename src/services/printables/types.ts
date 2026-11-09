@@ -9,6 +9,12 @@ export type PrintableType = 'worksheet' | 'verses' | 'letter';
 /** Картинка в работния лист — емоджи и думата за него (думата е за учителя и за задачите със звук). */
 export type Pic = { e: string; w: string };
 
+/** Клетка от „Открий разликите“: картинка (по желание по-голяма) или празно място. */
+export type DiffCell = (Pic & { big?: boolean }) | null;
+
+/** Рисунките за „Дорисувай половината“ (виж drawings.ts). */
+export type HalfShapeId = 'house' | 'tree' | 'heart' | 'butterfly' | 'apple' | 'mushroom' | 'tulip' | 'rocket' | 'car' | 'owl';
+
 export type WorksheetTask =
   /** Преброй картинките и огради числото */
   | { kind: 'count'; prompt: string; groups: { pic: Pic; count: number }[]; max: number }
@@ -23,7 +29,13 @@ export type WorksheetTask =
   /** Огради картинките, чиито имена започват със звука */
   | { kind: 'sound'; prompt: string; sound: string; pics: Pic[] }
   /** Нарисувай / оцвети в рамката */
-  | { kind: 'draw'; prompt: string };
+  | { kind: 'draw'; prompt: string }
+  /** Лабиринт: клетките са цифри 0–3 (+1 стена вдясно, +2 стена отдолу); вход горе вляво, изход долу вдясно */
+  | { kind: 'maze'; prompt: string; cols: number; rows: number; walls: string; start: Pic; end: Pic }
+  /** Открий разликите: две сцени с еднакво разположение, в дясната има `count` разлики */
+  | { kind: 'differences'; prompt: string; cols: number; rows: number; left: DiffCell[]; right: DiffCell[]; count: number }
+  /** Дорисувай половината: по пунктира (I–II гр.) или по точките в мрежа (III–IV гр.) */
+  | { kind: 'half'; prompt: string; shape: HalfShapeId; mode: 'trace' | 'grid' };
 
 export interface Worksheet {
   type: 'worksheet';
@@ -66,9 +78,19 @@ export interface ParentLetter {
 
 export type Printable = Worksheet | VersesSheet | ParentLetter;
 
+/** Какъв работен лист: смесен по направлението или цял лист от една рисувана задача. */
+export type WorksheetStyle = 'mixed' | 'maze' | 'differences' | 'half';
+
+export const WORKSHEET_STYLE_LABELS: Record<WorksheetStyle, string> = {
+  mixed: 'Смесени задачи',
+  maze: 'Лабиринти',
+  differences: 'Открий разликите',
+  half: 'Дорисувай половината',
+};
+
 /** Параметрите за генериране — едни и същи за сървъра и за вградения двигател. */
 export type PrintableRequest =
-  | { type: 'worksheet'; ageGroup: AgeGroup; direction: LessonDirection; topic: string }
+  | { type: 'worksheet'; ageGroup: AgeGroup; direction: LessonDirection; topic: string; style?: WorksheetStyle }
   | { type: 'verses'; ageGroup: AgeGroup; kind: VersesKind; topic: string }
   | {
       type: 'letter';
@@ -115,6 +137,9 @@ export const SHEET_KIND_LABELS: Record<SheetKind, string> = {
   trace: 'По пунктира',
   sound: 'Първият звук (III–IV гр.)',
   draw: 'Нарисувай и оцвети',
+  maze: 'Лабиринт',
+  differences: 'Открий разликите',
+  half: 'Дорисувай половината',
 };
 
 /** Карти с картинки за изрязване (за самата игра). */

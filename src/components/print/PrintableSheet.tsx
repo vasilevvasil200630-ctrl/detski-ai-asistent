@@ -1,6 +1,7 @@
 import { KG, KG_SIGNATURE } from "@/config/kindergarten";
 import type { ParentLetter, Pic, Printable, VersesSheet, Worksheet, WorksheetTask } from "@/services/printables";
 import { AGE_SHORT } from "@/services/materialText";
+import { DifferencesView, HalfView, MazeView } from "./DrawnTasks";
 
 /**
  * Листът за печат (A4): работен лист, стихчета/гатанки или писмо до родителите.
@@ -45,7 +46,7 @@ const TRACE_PATHS: Record<Extract<WorksheetTask, { kind: "trace" }>["shape"], st
     "M10 50 C30 50 40 15 55 15 C70 15 70 45 55 45 C40 45 60 50 90 50 C110 50 120 15 135 15 C150 15 150 45 135 45 C120 45 140 50 170 50 C190 50 200 15 215 15 C230 15 230 45 215 45 C200 45 220 50 250 50 C270 50 280 15 295 15 C310 15 310 45 295 45 C280 45 300 50 330 50 C350 50 360 15 375 15 C390 15 390 45 375 45 C360 45 380 50 410 50 C430 50 440 15 455 15 C470 15 470 45 455 45 C440 45 460 50 490 50",
 };
 
-function TaskBody({ task }: { task: WorksheetTask }) {
+function TaskBody({ task, compact }: { task: WorksheetTask; compact?: boolean }) {
   switch (task.kind) {
     case "count":
       return (
@@ -139,6 +140,12 @@ function TaskBody({ task }: { task: WorksheetTask }) {
       );
     case "draw":
       return <div className="h-56 rounded-xl border-2 border-dashed border-slate-300" aria-label="място за рисунка" />;
+    case "maze":
+      return <MazeView task={task} compact={compact} />;
+    case "differences":
+      return <DifferencesView task={task} compact={compact} />;
+    case "half":
+      return <HalfView task={task} compact={compact} />;
   }
 }
 
@@ -160,7 +167,7 @@ function WorksheetSheet({ ws }: { ws: Worksheet }) {
       <div className="mt-5 space-y-4">
         {ws.tasks.map((task, i) => (
           <TaskBox key={i} n={i + 1} prompt={task.prompt}>
-            <TaskBody task={task} />
+            <TaskBody task={task} compact={ws.tasks.length > 2} />
           </TaskBox>
         ))}
       </div>

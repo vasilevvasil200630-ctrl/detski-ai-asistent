@@ -1,7 +1,8 @@
 import type { AgeGroup, LessonDirection } from '../../types';
 import { DIRECTION_STANDARDS } from '../naredba5';
 import { MATCH_PAIRS, PATTERN_PICS, otherThemePics, themeFor } from './themes';
-import type { Pic, SheetKind, Worksheet, WorksheetTask } from './types';
+import type { Pic, SheetKind, Worksheet, WorksheetStyle, WorksheetTask } from './types';
+import { describeDifferences, differencesTask, halfTask, mazeTask } from './drawings';
 
 /**
  * Вграден генератор на работни листове (без връзка към модела). Всяко извикване разбърква
@@ -98,6 +99,8 @@ function soundTask(pics: Pic[]): WorksheetTask | null {
 
 const draw = (prompt: string): WorksheetTask => ({ kind: 'draw', prompt });
 
+const coin = () => Math.random() < 0.5;
+
 function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): WorksheetTask[] {
   const theme = themeFor(topic);
   const pics = theme.pics;
@@ -105,7 +108,8 @@ function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): Wor
   const older = age === '3' || age === '4';
   switch (direction) {
     case 'math':
-      return [countTask(pics, age), countMatchTask(pics, age), sequenceTask(pics, age), oddTask(pics, theme.id, older ? 3 : 2)];
+      // III–IV група: лабиринтът е очакван резултат („ориентира се … в квадратна мрежа, лабиринт“)
+      return [countTask(pics, age), countMatchTask(pics, age), sequenceTask(pics, age), older && coin() ? mazeTask(pics, age) : oddTask(pics, theme.id, older ? 3 : 2)];
     case 'bel': {
       const sound = older ? soundTask(pics) : null;
       return [
@@ -116,15 +120,15 @@ function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): Wor
       ];
     }
     case 'world':
-      return [oddTask(pics, theme.id, older ? 3 : 2), matchTask(MATCH_PAIRS.world, 'Свържи животното с това, което яде.', older ? 4 : 3), countTask(pics, age), draw(`Нарисувай какво научи за „${t}“.`)];
+      return [oddTask(pics, theme.id, older ? 3 : 2), matchTask(MATCH_PAIRS.world, 'Свържи животното с това, което яде.', older ? 4 : 3), coin() ? differencesTask(pics, otherThemePics(theme.id), age) : countTask(pics, age), draw(`Нарисувай какво научи за „${t}“.`)];
     case 'art':
-      return [sequenceTask([...PATTERN_PICS.art], age), traceTask(pics, age, 'Довърши шарката по пунктира и я оцвети.'), draw(`Нарисувай и оцвети „${t}“ с любимите си цветове.`), oddTask(pics, theme.id, 2)];
+      return [sequenceTask([...PATTERN_PICS.art], age), halfTask(theme.id, age), traceTask(pics, age, 'Довърши шарката по пунктира и я оцвети.'), draw(`Нарисувай и оцвети „${t}“ с любимите си цветове.`)];
     case 'music':
       return [countTask([...PATTERN_PICS.music.slice(0, 2), ...pics.slice(0, 2)], age), sequenceTask([...PATTERN_PICS.music], age), matchTask(MATCH_PAIRS.music, 'Свържи еднаквите инструменти.', older ? 4 : 3), draw('Нарисувай инструмента, на който искаш да свириш.')];
     case 'construct':
       return [matchTask(MATCH_PAIRS.construct, 'Свържи човека с инструмента, с който работи.', older ? 4 : 3), sequenceTask([...PATTERN_PICS.construct], age), countTask([...PATTERN_PICS.construct], age), draw(`Нарисувай какво би построил/а за „${t}“.`)];
     case 'pe':
-      return [traceTask(pics, age, 'Помогни да стигне до другата картинка — следвай пътечката.'), sequenceTask([...PATTERN_PICS.pe], age), countTask(pics, age), draw('Нарисувай любимата си игра навън.')];
+      return [older && coin() ? mazeTask(pics, age) : traceTask(pics, age, 'Помогни да стигне до другата картинка — следвай пътечката.'), sequenceTask([...PATTERN_PICS.pe], age), countTask(pics, age), draw('Нарисувай любимата си игра навън.')];
     case 'bdp':
       return [sequenceTask([...PATTERN_PICS.bdp], age), matchTask(MATCH_PAIRS.bdp, 'Свържи превозното средство с мястото, където се движи.', older ? 4 : 3), oddTask(themeFor('транспорт').pics, 'transport', 2), draw('Нарисувай светофар и оцвети светлините му в правилния ред.')];
   }
@@ -138,6 +142,7 @@ function answersNote(tasks: WorksheetTask[]): string[] {
     if (task.kind === 'odd') out.push(`${n}. ${task.rows.map((r) => r.items[r.odd]!.w).join(', ')}.`);
     if (task.kind === 'sound') out.push(`${n}. ${task.pics.filter((p) => p.w.charAt(0).toUpperCase() === task.sound).map((p) => p.w).join(', ')}.`);
     if (task.kind === 'match' && task.prompt.includes('число')) out.push(`${n}. Групите се свързват с числото, равно на броя на картинките.`);
+    if (task.kind === 'differences') out.push(`${n}. ${describeDifferences(task).join('; ')}.`);
   });
   return out;
 }
@@ -171,7 +176,40 @@ function kindTask(kind: SheetKind, age: AgeGroup, direction: LessonDirection, to
       return older ? soundTask(pics) : null;
     case 'draw':
       return draw(`Нарисувай и оцвети любимия си момент от играта „${t}“.`);
+    case 'maze':
+      return mazeTask(pics, age);
+    case 'differences':
+      return differencesTask(pics, otherThemePics(theme.id), age);
+    case 'half':
+      return halfTask(theme.id, age);
   }
+}
+
+/** Защо са тези задачи — за бележката на учителя (Наредба № 5). */
+export const DRAWN_GOALS: Partial<Record<WorksheetTask['kind'], string>> = {
+  maze: 'Лабиринтът упражнява ориентирането в двумерното пространство („Математика“ — „Пространствени отношения“) и движението на ръката с молив.',
+  differences: '„Открий разликите“ развива зрителното внимание и сравняването на обекти по признаци.',
+  half: 'Дорисуването на половината упражнява симетрията, ориентирането в квадратна мрежа и графомоториката — подготовка за писане.',
+};
+
+/** Цял лист от една рисувана задача (два лабиринта, две двойки картинки, две рисунки) — само вграденият двигател. */
+export function buildStyledWorksheet(age: AgeGroup, direction: LessonDirection, topic: string, style: Exclude<WorksheetStyle, 'mixed'>): Worksheet {
+  const theme = themeFor(topic);
+  const pics = theme.pics;
+  let tasks: WorksheetTask[];
+  if (style === 'maze') {
+    const other = shuffle(pics);
+    tasks = [mazeTask(other.slice(0, 4), age), mazeTask(other.slice(4).length >= 2 ? other.slice(4) : other, age)];
+  } else if (style === 'differences') {
+    tasks = [differencesTask(pics, otherThemePics(theme.id), age), differencesTask(shuffle(pics), otherThemePics(theme.id), age)];
+  } else {
+    const first = halfTask(theme.id, age);
+    tasks = [first, halfTask(theme.id, age, first.kind === 'half' ? first.shape : undefined)];
+  }
+  const t = topic.trim();
+  const label = { maze: 'Лабиринти', differences: 'Открий разликите', half: 'Дорисувай половината' }[style];
+  const ws = finishWorksheet(age, direction, topic, tasks);
+  return { ...ws, title: t ? `${label}: ${t}` : label };
 }
 
 /** Работен лист от видовете задачи, които учителят е избрал (в същия ред). */
@@ -183,6 +221,7 @@ export function buildWorksheetFromKinds(age: AgeGroup, direction: LessonDirectio
 function finishWorksheet(age: AgeGroup, direction: LessonDirection, topic: string, tasks: WorksheetTask[]): Worksheet {
   const dirLabel = direction === 'bdp' ? 'Безопасност на движението по пътищата' : DIRECTION_STANDARDS[direction].label;
   const answers = answersNote(tasks);
+  const goals = [...new Set(tasks.map((x) => DRAWN_GOALS[x.kind]).filter(Boolean))];
   return {
     type: 'worksheet',
     title: topic.trim() ? `Работен лист: ${topic.trim()}` : `Работен лист по ${dirLabel.toLowerCase()}`,
@@ -192,6 +231,7 @@ function finishWorksheet(age: AgeGroup, direction: LessonDirection, topic: strin
     tasks,
     teacherNote: [
       `Направление: ${dirLabel}. Задачите следват очакваните резултати за групата по Наредба № 5; учителят прочита условието на глас.`,
+      ...goals,
       ...(answers.length ? ['Отговори: ' + answers.join(' ')] : []),
     ].join(' '),
   };

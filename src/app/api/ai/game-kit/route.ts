@@ -18,7 +18,7 @@ const Params = z.object({
   direction: DIRECTION,
   topic: z.string().trim().max(120).default(""),
   parts: z.array(z.enum(["worksheet", "cards", "poster", "parent", "supplies"])).min(1).max(5),
-  sheetKinds: z.array(z.enum(["count", "match", "odd", "sequence", "trace", "sound", "draw"])).max(4).default([]),
+  sheetKinds: z.array(z.enum(["count", "match", "odd", "sequence", "trace", "sound", "draw", "maze", "differences", "half"])).max(4).default([]),
   resources: z.string().trim().max(200).optional(),
   game: z.object({
     title: z.string().trim().min(1).max(160),
