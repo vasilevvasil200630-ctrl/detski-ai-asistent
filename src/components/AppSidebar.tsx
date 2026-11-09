@@ -25,6 +25,7 @@ import {
   Store,
   FolderHeart,
   Megaphone,
+  CalendarRange,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { performSignOut } from "@/lib/session-cache";
@@ -54,6 +55,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/games", label: "Магическа кутия с игри", icon: Dices },
       { href: "/materials", label: "Материали за печат", icon: Printer },
       { href: "/dos", label: "ДОС план-конспект", icon: Rocket },
+      { href: "/plan", label: "Тематично разпределение", icon: CalendarRange },
       { href: "/prompts", label: "Златни промптове", icon: BookMarked },
     ],
   },

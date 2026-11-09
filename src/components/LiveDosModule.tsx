@@ -87,12 +87,27 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(defaultAgeGroup ?? '3');
   const [source, setSource] = useState<AiSource | null>(null);
   useEffect(() => {
-    if (defaultAgeGroup) setAgeGroup(defaultAgeGroup);
+    // Групата от тематичното разпределение (?group=) е с предимство пред групата от профила
+    if (defaultAgeGroup && !new URLSearchParams(window.location.search).get('group')) setAgeGroup(defaultAgeGroup);
   }, [defaultAgeGroup]);
   const [direction, setDirection] = useState<LessonDirection>('world');
   // Празно = AI избира най-подходящото официално ядро за темата
   const [core, setCore] = useState<string>('');
   const [topic, setTopic] = useState<string>('Есен в гората');
+  // От тематичното разпределение: /dos?dir=math&core=…&topic=…&group=2 попълва формата
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const dir = q.get('dir');
+    const dirs: LessonDirection[] = ['bel', 'math', 'world', 'art', 'music', 'construct', 'pe', 'bdp'];
+    const found = dirs.find((d) => d === dir);
+    if (found) setDirection(found);
+    const qCore = q.get('core');
+    if (qCore && found && found !== 'bdp' && DIRECTION_STANDARDS[found].cores.includes(qCore)) setCore(qCore);
+    const qTopic = q.get('topic');
+    if (qTopic) setTopic(qTopic.slice(0, 120));
+    const g = q.get('group');
+    if (g === '1' || g === '2' || g === '3' || g === '4') setAgeGroup(g);
+  }, []);
   const isBdp = direction === 'bdp';
   const dirStd = direction === 'bdp' ? null : DIRECTION_STANDARDS[direction];
   // При БДП вместо ядро се избира тема от програмата на МОН за групата
