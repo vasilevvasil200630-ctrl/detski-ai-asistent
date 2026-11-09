@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CalendarHeart, Cloud, CloudUpload, Dices, Download, FileText, KeyRound, Loader2, NotebookPen, Printer } from "lucide-react";
+import { ArrowRight, CalendarClock, CalendarHeart, Camera, Cloud, CloudUpload, Dices, Download, FileText, KeyRound, Loader2, NotebookPen, Printer } from "lucide-react";
 import type { SavedMaterial, SessionTeacher } from "@/types";
 import { fetchMaterials } from "@/lib/client/materials";
 import { cloudDownloadUrl, listCloudFiles } from "@/lib/client/cloud";
@@ -68,6 +68,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
   const actions = [
     { href: "/games", label: "Нови игри", icon: Dices },
     { href: "/cloud", label: "Общ облак", icon: Cloud },
+    { href: "/showcase?new=1", label: "Днес в групата", icon: Camera },
     { href: "/materials", label: "Материали за печат", icon: Printer },
     { href: "/dos", label: "План-конспект", icon: FileText },
     { href: "/holidays", label: "Празници", icon: CalendarHeart },

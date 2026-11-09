@@ -24,6 +24,8 @@ export interface ShowcaseItemView {
   /** Копието на материала (игра, план-конспект или материал за печат) */
   content: unknown;
   images: { id: string; url: string }[];
+  /** „Днес в групата“: дейност от деня (разказ и снимки), не материал от библиотеката */
+  activity: boolean;
   allowPrint: boolean;
   status: ShowcaseStatus;
   reviewNote: string | null;
@@ -37,6 +39,12 @@ export const SHOWCASE_STATUS_LABELS: Record<ShowcaseStatus, string> = {
   APPROVED: "На витрината",
   RETURNED: "Върнато за промяна",
 };
+
+/** Вид и знак за картите: дейност от деня или вида на материала. */
+export function showcaseKind(item: Pick<ShowcaseItemView, "kind" | "activity">): { label: string; emoji: string } {
+  if (item.activity) return { label: "Днес в групата", emoji: "📷" };
+  return { GAME: { label: "Игра", emoji: "🎲" }, LESSON: { label: "Педагогическа ситуация", emoji: "📋" }, MATERIAL: { label: "Материал", emoji: "📝" } }[item.kind];
+}
 
 export const STORY_MIN = 20;
 export const STORY_MAX = 1500;
