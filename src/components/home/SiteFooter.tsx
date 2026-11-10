@@ -7,7 +7,7 @@ import { KG, KG_SIGNATURE } from "@/config/kindergarten";
 
 /** Долната част за гостите (родителите): какво има за тях, входът за учители и правните страници. */
 const LINKS = [
-  { title: "За родителите", items: [["/grupi", "Нашите групи"], ["/vitrina", "Дейности с децата"], ["/", "Предстоящи празници"]] },
+  { title: "За родителите", items: [["/grupi", "Нашите групи"], ["/vitrina", "Дейности с децата"], ["/", "Предстоящи празници"], [KG.officialSite, "Официалният сайт"]] },
   { title: "За учителите", items: [["/login", "Вход за учители"]] },
   { title: "Справка", items: [["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
 ] as const;
@@ -15,11 +15,15 @@ const LINKS = [
 const FEEDBACK_BUTTON = "cursor-pointer text-left hover:text-slate-800 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
 
 /** Долната част на сайта: навигация, нормативна основа, правни страници и обратна връзка. */
-export function SiteFooter({ compact = false }: { compact?: boolean }) {
+export function SiteFooter({ compact = false, guest = false }: { compact?: boolean; guest?: boolean }) {
   const year = new Date().getFullYear();
+  // За родителите: поляната с цветя и оранжевата линия от официалния сайт
+  const meadow = guest ? <div aria-hidden className={`kg-meadow ${compact ? "h-14 sm:h-20" : "h-20 sm:h-28"}`} /> : null;
   if (compact) {
     return (
-      <footer className="no-print border-t border-slate-200 px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8">
+      <>
+      {meadow}
+      <footer className={`no-print px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8 ${guest ? "border-t-4 border-kg-orange" : "border-t border-slate-200"}`}>
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <span>© {year} {KG_SIGNATURE} · Учителски облак · Съобразено с Наредба № 5</span>
           <nav aria-label="Връзки в долната част" className="flex flex-wrap gap-4">
@@ -32,15 +36,18 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
           </nav>
         </div>
       </footer>
+      </>
     );
   }
   return (
-    <footer className="no-print border-t border-slate-200 bg-white">
+    <>
+    {meadow}
+    <footer className={`no-print bg-white ${guest ? "border-t-4 border-kg-orange" : "border-t border-slate-200"}`}>
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.3fr_repeat(3,1fr)]">
         <div>
           <Link href="/" className="flex items-center gap-2.5">
-            <LogoIcon className="h-8 w-8" />
-            <LogoWordmark className="text-base" />
+            <LogoIcon className="h-12 w-auto" />
+            <LogoWordmark className="text-lg" withVillage />
           </Link>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
             {KG.fullName}, {KG.village}. Игри, дейности и празници от нашите групи — по Наредба № 5 за предучилищното образование.
@@ -52,9 +59,15 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
             <ul className="mt-3 space-y-2 text-sm">
               {group.items.map(([href, label]) => (
                 <li key={href}>
-                  <Link href={href} className="text-slate-600 hover:text-[#0a4b82]">
-                    {label}
-                  </Link>
+                  {href.startsWith("http") ? (
+                    <a href={href} className="text-slate-600 hover:text-[#0a4b82]">
+                      {label}
+                    </a>
+                  ) : (
+                    <Link href={href} className="text-slate-600 hover:text-[#0a4b82]">
+                      {label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -70,5 +83,6 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         </div>
       </div>
     </footer>
+    </>
   );
 }

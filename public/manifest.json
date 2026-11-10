@@ -9,16 +9,78 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
-    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Магическа кутия с игри", "short_name": "Игри", "url": "/games", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
-    { "name": "План-конспект по ДОС", "short_name": "ДОС план", "url": "/dos", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
-    { "name": "Моята библиотека", "short_name": "Библиотека", "url": "/library", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] },
-    { "name": "Материали за печат", "short_name": "Печат", "url": "/materials", "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }] }
+    {
+      "name": "Магическа кутия с игри",
+      "short_name": "Игри",
+      "url": "/games",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "План-конспект по ДОС",
+      "short_name": "ДОС план",
+      "url": "/dos",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Моята библиотека",
+      "short_name": "Библиотека",
+      "url": "/library",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Материали за печат",
+      "short_name": "Печат",
+      "url": "/materials",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

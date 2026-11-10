@@ -1,13 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { LogoIcon, LogoWordmark } from "@/components/Logo";
+import { usePathname } from "next/navigation";
+import { ExternalLink } from "lucide-react";
+import { LogoIcon } from "@/components/Logo";
 import { KG } from "@/config/kindergarten";
 import { SiteFooter } from "./SiteFooter";
 
+/** Менюто за родителите — в жълтата лента като на официалния сайт */
+const NAV = [
+  { href: "/", label: "Начало", match: (p: string) => p === "/" },
+  { href: "/grupi", label: "Групи", match: (p: string) => p.startsWith("/grupi") },
+  { href: "/vitrina", label: "Дейности", match: (p: string) => p.startsWith("/vitrina") },
+] as const;
+
+const NAV_LINK =
+  "font-hand shrink-0 whitespace-nowrap rounded-lg px-2.5 py-1 text-xl text-kg-yellow-ink transition-colors duration-150 hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kg-yellow-ink sm:px-3.5 sm:text-2xl";
+
 /**
- * Рамката на сайта за родителите и гостите: марката на градината, „Дейности“ и малка връзка
- * „Вход за учители“. Менюто с инструментите се показва едва след вход — облакът е затворен.
+ * Рамката на сайта за родителите и гостите — продължение на официалния сайт на градината:
+ * същото лого, небето с облаци, ръкописното заглавие и жълтата лента с менюто.
+ * Менюто с инструментите се показва едва след вход — облакът е затворен.
  */
 export function GuestShell({
   children,
@@ -20,40 +33,47 @@ export function GuestShell({
   variant?: "site" | "showcase";
 }) {
   void variant;
+  const pathname = usePathname() ?? "/";
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      <header className="border-b border-slate-200 print:hidden">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5" aria-label={`${KG.siteName} — начало`}>
-            <LogoIcon className="h-9 w-9" />
-            <LogoWordmark className="text-lg" withVillage />
-          </Link>
-          <nav aria-label="Основно меню" className="flex items-center gap-0.5 sm:gap-2">
-            <Link
-              href="/grupi"
-              className="rounded-lg px-1.5 py-2 text-sm font-semibold text-[#0a4b82] transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:px-3"
-            >
-              Групи
+    <div className="kg-site flex min-h-screen flex-col bg-white text-slate-900">
+      <header className="print:hidden">
+        <div className="kg-sky">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
+            <Link href="/" className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:gap-4" aria-label={`${KG.siteName} — начало`}>
+              <LogoIcon className="h-14 w-auto shrink-0 sm:h-20" priority />
+              <span className="flex min-w-0 flex-col">
+                <span className="font-hand text-[2rem] leading-none text-kg-green-ink [text-shadow:0_1px_0_rgb(255_255_255/0.9)] sm:text-[2.75rem]">{KG.name}</span>
+                <span className="font-hand mt-1 text-lg leading-tight text-slate-700 sm:truncate sm:text-2xl">{KG.tagline}</span>
+              </span>
             </Link>
-            <Link
-              href="/vitrina"
-              className="rounded-lg px-1.5 py-2 text-sm font-semibold text-[#0a4b82] transition-colors duration-150 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:px-3"
+            <a
+              href={KG.officialSite}
+              className="hidden shrink-0 items-center gap-1.5 rounded-xl bg-white/80 px-3 py-2 text-sm font-semibold text-[#0a4b82] shadow-sm ring-1 ring-slate-200/70 transition-colors hover:bg-white md:inline-flex"
             >
-              Дейности
-            </Link>
-            <Link
-              href="/login"
-              className="whitespace-nowrap rounded-lg px-1.5 py-2 text-sm font-medium text-slate-500 sm:px-3 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
-            >
+              Официален сайт <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+            </a>
+          </div>
+        </div>
+        <nav aria-label="Основно меню" className="bg-kg-yellow shadow-[0_1px_2px_rgb(0_0_0/0.25)]">
+          <div className="no-scrollbar mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-3 py-1.5 sm:px-5">
+            {NAV.map((item) => {
+              const active = item.match(pathname);
+              return (
+                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`${NAV_LINK} ${active ? "bg-white/70" : ""}`}>
+                  {item.label}
+                </Link>
+              );
+            })}
+            <Link href="/login" className={`${NAV_LINK} ml-auto ${pathname === "/login" ? "bg-white/70" : ""}`}>
               <span className="sm:hidden">Вход</span>
               <span className="hidden sm:inline">Вход за учители</span>
             </Link>
-          </nav>
-        </div>
+          </div>
+        </nav>
       </header>
       <div className="flex-1">{children}</div>
       <div className="print:hidden">
-        <SiteFooter compact={footer === "compact"} />
+        <SiteFooter compact={footer === "compact"} guest />
       </div>
     </div>
   );

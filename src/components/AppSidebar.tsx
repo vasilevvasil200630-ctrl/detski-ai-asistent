@@ -137,20 +137,20 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } md:sticky md:top-0 md:translate-x-0 ${width}`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-slate-200/75 px-4">
+        <div className="flex h-16 items-center justify-between border-b-[3px] border-kg-yellow px-4">
           {!collapsed && (
             <Link href="/" className="group flex items-center gap-2.5" onClick={onCloseMobile}>
-              <LogoIcon className="h-8 w-8 shrink-0 transition-transform" />
+              <LogoIcon className="h-11 w-auto shrink-0 transition-transform" />
               <LogoWordmark withVillage />
             </Link>
           )}
           {collapsed && (
             <Link
               href="/"
-              className="mx-auto flex h-8 w-8 items-center justify-center transition-colors"
+              className="mx-auto flex h-10 w-10 items-center justify-center transition-colors"
               title="ДГ „Пролет“ — Начало"
             >
-              <LogoIcon className="h-8 w-8 shrink-0" />
+              <LogoIcon className="h-10 w-auto shrink-0" />
             </Link>
           )}
           <button

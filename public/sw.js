@@ -4,9 +4,9 @@
  * запазена версия на страницата или /offline.html. API заявките винаги отиват към сървъра.
  */
 
-const CACHE_NAME = "detski-pwa-v2";
+const CACHE_NAME = "detski-pwa-v3";
 
-const PRECACHE_ASSETS = ["/", "/offline.html", "/manifest.json", "/icon-192.svg", "/icon-512.svg"];
+const PRECACHE_ASSETS = ["/", "/offline.html", "/manifest.json", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

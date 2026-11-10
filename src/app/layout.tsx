@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/AppShell";
@@ -22,6 +22,14 @@ const geistMono = Geist_Mono({
   preload: true,
 });
 
+// Ръкописният шрифт на официалния сайт на градината (dg-yagodovo.com) — за марката и заглавията
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "700"],
+  display: "swap",
+});
+
 const SITE_DESCRIPTION =
   "Учителският облак на ДГ „Пролет“, с. Ягодово: игри, работни листове, стихчета, писма до родителите, грамоти и план-конспекти за печат. Съобразено с Наредба № 5 за предучилищното образование.";
 
@@ -35,7 +43,7 @@ export const metadata: Metadata = {
   applicationName: "ДГ „Пролет“",
   manifest: "/manifest.json",
   appleWebApp: { capable: true, title: "ДГ „Пролет“", statusBarStyle: "default" },
-  icons: { apple: "/icon-192.svg" },
+  icons: { apple: "/apple-touch-icon.png" },
   keywords: ["ДГ Пролет", "Ягодово", "детска градина", "учители", "план-конспект", "ДОС", "ситуационни игри", "Наредба № 5", "Златно ключе", "предучилищно образование"],
   openGraph: {
     title: "Учителски облак · ДГ „Пролет“, с. Ягодово",
@@ -55,7 +63,7 @@ export default function RootLayout({
     <html
       lang="bg"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full antialiased`}
     >
       <head>
         <meta name="theme-color" content="#ffffff" />

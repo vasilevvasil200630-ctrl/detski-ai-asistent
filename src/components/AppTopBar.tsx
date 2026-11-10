@@ -69,7 +69,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
   return (
     <header
       data-app-topbar
-      className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-slate-200/75 bg-white/95 px-3 sm:px-4 backdrop-blur-md"
+      className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b-[3px] border-kg-yellow bg-white/95 px-3 sm:px-4 backdrop-blur-md"
     >
       <div className="flex min-w-0 items-center gap-2">
         <button
@@ -90,7 +90,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
           {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
         <Link href="/" className="flex items-center gap-2.5 md:hidden group" aria-label="ДГ „Пролет“ — Начало">
-          <LogoIcon className="h-8 w-8 shrink-0" />
+          <LogoIcon className="h-10 w-auto shrink-0" />
           <LogoWordmark className="hidden text-base sm:inline-flex" withVillage />
         </Link>
       </div>
