@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [needsCode, setNeedsCode] = useState<boolean | null>(null);
   const [open, setOpen] = useState(true);
+  // Директорът ползва списък с разрешени имейли — код не е нужен, но имейлът трябва да е в списъка
+  const [byEmail, setByEmail] = useState(false);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,9 +49,10 @@ export default function RegisterPage() {
   useEffect(() => {
     fetch("/api/auth/register")
       .then((r) => r.json())
-      .then((d: { needsCode?: boolean; open?: boolean }) => {
+      .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean }) => {
         setNeedsCode(d.needsCode !== false);
         setOpen(d.open !== false);
+        setByEmail(d.byEmail === true);
       })
       .catch(() => setNeedsCode(true));
   }, []);
@@ -114,7 +117,7 @@ export default function RegisterPage() {
           <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             Регистрацията на нови учители в {KG.name} е затворена — екипът вече е в облака. Ако сте нов колега, обърнете се
-            към директора: той ще я отвори за вас.
+            към директора — ще я отвори за вас.
           </p>
           <p className="text-sm leading-relaxed text-slate-600">
             Родител или гост? Не ви трябва профил —{" "}
@@ -139,6 +142,12 @@ export default function RegisterPage() {
                   autoComplete="off"
                   required
                 />
+              ) : byEmail ? (
+                <p className="flex items-start gap-2 rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm leading-relaxed text-sky-900">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  Регистрацията е само с имейл, който директорът е добавил в списъка на {KG.name}. Използвайте същия имейл, който сте дали
+                  на директора.
+                </p>
               ) : (
                 <p className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm leading-relaxed text-emerald-900">
                   <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
