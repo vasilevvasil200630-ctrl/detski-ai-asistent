@@ -196,8 +196,8 @@ export default function RegisterPage() {
                 Със създаването на профила приемате{" "}
                 <Link href="/terms" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
                   условията за ползване
-                </Link>{" "}
-                и{" "}
+                </Link>
+                . Как обработваме данните ви, включително имейл адреса, е описано в{" "}
                 <Link href="/privacy" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
                   политиката за поверителност
                 </Link>

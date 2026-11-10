@@ -222,6 +222,12 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
                 placeholder="petrova@abv.bg"
                 className={FIELD}
               />
+              <p className="mt-1 text-xs text-slate-500">
+                Ползваме го само за да ви отговорим и го пазим до две години.{" "}
+                <a href="/privacy#email" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+                  Поверителност
+                </a>
+              </p>
             </div>
 
             {/* Honeypot: невидимо за хора, ботовете го попълват */}

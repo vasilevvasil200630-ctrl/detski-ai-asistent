@@ -27,6 +27,8 @@ export async function createEmailToken(purpose: EmailTokenPurpose, userId: strin
   const identifier = identifierFor(purpose, userId);
   await prisma.$transaction([
     prisma.verificationToken.deleteMany({ where: { identifier } }),
+    // Изтеклите линкове на всички потребители не се пазят (срок на съхранение по политиката)
+    prisma.verificationToken.deleteMany({ where: { expires: { lt: new Date() } } }),
     prisma.verificationToken.create({
       data: { identifier, token: hashToken(raw), expires: new Date(Date.now() + EMAIL_TOKEN_TTL_MS[purpose]) },
     }),

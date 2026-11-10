@@ -60,6 +60,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Съобщението не беше изпратено. Опитайте отново или пишете на ${EMAIL_CONFIG.supportEmail}.` }, { status: 502 });
   }
 
+  // Срок на съхранение по политиката за поверителност: обратната връзка и имейлът в нея — до две години
+  const TWO_YEARS_MS = 2 * 365 * 24 * 60 * 60 * 1000;
+  await prisma.feedback
+    .deleteMany({ where: { createdAt: { lt: new Date(Date.now() - TWO_YEARS_MS) } } })
+    .catch((err) => console.warn("[feedback] Старите съобщения не бяха изтрити:", err instanceof Error ? err.message : err));
+
   const apiKey = getResendApiKey();
   if (apiKey) {
     const stars = "★".repeat(rating) + "☆".repeat(5 - rating);
