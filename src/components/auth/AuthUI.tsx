@@ -2,7 +2,6 @@
 
 import React, { useId, useState } from "react";
 import { AlertCircle, Check, Eye, EyeOff, Loader2 } from "lucide-react";
-import { LogoIcon } from "@/components/Logo";
 
 // Копирано от МатураПлюс (src/components/auth/AuthUI.tsx): обвивка с фина мрежа, полета с
 // видими фокус/грешка състояния, бутон със зареждане, грешка и стъпки. Без Google и бухала.
@@ -34,9 +33,7 @@ export function AuthShell({
       style={GRID_STYLE}
     >
       <div className="w-full max-w-md">
-        <div className="mb-4 flex justify-center">
-          <LogoIcon className="h-20 w-20 drop-shadow-sm" />
-        </div>
+        {/* Логото и името са в горната част на сайта (както на официалния сайт) */}
         <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900">
           <h1 className="text-center text-2xl font-bold tracking-tight text-balance text-slate-900 dark:text-slate-50">
             {title}

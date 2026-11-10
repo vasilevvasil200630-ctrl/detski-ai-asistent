@@ -81,7 +81,7 @@ export function ReminderCenter() {
       const note = new Notification(todo.length === 1 ? `Напомняне: ${noteLabel(first)}` : `Имате ${todo.length} напомняния`, {
         body: todo.length === 1 ? dueText(first) : todo.slice(0, 3).map((n) => `• ${noteLabel(n)} — ${dueText(n)}`).join("\n"),
         tag: "detski-reminders",
-        icon: "/icon-192.svg",
+        icon: "/icon-192.png",
       });
       note.onclick = () => {
         window.focus();

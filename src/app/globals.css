@@ -35,6 +35,16 @@
   /* Слънчев акцент (капакът на кутията в логото, награди) */
   --brand-sun: #f59e0b;
 
+  /* Цветовете на официалния сайт на ДГ „Пролет“ (dg-yagodovo.com): жълтото меню, зеленото
+     заглавие и оранжевите акценти. За текст са по-тъмните „ink“ варианти (контраст поне 4.5:1). */
+  --kg-yellow: #faca04;
+  --kg-yellow-ink: #3d2f00;
+  --kg-green: #74a710;
+  --kg-green-ink: #4d7a0a;
+  --kg-orange: #ff5300;
+  --kg-orange-ink: #c43d00;
+  --kg-cream: #fffeea;
+
   --primary: #0a4b82;
   --primary-foreground: #ffffff;
   --accent-rose: #e11d48;
@@ -58,6 +68,14 @@
   --color-brand-leaf-soft: var(--brand-leaf-soft);
 
   --color-brand-sun: var(--brand-sun);
+
+  --color-kg-yellow: var(--kg-yellow);
+  --color-kg-yellow-ink: var(--kg-yellow-ink);
+  --color-kg-green: var(--kg-green);
+  --color-kg-green-ink: var(--kg-green-ink);
+  --color-kg-orange: var(--kg-orange);
+  --color-kg-orange-ink: var(--kg-orange-ink);
+  --color-kg-cream: var(--kg-cream);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -110,6 +128,8 @@
 
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Ръкописният шрифт на официалния сайт — за марката и заглавията */
+  --font-hand: var(--font-caveat), "Segoe Print", "Comic Sans MS", cursive;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --animate-float: float 4s ease-in-out infinite;
@@ -221,6 +241,48 @@ select,
 textarea,
 .touch-manipulation {
   touch-action: manipulation;
+}
+
+/* ============================================================ */
+/* ОФИЦИАЛНИЯТ САЙТ НА ГРАДИНАТА: ръкописен шрифт, небе и поляна */
+/* ============================================================ */
+
+/* Caveat е по-дребен от Geist при същия размер — font-size-adjust изравнява височината на буквите */
+.font-hand,
+.kg-site h1,
+.kg-site h2.text-2xl,
+.kg-site h2.text-xl {
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* Заглавията на страниците за родителите — оранжеви, като на официалния сайт */
+.kg-site h1 {
+  color: var(--kg-orange-ink);
+}
+
+/* Небето с облаци от официалния сайт зад горната част, с бял воал за четимост */
+.kg-sky {
+  background-color: #dff1fb;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
+    url("/brand/sky.webp");
+  background-size: cover;
+  background-position: center top;
+}
+
+/* Поляната с цветя над долната част на сайта */
+.kg-meadow {
+  background-image: url("/brand/meadow.webp");
+  background-size: cover;
+  background-position: center top;
+}
+
+/* Марката „ДГ „Пролет““ в тъмен режим — по-светло зелено */
+.dark .kg-wordmark {
+  color: #9bd33a;
 }
 
 /* Фон на приложението — като bg-shield-ambient в МатураПлюс, но с топло слънчево осветяване */

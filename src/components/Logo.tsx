@@ -1,36 +1,18 @@
 import React from "react";
+import Image from "next/image";
 import { KG } from "@/config/kindergarten";
 
-// Същата структура като Logo.tsx в МатураПлюс (LogoIcon + текстова марка с два цвята),
-// но с емблема за детската градина: вълшебна кутия с излитаща звезда.
+// Логото е същото като на официалния сайт на ДГ „Пролет“ (dg-yagodovo.com): дървото с ръчички и децата.
+// Марката е с ръкописния шрифт и зеленото на официалния сайт.
 
-export interface LogoIconProps extends React.SVGProps<SVGSVGElement> {
+export interface LogoIconProps {
   className?: string;
+  /** За логото над формата за вход — зарежда се веднага */
+  priority?: boolean;
 }
 
-export const LogoIcon = React.memo(function LogoIcon({ className = "h-8 w-8", ...props }: LogoIconProps) {
-  return (
-    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden {...props}>
-      {/* Кутия */}
-      <rect x="16" y="46" width="68" height="44" rx="10" fill="#0a4b82" />
-      <rect x="16" y="46" width="68" height="12" rx="6" fill="#083861" />
-      {/* Панделка */}
-      <rect x="45" y="46" width="10" height="44" fill="#f59e0b" />
-      {/* Отворен капак */}
-      <path d="M12 40L50 30L88 40L86 48H14Z" fill="#0e5e9e" />
-      {/* Звезда, която излита */}
-      <path
-        d="M50 4l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L50 27.6l-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z"
-        fill="#f59e0b"
-        stroke="#b45309"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      {/* Листенце (растеж) */}
-      <path d="M70 22c8-1 13 3 14 9-7 1-12-2-14-9z" fill="#1ea858" />
-      <path d="M30 22c-8-1-13 3-14 9 7 1 12-2 14-9z" fill="#1ea858" opacity="0.75" />
-    </svg>
-  );
+export const LogoIcon = React.memo(function LogoIcon({ className = "h-8 w-8", priority = false }: LogoIconProps) {
+  return <Image src={KG.logo} alt="" aria-hidden width={124} height={135} priority={priority} className={`object-contain ${className}`} />;
 });
 
 export interface LogoProps {
@@ -47,15 +29,12 @@ export default React.memo(function Logo({ className = "h-9 w-auto", showText = t
   );
 });
 
-/** Марката на облака: „ДГ „Пролет““ и по желание селото на втори ред. */
+/** Марката на облака: „ДГ „Пролет““ с ръкописния шрифт и по желание селото на втори ред. */
 export function LogoWordmark({ className = "text-base", withVillage = false }: { className?: string; withVillage?: boolean }) {
   return (
-    <span className={`inline-flex flex-col leading-tight ${className}`}>
-      <span className="whitespace-nowrap font-sans font-bold tracking-tight">
-        <span className="text-[#0a4b82]">ДГ</span>
-        <span className="text-[#1ea858]"> „Пролет“</span>
-      </span>
-      {withVillage && <span className="whitespace-nowrap text-[0.7em] font-medium text-slate-500">{KG.village}</span>}
+    <span className={`inline-flex flex-col leading-none ${className}`}>
+      <span className="kg-wordmark font-hand whitespace-nowrap text-[1.35em] leading-[1.05] text-kg-green-ink">{KG.name}</span>
+      {withVillage && <span className="mt-1 whitespace-nowrap font-sans text-[0.7em] font-medium tracking-tight text-slate-500">{KG.village}</span>}
     </span>
   );
 }
