@@ -1,6 +1,6 @@
 import type { AgeGroup, LessonDirection } from '../../types';
 import { DIRECTION_STANDARDS } from '../naredba5';
-import { MATCH_PAIRS, PATTERN_PICS, otherThemePics, themeFor } from './themes';
+import { MATCH_PAIRS, PATTERN_PICS, THEMES, otherThemePics, themeFor } from './themes';
 import type { Pic, SheetKind, Worksheet, WorksheetStyle, WorksheetTask } from './types';
 import { describeDifferences, differencesTask, halfTask, mazeTask } from './drawings';
 
@@ -56,6 +56,11 @@ function sequenceTask(pattern: Pic[], age: AgeGroup): WorksheetTask {
 }
 
 function oddTask(pics: Pic[], themeId: string, rows: number): WorksheetTask {
+  // Общият набор (тема без съвпадение) е смесен и няма „група“ — взима се истинска тема
+  if (themeId === 'default') {
+    const theme = shuffle(THEMES.filter((t) => t.id !== 'toys'))[0]!;
+    return oddTask(theme.pics, theme.id, rows);
+  }
   const others = shuffle(otherThemePics(themeId).filter((o) => !pics.some((p) => p.e === o.e)));
   return {
     kind: 'odd',
@@ -193,7 +198,7 @@ function kindTask(kind: SheetKind, age: AgeGroup, direction: LessonDirection, to
     case 'sound':
       return age === '4' ? soundTask(pics) : null;
     case 'draw':
-      return draw(`Нарисувай и оцвети любимия си момент от играта „${t}“.`);
+      return draw(`Нарисувай и оцвети любимия си момент от „${t}“.`);
     case 'maze':
       return mazeTask(pics, age);
     case 'differences':

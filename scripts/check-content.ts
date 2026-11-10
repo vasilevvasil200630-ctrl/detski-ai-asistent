@@ -15,6 +15,7 @@ import { buildDirectionGames, coresWithGames } from '../src/services/directionGa
 import { buildDemoLessonPlan } from '../src/services/aiEngine';
 import { buildDemoWorksheet, buildWorksheetFromKinds, ANSWER_MAX } from '../src/services/printables/worksheets';
 import { buildDemoVerses } from '../src/services/printables/verses';
+import { THEMES } from '../src/services/printables/themes';
 import { HOLIDAYS } from '../src/services/holidays';
 import { holidaysByWeek, orthodoxEaster, schoolWeeks } from '../src/services/thematicPlan';
 import type { DemoContext } from '../src/services/demoGames';
@@ -113,6 +114,24 @@ for (const a of AGES) {
   }
 }
 
+/* 6б. „Огради излишното“: трите картинки са от една тема, излишната — не (и при тема без съвпадение) */
+for (const topic of ['Моето тяло', 'Есен', 'Плодове', 'Вода', 'Лято', 'Играчки', 'Музика', 'Космос']) {
+  for (let i = 0; i < 25; i++) {
+    const task = buildWorksheetFromKinds('3', 'world', topic, ['odd']).tasks[0];
+    if (task?.kind !== 'odd') {
+      ok(`odd/${topic}: task built`, false);
+      continue;
+    }
+    for (const row of task.rows) {
+      const rest = row.items.filter((_, k) => k !== row.odd).map((p) => p.e);
+      const odd = row.items[row.odd]!;
+      const group = THEMES.find((t) => rest.every((e) => t.pics.some((p) => p.e === e)));
+      ok(`odd/${topic}: the three pictures share a theme`, !!group, rest.join(' '));
+      if (group) ok(`odd/${topic}: „${odd.w}“ is not from „${group.id}“`, !group.pics.some((p) => p.e === odd.e));
+    }
+  }
+}
+
 /* 7. Празници и календар */
 const easter = (y: number) => orthodoxEaster(y).toISOString().slice(0, 10);
 ok('Orthodox Easter 2025', easter(2025) === '2025-04-20', easter(2025));
@@ -124,9 +143,10 @@ for (const year of [2025, 2026, 2027]) {
   ok(`${year}: school weeks start on/after 15 September`, weeks[0]!.startDate >= `${year}-09-15`);
   ok(`${year}: school weeks end by 31 May`, weeks[weeks.length - 1]!.endDate <= `${year + 1}-05-31`);
   const placed = new Set([...holidaysByWeek(year).values()].flat().map((h) => h.id));
-  for (const h of HOLIDAYS) if (h.id !== '1-yuni') ok(`${year}: holiday „${h.name}“ is in a school week`, placed.has(h.id));
+  // 1 и 2 юни са след учебното време (31 май) — отбелязват се, но не са в учебна седмица
+  for (const h of HOLIDAYS) if (h.id !== '1-yuni' && h.id !== 'botev') ok(`${year}: holiday „${h.name}“ is in a school week`, placed.has(h.id));
 }
-for (const id of ['treti-mart', '24-mai', 'levski', 'nezavisimost', 'buditeli']) ok(`holiday ${id} exists`, HOLIDAYS.some((h) => h.id === id));
+for (const id of ['treti-mart', '24-mai', 'levski', 'botev', 'nezavisimost', 'buditeli']) ok(`holiday ${id} exists`, HOLIDAYS.some((h) => h.id === id));
 
 /* 8. Известни грешки не бива да се връщат; без латински букви в думи на кирилица */
 const files: string[] = [];
@@ -141,7 +161,10 @@ walk(join(__dirname, '../src/services'));
 const BANNED: [RegExp, string][] = [
   [/ябълк[аи][^'\n]{0,30}(на гърба|носи)/i, 'таралежът не носи ябълки на бодлите си'],
   [/пресичай бавно/i, 'на жълто не се пресича'],
-  [/жълто — готови/i, 'пешеходците тръгват само на зелено'],
+  [/жълто\s*[—–-]\s*готови/i, 'пешеходците тръгват само на зелено'],
+  [/три,? и пет/i, 'броилките не прескачат числа'],
+  [/(?<!тика)[\s—–-]так[!.,]/,'руската дума „так“ (на български: „така“)'],
+  [/мляко обича/i, 'котките не бива да пият мляко'],
   [/'ромб'/, 'ромбът не е в очакваните резултати за предучилищна възраст'],
 ];
 for (const f of files) {
