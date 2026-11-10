@@ -7,6 +7,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { normalizeJoinCode } from "@/lib/auth/utils";
 import { KG } from "@/config/kindergarten";
 import { NOT_ALLOWED_MESSAGE, allowlistSize } from "@/lib/allowed-emails";
+import { firstAdminAllowed, setupCodeConfigured } from "@/lib/auth/setup-code";
 
 // По модела на МатураПлюс (src/app/api/auth/register/route.ts): лимит по IP, Zod, bcrypt,
 // транзакция и обработка на P2002 (едновременна регистрация със същия имейл).
@@ -34,8 +35,15 @@ export async function GET() {
   const kg = await ensureKindergarten();
   const [members, listed] = await Promise.all([prisma.user.count({ where: { kindergartenId: kg.id } }), allowlistSize(kg.id)]);
   const byEmail = members > 0 && listed > 0;
+  // Първият профил (директорът) — с тайната дума от настройките на сървъра
+  const setup = members === 0;
   return NextResponse.json(
-    { needsCode: members > 0 && !byEmail, open: members === 0 || byEmail || kg.teacherSignupOpen, byEmail },
+    {
+      needsCode: setup || !byEmail,
+      open: setup ? setupCodeConfigured() || process.env.NODE_ENV !== "production" : byEmail || kg.teacherSignupOpen,
+      byEmail,
+      setup,
+    },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
@@ -72,6 +80,8 @@ export async function POST(request: Request) {
       // Проверката е в транзакцията: двама „първи“ едновременно не стават и двамата администратори
       const members = await tx.user.count({ where: { kindergartenId: kg.id } });
       const isFirst = members === 0;
+      // Само който знае тайната дума от настройките, може да стане първият директор
+      if (isFirst && !firstAdminAllowed(data.joinCode)) throw new Error("SETUP");
       if (!isFirst) {
         const listed = await tx.allowedEmail.count({ where: { kindergartenId: kg.id } });
         if (listed > 0) {
@@ -99,6 +109,12 @@ export async function POST(request: Request) {
       });
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "SETUP") {
+      return NextResponse.json(
+        { error: "Първоначалният код не е верен. Той е в настройките на сайта и го знае само директорът.", code: "SETUP" },
+        { status: 403 },
+      );
+    }
     if (error instanceof Error && error.message === "NOT_ALLOWED") {
       return NextResponse.json({ error: NOT_ALLOWED_MESSAGE, code: "NOT_ALLOWED" }, { status: 403 });
     }
