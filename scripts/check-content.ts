@@ -10,7 +10,10 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import type { AgeGroup, EducationalDirection, LessonDirection } from '../src/types';
 import { AGE_GROUP_STANDARDS, DIRECTION_ORDER, DIRECTION_STANDARDS } from '../src/services/naredba5';
-import { resultsForGroup } from '../src/services/naredba5Results';
+import { expectedResults, isExpectedResult } from '../src/services/naredba5Results';
+import { normalizeLessonPlan } from '../src/services/aiValidation';
+import { pickCore } from '../src/services/naredba5';
+import { SITUATION_TYPE_IDS, SITUATION_TYPES } from '../src/services/lessonParts';
 import { buildDirectionGames, coresWithGames } from '../src/services/directionGames';
 import { buildDemoLessonPlan } from '../src/services/aiEngine';
 import { buildDemoWorksheet, buildWorksheetFromKinds, ANSWER_MAX } from '../src/services/printables/worksheets';
@@ -60,19 +63,45 @@ for (const d of DIRS) {
   }
 }
 
-/* 4. План-конспект без модела: очакваните резултати са дословно от наредбата, основната част е игра по ядрото */
+/* 4. План-конспект без модела: пълна структура, очакваните резултати дословно от наредбата, игра по ядрото */
 for (const d of DIRECTION_ORDER) {
   for (const a of AGES) {
     for (const core of DIRECTION_STANDARDS[d].cores) {
-      const plan = buildDemoLessonPlan({ ageGroup: a, direction: d, topic: 'Есен в гората', core } as Parameters<typeof buildDemoLessonPlan>[0]);
-      const results = resultsForGroup(d, a).find((r) => r.core === core)?.results ?? [];
-      if (results.length) ok(`${d}/${a}/${core}: plan uses the official expected result`, plan.expectedResults.knowledge.startsWith(results[0]!), plan.expectedResults.knowledge.slice(0, 70));
-      ok(`${d}/${a}/${core}: main part is a concrete game`, /Провежда играта „/.test(plan.stages[1]!.teacherAction));
+      const type = SITUATION_TYPE_IDS[(a.charCodeAt(0) + core.length) % SITUATION_TYPE_IDS.length]!;
+      const plan = buildDemoLessonPlan({ ageGroup: a, direction: d, topic: 'Есен в гората', core, situationType: type });
+      const name = `${d}/${a}/${core}`;
+      if (expectedResults(d, core, a).length) ok(`${name}: has 1–3 expected results`, !!plan.naredbaResults && plan.naredbaResults.length >= 1 && plan.naredbaResults.length <= 3);
+      for (const r of plan.naredbaResults ?? []) ok(`${name}: result is verbatim from the Naredba`, isExpectedResult(d, core, a, r), r);
+      ok(`${name}: aim, three tasks, methods, assessment`, !!plan.aim && plan.goals.length === 3 && (plan.methods?.length ?? 0) >= 4 && !!plan.assessment && !!plan.differentiation);
+      ok(`${name}: tasks are educational, developing, upbringing`, /^Образователна: /.test(plan.goals[0]!) && /^Развиваща: /.test(plan.goals[1]!) && /^Възпитателна: /.test(plan.goals[2]!));
+      ok(`${name}: situation type`, plan.situationType === SITUATION_TYPES[type].label);
+      ok(`${name}: main part is a concrete game`, /Играта „/.test(plan.stages[1]!.teacherAction));
+      // Нищо от другите групи в плана за тази група
+      const text = JSON.stringify(plan.stages);
+      ok(`${name}: no text meant for other groups`, !/(I|II|III|IV) гр./.test(text), text.match(/.{30}(I|II|III|IV) гр..{10}/)?.[0]);
     }
   }
 }
-const bdpPlan = buildDemoLessonPlan({ ageGroup: '3', direction: 'bdp', topic: '' } as Parameters<typeof buildDemoLessonPlan>[0]);
-ok('bdp plan: main part is a road-safety game', /пешеход|светофар|улица/i.test(bdpPlan.stages[1]!.teacherAction));
+for (const a of AGES) {
+  const bdpPlan = buildDemoLessonPlan({ ageGroup: a, direction: 'bdp', topic: '' });
+  ok(`bdp/${a}: main part is a road-safety game`, /пешеход|светофар|улица/i.test(bdpPlan.stages[1]!.teacherAction));
+  ok(`bdp/${a}: results from the MON programme and the Naredba`, (bdpPlan.naredbaResults?.length ?? 0) === 2);
+}
+/* 4б. Ядрото по темата: познатите приказки са литературни произведения */
+for (const t of ['Житената питка', 'Дядовата ръкавичка', 'Червената шапчица', 'Приказка за ряпата'])
+  ok(`bel: „${t}“ is a literary work`, pickCore('bel', t) === 'Възприемане на литературно произведение', pickCore('bel', t));
+ok('bel: drama goes to „Пресъздаване“', pickCore('bel', 'Куклен театър „Трите прасенца“') === 'Пресъздаване на литературно произведение');
+/* 4в. Отговорът на модела: резултатите се приемат само ако са официалните (запетаите не пречат) */
+{
+  const fb = buildDemoLessonPlan({ ageGroup: '3', direction: 'math', topic: 'Есен', core: 'Количествени отношения' });
+  const raw = { naredbaResults: ['Брои до десет в прав ред.', 'Брои до сто и умножава', 'определя реда на обект в редица от пет предмета'], aim: 'Цел.', goals: ['а', 'б', 'в'] };
+  const p = normalizeLessonPlan(raw, fb, { direction: 'math', coreChosen: true, ageGroup: '3' });
+  ok('model: invented result dropped, official text kept', JSON.stringify(p.naredbaResults) === JSON.stringify(['Брои до десет в прав ред', 'Определя реда на обект в редица от пет предмета']), JSON.stringify(p.naredbaResults));
+  const none = normalizeLessonPlan({ naredbaResults: ['Нещо измислено'] }, fb, { direction: 'math', coreChosen: true, ageGroup: '3' });
+  ok('model: no valid result → built-in selection', JSON.stringify(none.naredbaResults) === JSON.stringify(fb.naredbaResults));
+  const other = normalizeLessonPlan({ educationalCore: 'Измерване', naredbaResults: [] }, fb, { direction: 'math', coreChosen: false, ageGroup: '3' });
+  ok('model: other core → results of that core', other.educationalCore === 'Измерване' && (other.naredbaResults ?? []).every((r) => isExpectedResult('math', 'Измерване', '3', r)) && (other.naredbaResults?.length ?? 0) > 0);
+}
 
 /* 5. Работни листове: числата и звуковете по групи */
 for (const a of AGES) {

@@ -116,13 +116,30 @@ export interface LessonStage {
   childrenActivity: string;
 }
 
+/** Вид на педагогическата ситуация според дидактическата ѝ задача. */
+export type SituationType = 'new' | 'practice' | 'summary' | 'check';
+
 export interface GeneratedLessonPlan {
   topic: string;
   ageGroupLabel: string;
   directionLabel: string;
   educationalCore: string;
   totalDuration: string;
+  /** Вид на ситуацията, напр. „Ситуация за нови знания“ (по-старите планове го нямат). */
+  situationType?: string;
+  /** Целта — едно изречение. Когато я има, `goals` са задачите (образователна, развиваща, възпитателна). */
+  aim?: string;
   goals: string[];
+  /** Очакваните резултати дословно от Наредба № 5 за ядрото и групата (по-старите планове ги нямат). */
+  naredbaResults?: string[];
+  /** Откъде са резултатите, напр. „Наредба № 5, приложение № 2, ядро „Измерване““. */
+  resultsSource?: string;
+  /** Методи и похвати. */
+  methods?: string[];
+  /** Как учителят проверява дали децата са постигнали резултатите. */
+  assessment?: string;
+  /** Подход към дете със СОП и към децата, които напредват по-бързо. */
+  differentiation?: string;
   expectedResults: { knowledge: string; skills: string; attitudes: string };
   materials: string[];
   stages: LessonStage[];

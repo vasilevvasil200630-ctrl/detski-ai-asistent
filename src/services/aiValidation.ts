@@ -1,5 +1,6 @@
-import { EducationalDirection, GameMode, GameTask, GeneratedGame, GeneratedLessonPlan, LessonDirection, LessonStage } from '../types';
-import { matchCore } from './naredba5';
+import { AgeGroup, EducationalDirection, GameMode, GameTask, GeneratedGame, GeneratedLessonPlan, LessonDirection, LessonStage } from '../types';
+import { DIRECTION_STANDARDS, matchCore } from './naredba5';
+import { expectedResults } from './naredba5Results';
 import { sanitizeKit } from './printables/kit';
 
 /**
@@ -137,7 +138,7 @@ function normalizeStage(raw: unknown): LessonStage | null {
 export function normalizeLessonPlan(
   parsed: unknown,
   fallback: GeneratedLessonPlan,
-  opts: { direction?: EducationalDirection; coreChosen?: boolean } = {},
+  opts: { direction?: EducationalDirection; coreChosen?: boolean; ageGroup?: AgeGroup } = {},
 ): GeneratedLessonPlan {
   const p = obj(parsed);
   if (Object.keys(p).length === 0) throw new Error('AI отговорът не е валиден JSON обект');
@@ -154,20 +155,29 @@ export function normalizeLessonPlan(
   const stages = Array.isArray(p.stages)
     ? p.stages.map(normalizeStage).filter((s): s is LessonStage => s !== null)
     : [];
+  const core =
+    opts.coreChosen || !opts.direction
+      ? fallback.educationalCore
+      : (matchCore(opts.direction, str(p.educationalCore)) ?? fallback.educationalCore);
+  const results = lessonResults(p.naredbaResults, core, fallback, opts);
 
   return {
     topic: pick(p.topic, fallback.topic),
     ageGroupLabel: pick(p.ageGroupLabel, fallback.ageGroupLabel),
     directionLabel: fallback.directionLabel,
-    educationalCore:
-      opts.coreChosen || !opts.direction
-        ? fallback.educationalCore
-        : (matchCore(opts.direction, str(p.educationalCore)) ?? fallback.educationalCore),
+    educationalCore: core,
     totalDuration: fallback.totalDuration,
-    goals: pickList(p.goals, fallback.goals),
+    ...(fallback.situationType ? { situationType: fallback.situationType } : {}),
+    aim: pick(p.aim, fallback.aim ?? ''),
+    goals: pickList(p.goals, fallback.goals).slice(0, 5),
+    naredbaResults: results.list,
+    resultsSource: results.source,
+    methods: pickList(p.methods, fallback.methods ?? []).slice(0, 8),
+    assessment: pick(p.assessment, fallback.assessment ?? ''),
+    differentiation: pick(p.differentiation, fallback.differentiation ?? ''),
     expectedResults: {
-      knowledge: pick(er.knowledge, fallback.expectedResults.knowledge),
-      skills: pick(er.skills, fallback.expectedResults.skills),
+      knowledge: results.list[0] ?? pick(er.knowledge, fallback.expectedResults.knowledge),
+      skills: results.list[1] ?? pick(er.skills, fallback.expectedResults.skills),
       attitudes: pick(er.attitudes, fallback.expectedResults.attitudes),
     },
     materials: withProgramMaterial(pickList(p.materials, fallback.materials), fallback.programMaterial),
@@ -191,6 +201,31 @@ export function normalizeLessonPlan(
       closingWarmth: pick(note.closingWarmth, fallback.parentNote.closingWarmth),
     },
   };
+}
+
+const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+
+/**
+ * Очакваните резултати в плана: само официалните от Наредбата за ядрото и групата. Текст от модела се
+ * приема, ако съвпада с официален (без значение за препинателните знаци) — и тогава се пише официалният.
+ * Иначе — подборът от вградения план или първите резултати на ядрото, което е избрал моделът.
+ */
+function lessonResults(
+  raw: unknown,
+  core: string,
+  fallback: GeneratedLessonPlan,
+  opts: { direction?: EducationalDirection; ageGroup?: AgeGroup },
+): { list: string[]; source: string | undefined } {
+  const fb = { list: fallback.naredbaResults ?? [], source: fallback.resultsSource };
+  if (!opts.direction || !opts.ageGroup) return fb;
+  const official = expectedResults(opts.direction, core, opts.ageGroup);
+  if (!official.length) return fb;
+  const source = `Наредба № 5, приложение № ${DIRECTION_STANDARDS[opts.direction].appendix}, ядро „${core}“`;
+  const byNorm = new Map(official.map((r) => [norm(r), r]));
+  const fromModel = [...new Set(strList(raw).map((r) => byNorm.get(norm(r))).filter((r): r is string => !!r))].slice(0, 3);
+  if (fromModel.length) return { list: fromModel, source };
+  if (core === fallback.educationalCore && fb.list.length) return fb;
+  return { list: official.slice(0, 3), source };
 }
 
 /** Книжката от „Златно ключе“ винаги е сред материалите, ако направлението има такава. */

@@ -1,7 +1,8 @@
-import { AgeGroup, EducationalDirection, LessonDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources } from '../types';
+import { AgeGroup, EducationalDirection, LessonDirection, GameFilterState, GeneratedGame, GeneratedLessonPlan, GroupMood, PlayDuration, PlayLocation, PlayResources, SituationType } from '../types';
 import { buildDemoGames, DemoContext } from './demoGames';
-import { gameForCore } from './directionGames';
-import { resultsForGroup } from './naredba5Results';
+import { bdpGameFor, gameForCore } from './directionGames';
+import { expectedResults } from './naredba5Results';
+import { assessmentText, differentiationText, lessonTasks, MAIN_PART_LEAD, METHODS, pickResults, SITUATION_TYPES } from './lessonParts';
 import {
   AGE_GROUP_STANDARDS,
   DIRECTION_ORDER,
@@ -16,10 +17,10 @@ import { BDP, BDP_NAREDBA5_RESULTS, BDP_THEMES, bdpPromptRules, findBdpTheme } f
 import { GAME_MODES, taskLine, tasksPromptBlock } from './gameTasks';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
-  '1': { short: '1-ва група (3-4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
-  '2': { short: '2-ра група (4-5 г.)', full: 'Втора възрастова група (4–5 години)', ageRange: '4-5 г.', dosDuration: '20 мин' },
-  '3': { short: '3-та група (5-6 г.)', full: 'Трета подготвителна група (5–6 години)', ageRange: '5-6 г.', dosDuration: '25 мин' },
-  '4': { short: '4-та група (6-7 г.)', full: 'Четвърта подготвителна група (6–7 години)', ageRange: '6-7 г.', dosDuration: '30 мин' },
+  '1': { short: 'I група (3–4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
+  '2': { short: 'II група (4–5 г.)', full: 'Втора възрастова група (4–5 години)', ageRange: '4-5 г.', dosDuration: '20 мин' },
+  '3': { short: 'III група (5–6 г.)', full: 'Трета подготвителна група (5–6 години)', ageRange: '5-6 г.', dosDuration: '25 мин' },
+  '4': { short: 'IV група (6–7 г.)', full: 'Четвърта подготвителна група (6–7 години)', ageRange: '6-7 г.', dosDuration: '30 мин' },
 };
 
 export const MOOD_LABELS: Record<GroupMood, { label: string; emoji: string; tag: string; goalFocus: string }> = {
@@ -190,7 +191,7 @@ function gamesTaskLine(filters: GameFilterState): string {
 }
 
 /** core — официалното образователно ядро; без него AI избира най-подходящото за темата. */
-export type LessonParams = { ageGroup: AgeGroup; direction: LessonDirection; topic: string; core?: string };
+export type LessonParams = { ageGroup: AgeGroup; direction: LessonDirection; topic: string; core?: string; situationType?: SituationType };
 
 /** Пълният промпт за ДОС разработка — вика се от сървъра (/api/ai/lesson). */
 export function buildLessonAiPrompt(params: LessonParams, demoPlan: GeneratedLessonPlan): string {
@@ -201,15 +202,35 @@ export function buildLessonAiPrompt(params: LessonParams, demoPlan: GeneratedLes
     ? `образователно ядро „${params.core}“`
     : `образователно ядро — избери най-подходящото за темата от: ${dir.cores.map((c) => `„${c}“`).join(', ')}`;
   const book = zlatnoBookFor(params.direction, params.ageGroup);
+  const type = SITUATION_TYPES[params.situationType ?? 'new'];
+  // Официалните очаквани резултати за групата — моделът ги копира дословно, не ги измисля
+  const cores = params.core ? [params.core] : dir.cores;
+  const resultsList = cores
+    .map((c) => `Ядро „${c}“:\n${expectedResults(params.direction as EducationalDirection, c, params.ageGroup).map((r) => `  - ${r}`).join('\n')}`)
+    .join('\n');
   return `Ти си методист по предучилищно образование в България.
 ${naredba5PromptRules(params.ageGroup)}
 
 Създай план-конспект на педагогическа ситуация на БЪЛГАРСКИ за ${ageInfo.full}, направление „${dir.label}“ (приложение № ${dir.appendix} към чл. 28), ${coreLine}, тема "${demoPlan.topic}", продължителност ${demoPlan.totalDuration} (в рамките на ${situationRangeLabel(params.ageGroup)} по чл. 25).
-Очакваните резултати да са по приложение № ${dir.appendix} за ${AGE_GROUP_STANDARDS[params.ageGroup].name}. Ситуацията протича предимно като игра.
+Вид на ситуацията: ${type.label}. Ситуацията протича предимно като игра.
+Очакваните резултати за ${AGE_GROUP_STANDARDS[params.ageGroup].name} по приложение № ${dir.appendix} (само тези са верни):
+${resultsList}
 Етапите са точно три, както в книгата за учителя на „Златно ключе“: „${ZLATNO_KLYUCHE.situationParts.join('“, „')}“ — с минути, които дават сбор ${demoPlan.totalDuration}.
+Всеки етап е конкретен: какво точно казва и показва учителят (с 2–3 въпроса към децата в кавички), каква игра или задача изпълняват децата и с какви материали. Основната част води към избраните очаквани резултати. Заключителната част проверява дали са постигнати.
 ${book ? `Сред материалите включи ${book}, без номера на страници.` : 'За Физическа култура няма познавателна книжка — материалите са уреди и пособия.'}
-Може да включиш куклата-водач ${ZLATNO_KLYUCHE.guide} от „Златно ключе“ като герой в мотивацията. Приказката да е оригинална, с конкретен герой и сюжет, свързан с темата. Играта за вкъщи е само по желание на семейството (чл. 32 забранява домашна работа).
-Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore (точното име на ядрото), totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3–4), organizationForm (фронтална, групова или индивидуална — може комбинация), integrativeLinks (2 връзки с други направления, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+Може да включиш куклата-водач ${ZLATNO_KLYUCHE.guide} от „Златно ключе“ като герой в мотивацията. Приказката да е оригинална, кратка, с един конкретен герой и сюжет, свързан с темата. Играта за вкъщи е само по желание на семейството (чл. 32 забранява домашна работа).
+Върни САМО валиден JSON (без markdown) с ключове:
+- topic, ageGroupLabel, directionLabel, educationalCore (точното име на ядрото), totalDuration;
+- aim — целта, едно изречение;
+- goals — точно 3 задачи, започват с „Образователна: “, „Развиваща: “ и „Възпитателна: “;
+- naredbaResults — 2–3 очаквани резултата, копирани ДОСЛОВНО от списъка по-горе, от избраното ядро;
+- methods — 4–6 методи и похвати (кратко);
+- materials (3–4), organizationForm (фронтална, групова или индивидуална — може комбинация), integrativeLinks (2 връзки с други направления, всяка започва с името на направлението);
+- stages (3 с phase, duration, teacherAction, childrenActivity);
+- assessment — как учителят разбира дали всяко дете е постигнало резултатите (наблюдение, конкретна задача);
+- differentiation — подход към дете със СОП и към децата, които се справят бързо;
+- story (title, hero, paragraphs (4), moral, discussionQuestions (3));
+- parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
 }
 
 /** Темата по БДП: избраната от учителя, позната по текста на темата или първата за групата. */
@@ -231,10 +252,10 @@ ${bdpPromptRules(params.ageGroup)}
 
 Създай план-конспект на педагогическа ситуация по безопасност на движението по пътищата на БЪЛГАРСКИ за ${ageInfo.full}.
 Тема от програмата на МОН: „${theme.theme}“ (област „${theme.area}“). Очаквани резултати по програмата: ${theme.expected} Нови понятия: ${theme.concepts}.
-Темата, зададена от учителя: "${demoPlan.topic}". Продължителност ${demoPlan.totalDuration} (в рамките на ${situationRangeLabel(params.ageGroup)} по чл. 25). Ситуацията протича предимно като игра (ролеви игри „пешеходци и шофьори“, макет на улица, светофар).
-Етапите са точно три: „${ZLATNO_KLYUCHE.situationParts.join('“, „')}“ — с минути, които дават сбор ${demoPlan.totalDuration}.
+Темата, зададена от учителя: "${demoPlan.topic}". Вид на ситуацията: ${SITUATION_TYPES[params.situationType ?? 'new'].label}. Продължителност ${demoPlan.totalDuration} (в рамките на ${situationRangeLabel(params.ageGroup)} по чл. 25). Ситуацията протича предимно като игра (ролеви игри „пешеходци и шофьори“, макет на улица, светофар).
+Етапите са точно три: „${ZLATNO_KLYUCHE.situationParts.join('“, „')}“ — с минути, които дават сбор ${demoPlan.totalDuration}. Всеки етап е конкретен: какво казва и показва учителят (с 2–3 въпроса към децата в кавички) и какво правят децата.
 Не посочвай познавателна книжка от „Златно ключе“ — за БДП такава не е посочена. Може да включиш куклата ${ZLATNO_KLYUCHE.guide} като малък пешеходец в мотивацията. Приказката да е оригинална и да показва безопасно поведение на пътя. Играта за вкъщи е само по желание (чл. 32) и се играе с възрастен.
-Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, goals (3), expectedResults (knowledge, skills, attitudes), materials (3–4), organizationForm, integrativeLinks (2 връзки с направления по Наредба № 5, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
+Върни САМО валиден JSON (без markdown) с ключове: topic, ageGroupLabel, directionLabel, educationalCore, totalDuration, aim (целта, едно изречение), goals (точно 3 задачи, започват с „Образователна: “, „Развиваща: “ и „Възпитателна: “), methods (4–6 методи и похвати), materials (3–4), organizationForm, integrativeLinks (2 връзки с направления по Наредба № 5, всяка започва с името на направлението), stages (3 с phase, duration, teacherAction, childrenActivity), assessment (как учителят разбира дали всяко дете е постигнало резултатите), differentiation (подход към дете със СОП и към децата, които се справят бързо), story (title, hero, paragraphs (4), moral, discussionQuestions (3)), parentNote (viberHeader, summaryMessage, highlights (3), homeGameTitle, homeGameDescription, closingWarmth).`;
 }
 
 /** Откъде е дошъл резултатът — показва се в интерфейса. */
@@ -293,22 +314,22 @@ export async function generateLessonPreparation(params: LessonParams): Promise<{
   );
 }
 
-/** Герой на приказката според ключови думи в темата (демо режим). */
+/** Герой на приказката според ключови думи в темата (демо режим) — един герой, за да е ясна граматиката. */
 const STORY_HEROES: { keys: string[]; hero: string }[] = [
-  { keys: ['есен', 'гора', 'листа'], hero: 'таралежчето Бодливко и златното листо Листчо' },
-  { keys: ['зим', 'сняг', 'снеж'], hero: 'снежко Бялчо и снежинката Искрица' },
-  { keys: ['пролет', 'цвет', 'мартени'], hero: 'кокичето Белчо и пчеличката Жужа' },
-  { keys: ['лят', 'море', 'слънц'], hero: 'слънчевото лъчице Златко и рибката Вълничка' },
-  { keys: ['коледа', 'нова година', 'дядо мраз'], hero: 'малкото джудже Звънчо от работилницата на Дядо Коледа' },
-  { keys: ['великден', 'яйц'], hero: 'шареното яйце Писанка и зайчето Скокльо' },
-  { keys: ['космос', 'планет', 'звезд'], hero: 'малкият астронавт Звезделин и комета Светулка' },
-  { keys: ['професи', 'занаят'], hero: 'любопитното момченце Марти и вълшебната шапка на майсторите' },
-  { keys: ['здрав', 'хран', 'плод', 'зеленчу', 'витамин'], hero: 'капитан Морковчо и дружината на Витамините' },
-  { keys: ['живот', 'зоопарк', 'ферм'], hero: 'мъдрата сова Совка и малкото лисиче Хитрушко' },
-  { keys: ['семейств', 'дом', 'мама', 'баба'], hero: 'мечето Бъди и неговото голямо мечешко семейство' },
-  { keys: ['транспорт', 'превоз', 'пътя', 'светофар'], hero: 'автобусчето Бибиш и светофарчо Мигачко' },
-  { keys: ['вода', 'дъжд', 'река'], hero: 'капчицата Капчо и облачето Пухчо' },
-  { keys: ['българ', 'родин', 'трибагрени'], hero: 'щъркелът Бенко, който обиколи цяла България' },
+  { keys: ['есен', 'гора', 'листа'], hero: 'таралежчето Бодливко' },
+  { keys: ['зим', 'сняг', 'снеж'], hero: 'снежко Бялчо' },
+  { keys: ['пролет', 'цвет', 'мартени'], hero: 'кокичето Белчо' },
+  { keys: ['лят', 'море', 'слънц'], hero: 'слънчевото лъчице Златко' },
+  { keys: ['коледа', 'нова година', 'дядо мраз'], hero: 'джуджето Звънчо от работилницата на Дядо Коледа' },
+  { keys: ['великден', 'яйц'], hero: 'зайчето Скокльо' },
+  { keys: ['космос', 'планет', 'звезд'], hero: 'малкият космонавт Звезделин' },
+  { keys: ['професи', 'занаят'], hero: 'любопитното мече Марти' },
+  { keys: ['здрав', 'хран', 'плод', 'зеленчу', 'витамин'], hero: 'капитан Морковчо' },
+  { keys: ['живот', 'зоопарк', 'ферм'], hero: 'мъдрата сова Совка' },
+  { keys: ['семейств', 'дом', 'мама', 'баба'], hero: 'мечето Мецко' },
+  { keys: ['транспорт', 'превоз', 'пътя', 'светофар', 'улиц', 'пешеход'], hero: 'автобусчето Бибиш' },
+  { keys: ['вода', 'дъжд', 'река'], hero: 'капчицата Капчо' },
+  { keys: ['българ', 'родин', 'трибагрени'], hero: 'щъркелът Бенко' },
 ];
 
 export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
@@ -316,26 +337,47 @@ export function buildDemoLessonPlan(params: LessonParams): GeneratedLessonPlan {
   return buildDemoDirectionPlan({ ...params, direction: params.direction });
 }
 
+const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+const trimEnd = (s: string) => lowerFirst(s.replace(/[.;]$/, ''));
+const childrenDo = (gameTitle: string, results: string[]) =>
+  results.length
+    ? `Участват в играта „${gameTitle}“. Всяко дете ${results.map(trimEnd).join('; ')}.`
+    : `Участват в играта „${gameTitle}“ и изпълняват задачите ѝ.`;
+
 /** Демо ситуация по БДП: интегрирана в „Околен свят“ (ядро „Социална и здравословна среда“). */
 function buildDemoBdpPlan(params: LessonParams): GeneratedLessonPlan {
   const theme = resolveBdpTheme(params);
   const topic = params.topic.trim() || theme.theme;
-  const base = buildDemoDirectionPlan({ ageGroup: params.ageGroup, direction: 'world', topic, core: BDP.host.core });
+  const type = params.situationType ?? 'new';
+  const base = buildDemoDirectionPlan({ ageGroup: params.ageGroup, direction: 'world', topic, core: BDP.host.core, situationType: type });
   const r = BDP_NAREDBA5_RESULTS[params.ageGroup];
   // Без познавателна книжка: за БДП „Златно ключе“ не посочва отделна
   const { programMaterial: _omit, ...rest } = base;
   void _omit;
-  // Основната част — игра по БДП, не общата по „Околен свят“
-  const bdpGame = gameForCore('bdp', BDP.host.core, topic, params.ageGroup);
-  const stages = bdpGame
-    ? rest.stages.map((st, i) => (i === 1 ? { ...st, teacherAction: `Провежда играта „${bdpGame.title}“ (тема по БДП „${theme.theme}“): ${bdpGame.steps.join(' ')}`, childrenActivity: `Участват в играта и упражняват: ${bdpGame.skills}.` } : st))
-    : rest.stages;
+  // Основната част — играта по БДП, която подхожда на темата
+  const game = bdpGameFor(`${theme.theme} ${theme.concepts} ${theme.expected}`, topic, params.ageGroup);
+  const stages = rest.stages.map((st, i) =>
+    i === 1
+      ? {
+          ...st,
+          teacherAction: `${MAIN_PART_LEAD[type]} Нови понятия: ${theme.concepts}. Играта „${game.title}“: ${game.steps.join(' ')}`,
+          childrenActivity: childrenDo(game.title, [r.world]),
+        }
+      : st,
+  );
   return {
     ...rest,
     stages,
     directionLabel: `${BDP.label} (интегрирано в „${BDP.host.direction}“)`,
     educationalCore: `${BDP.host.core} (${BDP.host.direction}) • тема по БДП „${theme.theme}“`,
-    goals: [...BDP.goals],
+    aim: `${SITUATION_TYPES[type].aim} по безопасност на движението по темата „${theme.theme}“ чрез играта „${game.title}“.`,
+    goals: lessonTasks('bdp', [r.world]),
+    // Резултатите: по програмата на МОН за темата и по Наредба № 5 (приложение № 3)
+    naredbaResults: [theme.expected, r.world],
+    resultsSource: `програмата на МОН по БДП (тема „${theme.theme}“) и Наредба № 5, приложение № ${BDP.host.appendix}`,
+    methods: METHODS.bdp,
+    assessment: assessmentText(type, [r.world]),
+    differentiation: differentiationText('bdp', game.sop),
     expectedResults: {
       knowledge: theme.expected,
       skills: `${r.world} (Наредба № 5, приложение № ${BDP.host.appendix})`,
@@ -345,7 +387,7 @@ function buildDemoBdpPlan(params: LessonParams): GeneratedLessonPlan {
       `Макет на улица с пешеходна пътека и светофар (понятия: ${theme.concepts})`,
       'Пътни знаци за игра и светлоотразителни жилетки',
       `Куклата ${ZLATNO_KLYUCHE.guide} като малък пешеходец`,
-      'Детски превозни средства за ролевата игра „Пешеходци и шофьори“',
+      'Волани или детски превозни средства за ролевата игра',
     ],
     organizationForm: 'Фронтална, групова и индивидуална',
     integrativeLinks: [
@@ -357,6 +399,7 @@ function buildDemoBdpPlan(params: LessonParams): GeneratedLessonPlan {
 
 function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalDirection }): GeneratedLessonPlan {
   const topic = params.topic.trim() || 'Есен в гората';
+  const type = params.situationType ?? 'new';
   const ageInfo = AGE_GROUP_LABELS[params.ageGroup];
   const dirInfo = DIRECTION_LABELS[params.direction];
   const core = pickCore(params.direction, topic, params.core);
@@ -373,8 +416,7 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
     pe: ['Математика — брой повторения и посоки в пространството', 'Околен свят — здравословен начин на живот'],
   };
 
-  const hero = STORY_HEROES.find((h) => h.keys.some((k) => t.includes(k)))?.hero
-    ?? `любознателното катериче Руменчо – откривателят на „${topic}“`;
+  const hero = STORY_HEROES.find((h) => h.keys.some((k) => t.includes(k)))?.hero ?? 'любознателното катериче Руменчо';
 
   const timings: Record<AgeGroup, [string, string, string]> = {
     '1': ['3 мин.', '9 мин.', '3 мин.'],
@@ -384,10 +426,13 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
   };
   const [t1, t2, t3] = timings[params.ageGroup];
 
-  // Съдържанието по направлението: очакваните резултати дословно от наредбата и играта за ядрото
-  const results = resultsForGroup(params.direction, params.ageGroup).find((r) => r.core === core)?.results ?? [];
+  // Играта за ядрото и очакваните резултати, които тя упражнява — дословно от наредбата
   const appendix = DIRECTION_STANDARDS[params.direction].appendix;
   const game = gameForCore(params.direction, core, topic, params.ageGroup);
+  const results = game
+    ? pickResults(params.direction, core, params.ageGroup, `${game.steps.join(' ')} ${game.skills} ${topic}`)
+    : expectedResults(params.direction, core, params.ageGroup).slice(0, 3);
+  const gameTitle = game?.title ?? `Игра по темата „${topic}“`;
 
   return {
     topic,
@@ -395,29 +440,26 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
     directionLabel: dirInfo.label,
     educationalCore: core,
     totalDuration: ageInfo.dosDuration,
-    goals: [
-      `Обогатяване и систематизиране на представите на децата по темата „${topic}“ в направление „${dirInfo.label}“.`,
-      `Развиване на познавателните, речевите и практическите умения чрез дидактични и ролеви игри по „${topic}“.`,
-      `Възпитаване на любознателност, екипност и позитивно отношение към света чрез примери от „${topic}“.`,
-    ],
+    situationType: SITUATION_TYPES[type].label,
+    aim: `${SITUATION_TYPES[type].aim} по ядро „${core}“ чрез играта „${gameTitle}“ (тема „${topic}“).`,
+    goals: lessonTasks(params.direction, results),
+    naredbaResults: results,
+    resultsSource: `Наредба № 5, приложение № ${appendix}, ядро „${core}“`,
+    methods: METHODS[params.direction],
+    assessment: assessmentText(type, results),
+    differentiation: differentiationText(params.direction, game?.sop),
     expectedResults: {
-      knowledge: results[0]
-        ? `${results[0]} (Наредба № 5, приложение № ${appendix}, ядро „${core}“).`
-        : `Разпознава и назовава основните обекти и признаци по темата „${topic}“ (ядро „${core}“, приложение № ${appendix} към Наредба № 5).`,
-      skills: results[1]
-        ? `${results[1]} (Наредба № 5, приложение № ${appendix}, ядро „${core}“).`
-        : game
-          ? `Упражнява: ${game.skills}.`
-          : `Участва активно в диалог, групира елементи и решава игрови задачи по темата „${topic}“.`,
-      attitudes: `Проявява емоционална отзивчивост, изследователски интерес и готовност за взаимопомощ в групата.`,
+      knowledge: results[0] ?? `Разпознава и назовава основните обекти и признаци по темата „${topic}“.`,
+      skills: results[1] ?? (game ? `Упражнява: ${game.skills}.` : `Участва в игрите по темата „${topic}“.`),
+      attitudes: 'Проявява емоционална отзивчивост, интерес и готовност за взаимопомощ в групата.',
     },
     materials: [
       ...(book ? [book[0]!.toUpperCase() + book.slice(1)] : []),
-      `Нагледни илюстративни табла и сюжетни карти по темата „${topic}“`,
-      `Магическа кутия със загадки и куклата ${ZLATNO_KLYUCHE.guide} като водач`,
+      `Картинки и предмети по темата „${topic}“ за играта`,
+      `Куклата ${ZLATNO_KLYUCHE.guide} в ролята на госта от мотивацията`,
       params.direction === 'pe'
         ? 'Уреди и пособия за двигателна дейност (обръчи, топки, ленти, гимнастически пейки)'
-        : `Индивидуални материали за практическа и дидактична работа (${dirInfo.shortLabel})`,
+        : `Индивидуални материали за всяко дете (${dirInfo.shortLabel})`,
     ],
     organizationForm: params.direction === 'pe' ? 'Фронтална и групова' : 'Фронтална, групова и индивидуална',
     integrativeLinks: LINKS[params.direction],
@@ -426,53 +468,43 @@ function buildDemoDirectionPlan(params: LessonParams & { direction: EducationalD
       {
         phase: '1. Уводна част (мотивация)',
         duration: t1,
-        teacherAction: `Посреща децата на килима с „Магическата кутия“ и чрез кратка загадка представя гостуващия герой (${hero}), който ги кани на пътешествие в света на „${topic}“.`,
-        childrenActivity: `Събират се с интерес в кръг, отгатват уводната загадка, поздравяват героя и споделят какво вече знаят за „${topic}“.`,
+        teacherAction: `Посреща децата в кръг. ${ZLATNO_KLYUCHE.guide} идва на гости с кутия с изненади по темата „${topic}“ и моли децата за помощ. Учителят пита: „Какво знаете по тази тема? Как можем да помогнем?“`,
+        childrenActivity: 'Поздравяват госта, разглеждат какво има в кутията и казват какво знаят по темата.',
       },
       {
         phase: '2. Основна част (игрова, познавателна и практическа дейност)',
         duration: t2,
         teacherAction: game
-          ? `Провежда играта „${game.title}“ (${dirInfo.label}, ядро „${core}“): ${game.steps.join(' ')}`
-          : `Представя основните понятия по темата „${topic}“ с нагледни материали и провежда дидактична игра по ядро „${core}“.`,
-        childrenActivity: game
-          ? `Участват в играта и упражняват: ${game.skills}.`
-          : `Наблюдават, сравняват и групират обектите от „${topic}“ и отговарят на въпроси.`,
+          ? `${MAIN_PART_LEAD[type]} Играта „${game.title}“: ${game.steps.join(' ')}`
+          : `${MAIN_PART_LEAD[type]} Провежда дидактична игра по ядро „${core}“ с картинки и предмети по темата.`,
+        childrenActivity: childrenDo(gameTitle, results),
       },
       {
-        phase: '3. Заключителна част (обобщение и рефлексия)',
+        phase: '3. Заключителна част (обобщение и оценка)',
         duration: t3,
-        teacherAction: `Обобщава наученото чрез рефлексивната игра „Вълшебният микрофон“: „Кое беше най-интересното ни откритие за ${topic} днес?“ и поощрява всяко дете.`,
-        childrenActivity: `Споделят своите впечатления и любими моменти, подреждат материалите и изпращат героя с усмивка.`,
+        teacherAction: `Пита: „Какво правихме днес? Кое беше лесно и кое — трудно?“ Казва на всяко дете конкретно какво е направило добре и изпраща госта.`,
+        childrenActivity: 'Казват какво са правили, показват с палец как са се справили и подреждат материалите.',
       },
     ],
     story: {
-      title: `Приказка за „${topic}“ и чудното откритие`,
+      title: `${hero.charAt(0).toUpperCase() + hero.slice(1)} и „${topic}“`,
       hero,
       paragraphs: [
-        `Една слънчева сутрин на Вълшебната поляна на откритията оживяха всички чудеса, свързани с „${topic}“. Там нашият главен герой – ${hero} – се събуди с широка усмивка и си каза: „Днес ще открия най-голямата тайна на ${topic}!“`,
-        `По пътеката пред него се появи златна загадка. За да я отключи, героят трябваше да събере три вълшебни ключета: наблюдателни очи, умни въпроси и добри приятели, които си помагат в труден момент.`,
-        `Скоро той срещна малките горски приятели, които се чудеха как да се справят със задачата за „${topic}“. Заедно те обединиха сили – всеки подаде ръка, сподели знание и с дружна усмивка подредиха пъзела на „${topic}“!`,
-        `Тогава поляната засия в топла светлина, а героят възкликна щастливо: „Истинското вълшебство на ${topic} се крие в това да учим, да творим и да откриваме света заедно!“`,
+        `Една сутрин ${hero} се събуди с въпрос: какво ли още не знае за „${topic}“? И реши да потърси отговора.`,
+        'По пътя срещна приятели. Всеки знаеше по нещо малко, но никой не знаеше всичко. „Хайде да търсим заедно!“ — предложи героят.',
+        'Те гледаха внимателно, питаха и опитваха. Когато някой се затрудняваше, другите му помагаха.',
+        'Накрая събраха всичко, което бяха научили, и отговорът беше намерен. „Заедно е по-лесно и по-весело!“ — казаха приятелите.',
       ],
-      moral: `Поука: Всяко знание за „${topic}“ става по-лесно и вълнуващо, когато го споделяме с добри приятели!`,
-      discussionQuestions: [
-        `Кой беше главният герой в нашата приказка за „${topic}“ и каква тайна искаше да открие той?`,
-        `Как приятелите успяха да се справят със загадката – сами или с общи усилия?`,
-        `Какво ново и интересно за „${topic}“ бихте разказали вие на нашия приказен герой?`,
-      ],
+      moral: 'Поука: когато питаме, опитваме и си помагаме, научаваме повече.',
+      discussionQuestions: [`Какъв въпрос имаше героят за „${topic}“?`, 'Кой му помогна и как?', 'Кога ти си помогнал или помогнала на приятел?'],
     },
     parentNote: {
-      viberHeader: `🌟 Днес в групата (${ageInfo.short}): Вълнуващо пътешествие по тема „${topic}“!`,
-      summaryMessage: `Скъпи родители, днес в направление „${dirInfo.label}“ нашите малки откриватели се потопиха в темата „${topic}“ с много игри, приказни герои и практически предизвикателства!`,
-      highlights: [
-        `Обогатихме представите и речника си с нови понятия по темата „${topic}“.`,
-        `Слушахме авторската приказка с героя ${hero} и беседвахме за приятелството и взаимопомощта.`,
-        `Децата работиха в екип и се справиха отлично с практическата мисия по ${dirInfo.shortLabel}!`,
-      ],
-      homeGameTitle: `🎲 5-минутна семейна игра (по желание): „Малкият експерт по ${topic}“`,
-      homeGameDescription: `Тази вечер разменете ролите за 5 минути – нека детето бъде „Учителят-експерт по ${topic}“, а вие неговият любопитен ученик! Попитайте го: „Кои са 3-те най-интересни неща за ${topic}, които научихте днес?“ и го оставете то да ви зададе гатанка!`,
-      closingWarmth: `Благодарим ви за партньорството! Пожелаваме ви топла и усмихната семейна вечер! 💛`,
+      viberHeader: `Днес в групата (${ageInfo.short}): „${topic}“`,
+      summaryMessage: `Мили родители, днес по ${dirInfo.label} работихме по темата „${topic}“ с играта „${gameTitle}“.`,
+      highlights: results.length ? results.map((r) => `Упражнявахме: ${trimEnd(r)}.`) : [`Говорихме и играхме по темата „${topic}“.`],
+      homeGameTitle: 'Игра вкъщи по желание: „Научи ме и мен“',
+      homeGameDescription: `Ако желаете, помолете детето да ви покаже как се играе „${gameTitle}“ и я изиграйте заедно за 5 минути. Това не е домашна работа — само по желание.`,
+      closingWarmth: 'Благодарим ви за подкрепата!',
     },
   };
 }

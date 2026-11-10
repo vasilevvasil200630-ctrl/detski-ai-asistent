@@ -23,7 +23,10 @@ import {
   AgeGroup,
   LessonDirection,
   GeneratedLessonPlan,
+  SituationType,
 } from '../types';
+import { SITUATION_TYPE_IDS, SITUATION_TYPES } from '../services/lessonParts';
+import { blocksText, planBlocksAfter, planBlocksBefore, type PlanBlock } from '../services/lessonSections';
 import {
   AGE_GROUP_LABELS,
   AiSource,
@@ -81,6 +84,32 @@ const QUICK_TOPICS: { label: string; topic: string; direction?: LessonDirection 
   { label: 'Пчеличките и цветята', topic: 'Трудолюбивите пчелички и пролетните цветя' },
 ];
 
+/** Една част от план-конспекта (цел, задачи, резултати…) — на екрана. */
+function PlanBlockView({ b, highlight = false }: { b: PlanBlock; highlight?: boolean }) {
+  const single = b.items.length === 1 && !b.numbered;
+  return (
+    <div className={highlight ? 'p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2' : ''}>
+      <h5 className="font-semibold text-slate-900 text-xs mb-2 flex items-center gap-1.5">
+        {highlight && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+        <span>{b.title}:</span>
+      </h5>
+      {b.note && <p className="text-xs text-slate-500 -mt-1 mb-2">{b.note}</p>}
+      {single ? (
+        <p className="text-slate-700">{b.items[0]}</p>
+      ) : (
+        <ul className="space-y-1.5 pl-1">
+          {b.items.map((x, i) => (
+            <li key={i} className="flex items-start gap-2 text-slate-700">
+              <span className="font-semibold text-emerald-600 shrink-0">{b.numbered ? `${i + 1}.` : '•'}</span>
+              <span>{x}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   defaultAgeGroup,
   onTimeSaved,
@@ -95,6 +124,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
   const [direction, setDirection] = useState<LessonDirection>('world');
   // Празно = AI избира най-подходящото официално ядро за темата
   const [core, setCore] = useState<string>('');
+  const [situationType, setSituationType] = useState<SituationType>('new');
   const [topic, setTopic] = useState<string>('Есен в гората');
   // От тематичното разпределение: /dos?dir=math&core=…&topic=…&group=2 попълва формата
   useEffect(() => {
@@ -171,7 +201,7 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
     }, 750);
 
     try {
-      const result = await generateLessonPreparation({ ageGroup, direction, topic: targetTopic, core: core || undefined });
+      const result = await generateLessonPreparation({ ageGroup, direction, topic: targetTopic, core: core || undefined, situationType });
       setPlan(result.plan);
       setSource(result.source);
       onTimeSaved(45);
@@ -203,30 +233,22 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
       `Група: ${p.ageGroupLabel} (${p.totalDuration})`,
       `Образователно направление: ${p.directionLabel}`,
       `Образователно ядро: ${p.educationalCore}`,
+      ...(p.situationType ? [`Вид на ситуацията: ${p.situationType}`] : []),
       ...(p.organizationForm ? [`Форма на организация: ${p.organizationForm}`] : []),
       `Нормативна основа: ${NAREDBA5.title}`,
       `Програмна система: ${ZLATNO_KLYUCHE.system} (${ZLATNO_KLYUCHE.publisher})`,
       '',
-      `ЦЕЛИ:`,
-      ...p.goals.map((g, i) => `${i + 1}. ${g}`),
-      '',
-      `ОЧАКВАНИ РЕЗУЛТАТИ (ДОС):`,
-      `• Знания: ${p.expectedResults.knowledge}`,
-      `• Умения: ${p.expectedResults.skills}`,
-      `• Отношения: ${p.expectedResults.attitudes}`,
-      '',
-      `НЕОБХОДИМИ МАТЕРИАЛИ:`,
-      ...p.materials.map((m) => `• ${m}`),
-      '',
-      ...(p.integrativeLinks?.length
-        ? [`ИНТЕГРАТИВНИ ВРЪЗКИ:`, ...p.integrativeLinks.map((l) => `• ${l}`), '']
-        : []),
+      ...blocksText(planBlocksBefore(p)),
       `ХОД НА СИТУАЦИЯТА ПО МИНУТИ:`,
       ...p.stages.map(
         (s) =>
           `${s.phase} (${s.duration})\n  - Дейност на учителя: ${s.teacherAction}\n  - Дейност на децата: ${s.childrenActivity}`
       ),
-    ].join('\n');
+      '',
+      ...blocksText(planBlocksAfter(p)),
+    ]
+      .join('\n')
+      .trim();
 
   const formatStoryText = (p: GeneratedLessonPlan) =>
     [
@@ -408,6 +430,24 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                   }`}
                 >
                   {c}
+                </button>
+              ))}
+            </div>
+            <p className="pt-1 text-xs font-semibold text-indigo-800">Вид на ситуацията:</p>
+            <div className="flex flex-wrap gap-2">
+              {SITUATION_TYPE_IDS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSituationType(id)}
+                  aria-pressed={situationType === id}
+                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border transition-all ${
+                    situationType === id
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {SITUATION_TYPES[id].label.replace('Ситуация за ', 'За ')}
                 </button>
               ))}
             </div>
@@ -747,6 +787,9 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                       <Clock className="w-4 h-4 text-emerald-600" />
                       <span>Продължителност по ДОС: {plan.totalDuration}</span>
                     </div>
+                    {plan.situationType && (
+                      <p className="text-xs font-bold text-emerald-900">Вид: {plan.situationType}</p>
+                    )}
                     {plan.organizationForm && (
                       <p className="text-xs font-bold text-emerald-900">Форма на организация: {plan.organizationForm}</p>
                     )}
@@ -755,65 +798,10 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                     )}
                   </div>
 
-                  {/* Goals */}
-                  <div>
-                    <h5 className="font-semibold text-slate-900 text-xs mb-2 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Образователни цели:</span>
-                    </h5>
-                    <ul className="space-y-1.5 pl-1">
-                      {plan.goals.map((g, i) => (
-                        <li key={i} className="flex items-start gap-2 text-slate-700">
-                          <span className="font-semibold text-emerald-600">•</span>
-                          <span>{g}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Expected Results (DOS) */}
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                    <h5 className="font-semibold text-slate-900 text-xs">
-                      Очаквани резултати (според ДОС):
-                    </h5>
-                    <p className="text-slate-700">
-                      <strong className="text-emerald-800">Знания:</strong> {plan.expectedResults.knowledge}
-                    </p>
-                    <p className="text-slate-700">
-                      <strong className="text-emerald-800">Умения:</strong> {plan.expectedResults.skills}
-                    </p>
-                    <p className="text-slate-700">
-                      <strong className="text-emerald-800">Отношения:</strong> {plan.expectedResults.attitudes}
-                    </p>
-                  </div>
-
-                  {/* Материали и интегративни връзки */}
-                  <div>
-                    <h5 className="font-semibold text-slate-900 text-xs mb-2">Материали:</h5>
-                    <ul className="space-y-1 pl-1">
-                      {plan.materials.map((m, i) => (
-                        <li key={i} className="flex items-start gap-2 text-slate-700">
-                          <span className="font-semibold text-emerald-600">•</span>
-                          <span>{m}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  {plan.integrativeLinks && plan.integrativeLinks.length > 0 && (
-                    <div>
-                      <h5 className="font-semibold text-slate-900 text-xs mb-2">
-                        Интегративни връзки:
-                      </h5>
-                      <ul className="space-y-1 pl-1">
-                        {plan.integrativeLinks.map((l, i) => (
-                          <li key={i} className="flex items-start gap-2 text-slate-700">
-                            <span className="font-semibold text-indigo-600"></span>
-                            <span>{l}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {/* Цел, задачи, очаквани резултати, методи, материали и интегративни връзки */}
+                  {planBlocksBefore(plan).map((b) => (
+                    <PlanBlockView key={b.title} b={b} highlight={b.title === 'Очаквани резултати'} />
+                  ))}
 
                   {/* Ход на ситуацията по минути */}
                   <div>
@@ -843,6 +831,11 @@ export const LiveDosModule: React.FC<LiveDosModuleProps> = ({
                       ))}
                     </div>
                   </div>
+
+                  {/* Проверка на резултатите и диференциран подход */}
+                  {planBlocksAfter(plan).map((b) => (
+                    <PlanBlockView key={b.title} b={b} />
+                  ))}
                 </div>
               </article>
             </div>

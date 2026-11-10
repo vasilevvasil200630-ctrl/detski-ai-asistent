@@ -16,6 +16,8 @@ const Params = z.object({
   topic: z.string().trim().max(120),
   // Официално ядро от Наредба № 5; празно — AI избира
   core: z.string().trim().max(80).optional(),
+  // Вид на ситуацията (за нови знания, упражнение, обобщение, проверка)
+  situationType: z.enum(["new", "practice", "summary", "check"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -43,6 +45,7 @@ export async function POST(request: Request) {
       // При БДП ядрото и направлението са фиксирани от програмата
       direction: direction === "bdp" ? undefined : direction,
       coreChosen: direction === "bdp" || Boolean(core),
+      ageGroup,
     });
     return NextResponse.json({ plan, source: "ai" });
   } catch (error) {
