@@ -101,10 +101,13 @@ export async function getSession(): Promise<SessionPayload | null> {
     const { prisma } = await import("@/lib/prisma");
     const dbUser = await prisma.user.findUnique({
       where: { id: decrypted.userId },
-      select: { email: true, name: true, passwordHash: true },
+      select: { email: true, name: true, passwordHash: true, kgRole: true, kindergartenId: true },
     });
     if (!dbUser) return null;
     if (decrypted.pv && decrypted.pv !== passwordVersion(dbUser.passwordHash)) return null;
+    // Директорът е махнал имейла от списъка с разрешени → сесията спира веднага
+    const { userHasAccess } = await import("@/lib/allowed-emails");
+    if (!(await userHasAccess(dbUser))) return null;
     return { userId: decrypted.userId, email: dbUser.email, name: dbUser.name };
   } catch {
     // Базата е недостъпна — подписаният токен остава валиден (по-добре от изхвърляне от профила)

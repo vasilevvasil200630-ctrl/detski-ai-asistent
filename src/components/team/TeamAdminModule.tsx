@@ -21,6 +21,7 @@ import {
 import { toast } from "@/components/Toaster";
 import { GroupsSection } from "./GroupsSection";
 import { ParentLinkSection } from "./ParentLinkSection";
+import { AllowedEmailsSection } from "./AllowedEmailsSection";
 import type { GroupView } from "@/lib/parents-shared";
 import { AGE_SHORT } from "@/services/materialText";
 
@@ -230,6 +231,8 @@ type Dialog =
 
 /** Панелът на директора: код за регистрация, екипът, роли, временни пароли, премахване. */
 export function TeamAdminModule() {
+  // Списъкът с разрешени имейли: когато е включен, кодът и „Приемане на нови учители“ не важат
+  const [listActive, setListActive] = useState<boolean | null>(null);
   const [data, setData] = useState<TeamData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
@@ -370,6 +373,9 @@ export function TeamAdminModule() {
         </p>
       </header>
 
+      <AllowedEmailsSection onActiveChange={setListActive} />
+
+      {listActive === false && (
       <section
         aria-labelledby="code-title"
         className="mt-6 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between"
@@ -405,8 +411,9 @@ export function TeamAdminModule() {
           </button>
         </div>
       </section>
+      )}
 
-      {data.kindergarten && (
+      {listActive === false && data.kindergarten && (
         <section
           aria-labelledby="signup-title"
           className={`mt-4 flex flex-col gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:justify-between ${

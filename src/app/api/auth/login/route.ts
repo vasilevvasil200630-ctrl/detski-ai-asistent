@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { LoginSchema } from "@/lib/auth/schemas";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSession, passwordVersion } from "@/lib/auth/session";
+import { ACCESS_STOPPED_MESSAGE, userHasAccess } from "@/lib/allowed-emails";
 import { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } from "@/lib/auth/rate-limit";
 import { getClientIp } from "@/lib/rate-limit";
 
@@ -53,6 +54,11 @@ export async function POST(request: Request) {
     await recordFailedLogin(ip, email);
     console.warn(`[auth] failed login (bad password) ip=${ip} email=${maskEmail(email)}`);
     return NextResponse.json({ error: GENERIC_ERROR }, { status: 401 });
+  }
+
+  // Само след вярна парола — иначе би се разбрало кой имейл е в списъка
+  if (!(await userHasAccess(user))) {
+    return NextResponse.json({ error: ACCESS_STOPPED_MESSAGE }, { status: 403 });
   }
 
   await clearFailedLogins(ip, email);

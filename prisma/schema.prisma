@@ -86,6 +86,21 @@ model Kindergarten {
   thematicPlans ThematicPlan[]
   groups        Group[]
   parentPosts   ParentPost[]
+  allowedEmails AllowedEmail[]
+}
+
+/// Имейлите, с които директорът разрешава учителски профил. Празен списък — регистрация с кода на градината.
+/// Когато списъкът е включен, учител без имейл в него не може да се регистрира, да влезе или да остане вписан
+/// (директорите — винаги могат).
+model AllowedEmail {
+  id             String       @id @default(cuid())
+  kindergartenId String
+  kindergarten   Kindergarten @relation(fields: [kindergartenId], references: [id], onDelete: Cascade)
+  /// Винаги с малки букви
+  email          String
+  createdAt      DateTime     @default(now())
+
+  @@unique([kindergartenId, email])
 }
 
 /// (Остаряло) Игра в колективната банка — от миграция 1_teacher_library данните са копирани в Material.
