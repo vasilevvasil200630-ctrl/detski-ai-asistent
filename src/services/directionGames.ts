@@ -136,7 +136,7 @@ const T: Record<LessonDirection, Template[]> = {
         `Учителят показва групи от предмети или картинки по темата „${kw}“ (числа ${NUMBER_RANGE[c.ageGroup]}).`,
         COUNT_ANSWER[c.ageGroup],
         c.ageGroup === '3' || c.ageGroup === '4'
-          ? 'Сравняват две групи: къде са повече, къде по-малко, колко трябва да добавим, за да станат равни.'
+          ? 'Сравняват и подреждат две множества по броя: къде са повече, къде по-малко, колко трябва да добавим, за да станат равни.'
           : 'Сравняват две групи: къде са повече и къде по-малко.',
       ],
       skills: 'броене в обхвата за групата (I гр. до 3, II гр. до 5, III и IV гр. до 10), сравняване на групи, свързване на брой с цифра (III гр. до 5, IV гр. до 10)',
@@ -519,11 +519,24 @@ const T: Record<LessonDirection, Template[]> = {
 };
 
 /** Играта за точно това ядро — за основната част на вградения план-конспект. */
-export function gameForCore(direction: LessonDirection, core: string, kw: string, ageGroup: AgeGroup): { title: string; steps: string[]; skills: string } | null {
+export function gameForCore(direction: LessonDirection, core: string, kw: string, ageGroup: AgeGroup): { title: string; steps: string[]; skills: string; sop: string } | null {
   const t = T[direction].find((x) => x.core.replace(' (БДП)', '') === core);
   if (!t) return null;
   const c = { ageGroup, isYard: false } as DemoContext;
-  return { title: t.title(kw), steps: t.steps(kw, c), skills: t.skills };
+  return { title: t.title(kw), steps: t.steps(kw, c), skills: t.skills, sop: t.sop };
+}
+
+/** Играта по БДП, която подхожда на темата от програмата на МОН (светофар, пресичане или опасни места). */
+export function bdpGameFor(themeText: string, kw: string, ageGroup: AgeGroup): { title: string; steps: string[]; skills: string; sop: string } {
+  const s = themeText.toLowerCase();
+  const title = /светоф|сигнал|звук и цвят/.test(s)
+    ? 'Светофарчо'
+    : /игра|играч|велосипед|площадк|опасн|разходка|дом/.test(s)
+      ? 'Опасно или безопасно?'
+      : 'Пешеходци и шофьори';
+  const t = T.bdp.find((x) => x.title(kw) === title) ?? T.bdp[0]!;
+  const c = { ageGroup, isYard: false } as DemoContext;
+  return { title: t.title(kw), steps: t.steps(kw, c), skills: t.skills, sop: t.sop };
 }
 
 /** Всички ядра, за които има вградена игра (за проверките). */

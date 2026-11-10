@@ -3,6 +3,7 @@ import { DIRECTION_STANDARDS } from './naredba5';
 import { BDP } from './bdp';
 import { findHoliday } from './holidays';
 import { taskLine } from './gameTasks';
+import { blocksText, planBlocksAfter, planBlocksBefore } from './lessonSections';
 
 /** Текстов вид на материалите — за преглед, копиране и печат в библиотеката. */
 
@@ -51,23 +52,17 @@ export function formatPlanText(p: GeneratedLessonPlan): string {
     `Група: ${p.ageGroupLabel} (${p.totalDuration})`,
     `Образователно направление: ${p.directionLabel}`,
     `Образователно ядро: ${p.educationalCore}`,
+    ...(p.situationType ? [`Вид на ситуацията: ${p.situationType}`] : []),
     ...(p.organizationForm ? [`Форма на организация: ${p.organizationForm}`] : []),
     '',
-    `🎯 ЦЕЛИ:`,
-    ...p.goals.map((g, i) => `${i + 1}. ${g}`),
-    '',
-    `📌 ОЧАКВАНИ РЕЗУЛТАТИ (ДОС):`,
-    `• Знания: ${p.expectedResults.knowledge}`,
-    `• Умения: ${p.expectedResults.skills}`,
-    `• Отношения: ${p.expectedResults.attitudes}`,
-    '',
-    `🧰 МАТЕРИАЛИ:`,
-    ...p.materials.map((m) => `• ${m}`),
-    ...(p.integrativeLinks?.length ? ['', `🔗 ИНТЕГРАТИВНИ ВРЪЗКИ:`, ...p.integrativeLinks.map((l) => `• ${l}`)] : []),
-    '',
-    `⏱️ ХОД НА СИТУАЦИЯТА:`,
+    ...blocksText(planBlocksBefore(p)),
+    `ХОД НА СИТУАЦИЯТА:`,
     ...p.stages.map((s) => `${s.phase} (${s.duration})\n  - Учител: ${s.teacherAction}\n  - Деца: ${s.childrenActivity}`),
-  ].join('\n');
+    '',
+    ...blocksText(planBlocksAfter(p)),
+  ]
+    .join('\n')
+    .trim();
 }
 
 export function formatStoryText(p: GeneratedLessonPlan): string {

@@ -1,5 +1,30 @@
 import { KG_SIGNATURE } from "@/config/kindergarten";
 import type { GeneratedLessonPlan } from "@/types";
+import { planBlocksAfter, planBlocksBefore, type PlanBlock } from "@/services/lessonSections";
+
+function Block({ b }: { b: PlanBlock }) {
+  return (
+    <>
+      <h2 className="mt-4 font-bold">{b.title}</h2>
+      {b.note && <p className="text-xs italic text-slate-500">{b.note}</p>}
+      {b.items.length === 1 && !b.numbered ? (
+        <p className="mt-1 text-sm">{b.items[0]}</p>
+      ) : b.numbered ? (
+        <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm">
+          {b.items.map((x, i) => (
+            <li key={i}>{x}</li>
+          ))}
+        </ol>
+      ) : (
+        <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+          {b.items.map((x, i) => (
+            <li key={i}>{x}</li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
 
 /** План-конспектът за печат — в библиотеката и на витрината. */
 export function LessonPrint({ plan }: { plan: GeneratedLessonPlan }) {
@@ -17,6 +42,12 @@ export function LessonPrint({ plan }: { plan: GeneratedLessonPlan }) {
           <dd>{plan.directionLabel}</dd>
           <dt className="font-semibold">Ядро:</dt>
           <dd>{plan.educationalCore}</dd>
+          {plan.situationType && (
+            <>
+              <dt className="font-semibold">Вид:</dt>
+              <dd>{plan.situationType}</dd>
+            </>
+          )}
           {plan.organizationForm && (
             <>
               <dt className="font-semibold">Форма:</dt>
@@ -24,20 +55,9 @@ export function LessonPrint({ plan }: { plan: GeneratedLessonPlan }) {
             </>
           )}
         </dl>
-        <h2 className="mt-5 font-bold">Цели</h2>
-        <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm">
-          {plan.goals.map((g, i) => (
-            <li key={i}>{g}</li>
-          ))}
-        </ol>
-        <h2 className="mt-4 font-bold">Очаквани резултати</h2>
-        <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
-          <li>Знания: {plan.expectedResults.knowledge}</li>
-          <li>Умения: {plan.expectedResults.skills}</li>
-          <li>Отношения: {plan.expectedResults.attitudes}</li>
-        </ul>
-        <h2 className="mt-4 font-bold">Материали</h2>
-        <p className="mt-1 text-sm">{plan.materials.join("; ")}</p>
+        {planBlocksBefore(plan).map((b) => (
+          <Block key={b.title} b={b} />
+        ))}
         <h2 className="mt-4 font-bold">Ход на ситуацията</h2>
         <table className="mt-2 w-full border-collapse text-sm">
           <thead>
@@ -60,6 +80,9 @@ export function LessonPrint({ plan }: { plan: GeneratedLessonPlan }) {
             ))}
           </tbody>
         </table>
+        {planBlocksAfter(plan).map((b) => (
+          <Block key={b.title} b={b} />
+        ))}
       </article>
       <article className="print-sheet mx-auto mt-6 max-w-[210mm] bg-white p-8 text-slate-900 shadow-sm ring-1 ring-slate-200 sm:p-10">
         <h2 className="text-2xl font-bold">{plan.story.title}</h2>

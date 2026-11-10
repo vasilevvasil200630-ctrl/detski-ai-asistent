@@ -17,6 +17,7 @@ import {
 import { KG_SIGNATURE } from "@/config/kindergarten";
 import { AGE_SHORT, directionLabel } from "@/services/materialText";
 import { taskLine } from "@/services/gameTasks";
+import { planBlocksAfter, planBlocksBefore, type PlanBlock } from "@/services/lessonSections";
 import { isPrintable, printableToText, SHEET_KIND_LABELS } from "@/services/printables";
 import type { AgeGroup, GeneratedGame, GeneratedLessonPlan, LessonDirection, MaterialKind } from "@/types";
 
@@ -81,17 +82,15 @@ function lessonBody(plan: GeneratedLessonPlan): (Paragraph | Table)[] {
     labeled("Образователно ядро", plan.educationalCore),
     labeled("Продължителност", plan.totalDuration),
   ];
+  if (plan.situationType) out.push(labeled("Вид на ситуацията", plan.situationType));
   if (plan.organizationForm) out.push(labeled("Форма на организация", plan.organizationForm));
   if (plan.programMaterial) out.push(labeled("Познавателна книжка", plan.programMaterial));
-  out.push(h("Цели"), ...numbered(plan.goals));
-  out.push(
-    h("Очаквани резултати"),
-    labeled("Знания", plan.expectedResults.knowledge),
-    labeled("Умения", plan.expectedResults.skills),
-    labeled("Отношения", plan.expectedResults.attitudes),
-  );
-  out.push(h("Материали"), ...bullets(plan.materials));
-  if (plan.integrativeLinks?.length) out.push(h("Интегративни връзки"), ...bullets(plan.integrativeLinks));
+  const block = (b: PlanBlock) => [
+    h(b.title),
+    ...(b.note ? [p(b.note, { italics: true, after: 60 })] : []),
+    ...(b.items.length === 1 && !b.numbered ? [p(b.items[0]!)] : b.numbered ? numbered(b.items) : bullets(b.items)),
+  ];
+  out.push(...planBlocksBefore(plan).flatMap(block));
   out.push(
     h("Ход на педагогическата ситуация"),
     table(
@@ -100,6 +99,7 @@ function lessonBody(plan: GeneratedLessonPlan): (Paragraph | Table)[] {
       [20, 40, 40],
     ),
   );
+  out.push(...planBlocksAfter(plan).flatMap(block));
   if (plan.story?.paragraphs?.length) {
     out.push(h(`Приказка: „${plan.story.title}“`), ...plan.story.paragraphs.map((x) => p(x)));
     if (plan.story.moral) out.push(p(`Поука: ${plan.story.moral}`, { italics: true }));
