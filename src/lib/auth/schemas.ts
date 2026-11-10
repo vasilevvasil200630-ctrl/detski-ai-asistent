@@ -29,7 +29,8 @@ export const RegisterSchema = z.object({
     kgName: z.string().trim().max(120).optional(),
     kgCity: z.string().trim().max(80).optional(),
     kgMotto: z.string().trim().max(160).optional(),
-    joinCode: z.string().trim().max(20).optional(),
+    // Кодът на градината или първоначалният код за първия профил (SETUP_CODE)
+    joinCode: z.string().trim().max(64).optional(),
   });
 
 export const ProfileUpdateSchema = z.object({

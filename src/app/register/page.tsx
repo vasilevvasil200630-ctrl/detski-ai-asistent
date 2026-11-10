@@ -34,6 +34,8 @@ export default function RegisterPage() {
   const [open, setOpen] = useState(true);
   // Директорът ползва списък с разрешени имейли — код не е нужен, но имейлът трябва да е в списъка
   const [byEmail, setByEmail] = useState(false);
+  // Още няма профили: първият е директорът и въвежда първоначалния код от настройките на сайта
+  const [setup, setSetup] = useState(false);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,8 @@ export default function RegisterPage() {
   useEffect(() => {
     fetch("/api/auth/register")
       .then((r) => r.json())
-      .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean }) => {
+      .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean; setup?: boolean }) => {
+        setSetup(d.setup === true);
         setNeedsCode(d.needsCode !== false);
         setOpen(d.open !== false);
         setByEmail(d.byEmail === true);
@@ -60,7 +63,7 @@ export default function RegisterPage() {
   function nextStep(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (needsCode && joinCode.trim().length < 6) return setError(`Въведете кода на ${KG.name}.`);
+    if (needsCode && joinCode.trim().length < 6) return setError(setup ? "Въведете първоначалния код." : `Въведете кода на ${KG.name}.`);
     if (name.trim().length < 2) return setError("Моля, въведете име (напр. „Г-жа Петрова“).");
     if (!email.includes("@")) return setError("Моля, въведете валиден имейл адрес.");
     if (password.length < 8) return setError("Паролата трябва да е поне 8 символа.");
@@ -116,8 +119,9 @@ export default function RegisterPage() {
         <div className="space-y-4">
           <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-            Регистрацията на нови учители в {KG.name} е затворена — екипът вече е в облака. Ако сте нов колега, обърнете се
-            към директора — ще я отвори за вас.
+            {setup
+              ? `Облакът на ${KG.name} още не е отворен. Директорът го отваря с първоначалния код от настройките на сайта.`
+              : `Регистрацията на нови учители в ${KG.name} е затворена — екипът вече е в облака. Ако сте нов колега, обърнете се към директора — ще я отвори за вас.`}
           </p>
           <p className="text-sm leading-relaxed text-slate-600">
             Родител или гост? Не ви трябва профил —{" "}
@@ -135,10 +139,10 @@ export default function RegisterPage() {
             <form onSubmit={nextStep} className="space-y-4" noValidate>
               {needsCode ? (
                 <TextField
-                  label={`Код на ${KG.name}`}
+                  label={setup ? "Първоначален код (за първия профил — директора)" : `Код на ${KG.name}`}
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value)}
-                  placeholder="ДГ-7K4P2M"
+                  placeholder={setup ? "" : "ДГ-7K4P2M"}
                   autoComplete="off"
                   required
                 />
@@ -171,7 +175,11 @@ export default function RegisterPage() {
               <FormError message={error} />
               <PrimaryButton type="submit">Продължи</PrimaryButton>
               {needsCode && (
-                <p className="text-xs leading-relaxed text-slate-500">Кодът се дава от администратора на облака — директора или колегата, която го е създала.</p>
+                <p className="text-xs leading-relaxed text-slate-500">
+                  {setup
+                    ? "Първият профил става администратор на облака. Първоначалният код е в настройките на сайта и го знае само директорът."
+                    : "Кодът се дава от администратора на облака — директора или колегата, която го е създала."}
+                </p>
               )}
             </form>
           ) : (
