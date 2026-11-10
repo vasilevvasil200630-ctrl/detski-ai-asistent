@@ -32,9 +32,23 @@ export function themeFor(topic: string): Theme {
   return THEMES.find((th) => th.keys.some((k) => t.includes(k))) ?? { id: 'default', keys: [], pics: DEFAULT_PICS };
 }
 
+/**
+ * Теми, чиито картинки се застъпват с темата вляво: гъбата е и храна, капката и мидата са и при водата,
+ * динята е лятна, барабанът е и играчка. Те не дават „излишната“ картинка, за да има само един верен отговор.
+ */
+const OVERLAPS: Record<string, string[]> = {
+  autumn: ['food', 'water'],
+  food: ['autumn'],
+  water: ['summer', 'autumn'],
+  summer: ['water', 'food'],
+  toys: ['music'],
+  music: ['toys'],
+};
+
 /** Картинки от друга тема — за „огради излишното“. */
 export function otherThemePics(themeId: string): Pic[] {
-  const other = THEMES.filter((t) => t.id !== themeId && t.id !== 'toys');
+  const skip = OVERLAPS[themeId] ?? [];
+  const other = THEMES.filter((t) => t.id !== themeId && t.id !== 'toys' && !skip.includes(t.id));
   return other.flatMap((t) => t.pics.slice(0, 2));
 }
 
