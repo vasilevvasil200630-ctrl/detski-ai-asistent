@@ -16,9 +16,11 @@ import { pickCore } from '../src/services/naredba5';
 import { SITUATION_TYPE_IDS, SITUATION_TYPES } from '../src/services/lessonParts';
 import { buildDirectionGames, coresWithGames } from '../src/services/directionGames';
 import { buildDemoLessonPlan } from '../src/services/aiEngine';
-import { buildDemoWorksheet, buildWorksheetFromKinds, ANSWER_MAX } from '../src/services/printables/worksheets';
+import { buildDemoWorksheet, buildStyledWorksheet, buildWorksheetFromKinds, ANSWER_MAX } from '../src/services/printables/worksheets';
+import { normalizePrintable, buildDemoPrintable, taskOnTopic } from '../src/services/printables';
+import type { Pic, WorksheetTask } from '../src/services/printables/types';
 import { buildDemoVerses } from '../src/services/printables/verses';
-import { THEMES } from '../src/services/printables/themes';
+import { THEMES, themeFor } from '../src/services/printables/themes';
 import { HOLIDAYS } from '../src/services/holidays';
 import { holidaysByWeek, orthodoxEaster, schoolWeeks } from '../src/services/thematicPlan';
 import type { DemoContext } from '../src/services/demoGames';
@@ -159,6 +161,57 @@ for (const topic of ['Моето тяло', 'Есен', 'Плодове', 'Во�
       if (group) ok(`odd/${topic}: „${odd.w}“ is not from „${group.id}“`, !group.pics.some((p) => p.e === odd.e));
     }
   }
+}
+
+/* 6в. Материалите за печат са по темата: главният предмет („ябълка“) е във всяка задача с картинки */
+const picsOf = (t: WorksheetTask): Pic[] =>
+  t.kind === 'count' ? t.groups.map((g) => g.pic)
+  : t.kind === 'sequence' ? t.pattern
+  : t.kind === 'trace' || t.kind === 'maze' ? [t.start, t.end]
+  : t.kind === 'odd' ? t.rows.flatMap((r) => r.items.filter((_, i) => i !== r.odd))
+  : t.kind === 'match' ? t.pairs.flatMap((p) => [p.left, p.right])
+  : t.kind === 'differences' ? (t.left.filter(Boolean) as Pic[])
+  : [];
+const HALF_OF: Record<string, string> = { Ябълка: 'apple', Гъба: 'mushroom', Ракета: 'rocket', Пеперуда: 'butterfly' };
+for (const topic of ['Ябълка', 'Круша', 'Таралеж', 'Ракета', 'Котката', 'Пеперуда', 'Тиква', 'Мечката', 'Морков', 'Гъба']) {
+  const theme = themeFor(topic);
+  ok(`topic „${topic}“ has a main object`, !!theme.focus, theme.id);
+  const focus = theme.focus!;
+  const inTheme = new Set(theme.pics.map((x) => x.e));
+  const sheets = [
+    ...AGES.flatMap((a) => (['math', 'world', 'art', 'construct', 'pe', 'bel'] as const).map((d) => buildDemoWorksheet(a, d, topic))),
+    ...AGES.flatMap((a) => (['maze', 'differences', 'half'] as const).map((st) => buildStyledWorksheet(a, 'math', topic, st))),
+    ...AGES.map((a) => buildWorksheetFromKinds(a, 'world', topic, ['count', 'match', 'odd', 'sequence'])),
+  ];
+  for (const ws of sheets) {
+    for (const t of ws.tasks) {
+      const pics = picsOf(t).filter((x) => !/^[\d●]+$/u.test(x.e));
+      if (!pics.length) continue;
+      const fromTheme = (x: Pic) => [...inTheme].some((e) => x.e.includes(e));
+      // „Свържи“: всяка двойка има поне една картинка от темата (заек — морков при „Таралеж“)
+      const fits = t.kind === 'match' ? t.pairs.every((p) => fromTheme(p.left) || fromTheme(p.right)) : pics.every(fromTheme);
+      ok(`${topic}/${ws.ageGroup}/${t.kind}: pictures are from the topic`, fits, pics.map((x) => x.w).join(', '));
+      if (['count', 'sequence', 'trace', 'maze', 'differences'].includes(t.kind)) ok(`${topic}/${ws.ageGroup}/${t.kind}: main object „${focus.w}“ is in it`, pics.some((x) => x.e === focus.e));
+      if (t.kind === 'half' && HALF_OF[topic] && t.mode === 'grid') ok(`${topic}: half drawing is the object itself`, ws.tasks[0]!.kind === 'half' && (ws.tasks[0] as { shape: string }).shape === HALF_OF[topic]);
+    }
+  }
+  const riddles = buildDemoVerses('3', 'riddles', topic).riddles;
+  ok(`${topic}: riddles are about the topic`, riddles.length >= 2 && riddles.every((r) => theme.pics.some((x) => x.w.slice(0, 4) === r.answer.slice(0, 4)) || ['зъби', 'уши'].includes(r.answer)), riddles.map((r) => r.answer).join(', '));
+}
+ok('apple riddles start with the apple', buildDemoVerses('3', 'riddles', 'Ябълка').riddles[0]?.answer === 'ябълка');
+ok('apple poems start with the apple poem', buildDemoVerses('3', 'poem', 'Ябълка').pieces[0]?.title === 'Ябълка');
+/* 6г. Отговорът на модела: задача извън темата се заменя със задача по темата */
+{
+  const off: WorksheetTask = { kind: 'count', prompt: 'Преброй.', max: 5, groups: [{ pic: { e: '🚗', w: 'кола' }, count: 2 }, { pic: { e: '🐈', w: 'котка' }, count: 3 }, { pic: { e: '⭐', w: 'звезда' }, count: 1 }] };
+  const on: WorksheetTask = { kind: 'count', prompt: 'Преброй.', max: 5, groups: [{ pic: { e: '🍏', w: 'ябълка' }, count: 2 }, { pic: { e: '🍐', w: 'круша' }, count: 3 }, { pic: { e: '🍌', w: 'банан' }, count: 1 }] };
+  ok('model task off the topic is detected', !taskOnTopic(off, 'Ябълка'));
+  ok('model task on the topic (other apple emoji, same word) is kept', taskOnTopic(on, 'Ябълка'));
+  ok('unknown topics are not second-guessed', taskOnTopic(off, 'Моята група'));
+  const req = { type: 'worksheet' as const, ageGroup: '3' as const, direction: 'math' as const, topic: 'Ябълка' };
+  const fb = buildDemoPrintable(req);
+  const out = normalizePrintable({ title: 'Лист', tasks: [off, on] }, req, fb);
+  const firstPics = out.type === 'worksheet' ? picsOf(out.tasks[0]!) : [];
+  ok('model sheet: the off-topic task is replaced by an apple task', out.type === 'worksheet' && out.tasks.length === 2 && firstPics.some((x) => x.e === '🍎') && JSON.stringify(picsOf(out.tasks[1]!)) === JSON.stringify(picsOf(on)), firstPics.map((x) => x.w).join(', '));
 }
 
 /* 7. Празници и календар */

@@ -2,7 +2,8 @@ import { KG } from '../../config/kindergarten';
 import { AGE_GROUP_STANDARDS, DIRECTION_STANDARDS, naredba5PromptRules } from '../naredba5';
 import { BDP, bdpPromptRules } from '../bdp';
 import type { AgeGroup, LessonDirection } from '../../types';
-import { ANSWER_MAX, answersWithDots, buildDemoWorksheet, buildStyledWorksheet, countPrompt } from './worksheets';
+import { ANSWER_MAX, answersWithDots, buildDemoWorksheet, buildStyledWorksheet, countPrompt, kindTask } from './worksheets';
+import { themeFor, themeStems, topicRule } from './themes';
 import { HALF_SHAPE_IDS, solveMaze } from './drawings';
 import { buildDemoVerses } from './verses';
 import { buildDemoLetter, letterSignature } from './letters';
@@ -67,6 +68,7 @@ ${naredba5PromptRules(req.ageGroup)}`;
     return `${head}
 ${req.direction === 'bdp' ? bdpPromptRules(req.ageGroup) : ''}
 Създай РАБОТЕН ЛИСТ ЗА ПЕЧАТ в направление ${directionText(req.direction)} по темата „${req.topic || 'по избор, подходяща за сезона'}“.
+${topicRule(req.topic)}
 Децата не четат — условията са кратки, за да ги прочете учителят. Картинките са ЕДНО емоджи всяка (без текст), с дума за учителя.
 Числата в задачите за броене са от 1 до ${ANSWER_MAX[req.ageGroup]}${answersWithDots(req.ageGroup) ? ' (децата още не познават цифрите — отговорът е брой точки)' : ''}. Брой задачи: ${req.ageGroup === '1' || req.ageGroup === '2' ? 3 : 4}, различни по вид.
 Видове задачи (поле "kind"):
@@ -82,7 +84,11 @@ ${SHEET_KIND_ORDER.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}
       tongue: '5 скоропоговорки (по един ред) за ясна реч — с повтарящи се звуци',
     };
     return `${head}
-Напиши ${what[req.kind]} по темата „${req.topic || 'детската градина'}“. Всичко да е оригинално, весело и подходящо за възрастта.
+Напиши ${what[req.kind]} по темата „${req.topic || 'детската градина'}“. Всичко да е оригинално, весело и подходящо за възрастта.${
+      req.topic.trim()
+        ? `\nТЕМАТА Е ЗАДЪЛЖИТЕЛНА: всяко стихче, броилка или скоропоговорка е за „${req.topic.trim()}“ — споменава я или предмети от нея; всяка гатанка има за отговор нещо от темата.`
+        : ''
+    }
 Върни САМО валиден JSON (без markdown): {"title":"…","pieces":[{"title":"…","lines":["ред 1","ред 2"]}],"riddles":[{"lines":["ред 1","ред 2"],"answer":"отговор"}],"note":"кратък съвет към учителя"}.
 ${req.kind === 'riddles' ? 'Попълни "riddles", а "pieces" остави празен.' : 'Попълни "pieces", а "riddles" остави празен.'}`;
   }
@@ -222,11 +228,54 @@ export function savedDrawnTask(raw: unknown): WorksheetTask | null {
 }
 
 /** Слива отговора на модела с вградения резултат: невалидното се взима от `fallback`. */
+/** Всички картинки в задача — за проверката дали е по темата. */
+function taskPics(t: WorksheetTask): Pic[] {
+  switch (t.kind) {
+    case 'count':
+      return t.groups.map((g) => g.pic);
+    case 'match':
+      return t.pairs.flatMap((p) => [p.left, p.right]);
+    case 'odd':
+      // Излишната картинка по замисъл е извън темата — гледат се останалите
+      return t.rows.flatMap((r) => r.items.filter((_, i) => i !== r.odd));
+    case 'sequence':
+      return t.pattern;
+    case 'trace':
+      return [t.start, t.end];
+    case 'sound':
+      return t.pics;
+    default:
+      return [];
+  }
+}
+
+/**
+ * Дали задачата от модела е по темата: има картинка от темата (или дума с корен от нея), или
+ * условието споменава темата. Рисуваните и „нарисувай“ задачите се приемат.
+ */
+export function taskOnTopic(task: WorksheetTask, topic: string): boolean {
+  const theme = themeFor(topic);
+  // Без разпозната тема („Моята група“) не се гадае — задачата от модела остава
+  if (theme.id === 'default') return true;
+  const words = topic.toLowerCase().split(/[^\p{L}]+/u).filter((w) => w.length >= 4).map((w) => w.slice(0, -1));
+  const stems = [...themeStems(theme), ...words];
+  if (task.kind === 'draw' || task.kind === 'maze' || task.kind === 'differences' || task.kind === 'half') return true;
+  const emojis = theme.pics.map((x) => x.e);
+  const pics = taskPics(task);
+  if (task.kind === 'sound') return pics.some((x) => emojis.some((e) => x.e.includes(e)) || stems.some((st) => x.w.toLowerCase().startsWith(st)));
+  const hits = pics.filter((x) => emojis.some((e) => x.e.includes(e)) || stems.some((st) => x.w.toLowerCase().startsWith(st)));
+  // Повечето картинки (без числата и точките в „свържи с броя“) са от темата
+  const real = pics.filter((x) => !/^[\d●]+$/u.test(x.e));
+  return real.length === 0 || hits.length * 2 >= real.length || stems.some((st) => task.prompt.toLowerCase().includes(st));
+}
+
 export function normalizePrintable(raw: unknown, req: PrintableRequest, fallback: Printable): Printable {
   const o = obj(raw);
   if (req.type === 'worksheet' && fallback.type === 'worksheet') {
-    const tasks = arr(o.tasks).map((t) => normalizeTask(t, req.ageGroup)).filter((t): t is WorksheetTask => !!t).slice(0, 4);
-    if (tasks.length < 2) throw new Error('Работният лист няма достатъчно валидни задачи');
+    const fromModel = arr(o.tasks).map((t) => normalizeTask(t, req.ageGroup)).filter((t): t is WorksheetTask => !!t).slice(0, 4);
+    if (fromModel.length < 2) throw new Error('Работният лист няма достатъчно валидни задачи');
+    // Задача извън темата се заменя със същия вид задача от вградения генератор — по темата
+    const tasks = fromModel.map((t, i) => (taskOnTopic(t, req.topic) ? t : (kindTask(t.kind, req.ageGroup, req.direction, req.topic) ?? fallback.tasks[i] ?? t)));
     const ws: Worksheet = { ...fallback, title: str(o.title, 120) || fallback.title, tasks, teacherNote: str(o.teacherNote, 800) || fallback.teacherNote };
     return ws;
   }

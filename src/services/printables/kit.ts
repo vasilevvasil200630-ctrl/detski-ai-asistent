@@ -4,7 +4,7 @@ import { bdpPromptRules } from '../bdp';
 import { taskLine } from '../gameTasks';
 import type { AgeGroup, GameTask, GeneratedGame, LessonDirection } from '../../types';
 import { COUNT_MAX, DRAWN_GOALS, buildWorksheetFromKinds } from './worksheets';
-import { themeFor } from './themes';
+import { themeFor, topicRule } from './themes';
 import { SHEET_KIND_SPECS, normalizeTask, pic, savedDrawnTask } from './index';
 import { isDrawnKind } from './drawings';
 import type { GameKit, KitParentNote, KitPart, Pic, PictureCards, SheetKind, Worksheet, WorksheetTask } from './types';
@@ -86,6 +86,7 @@ export function buildKitPrompt(req: KitRequest): string {
   if (req.parts.includes('worksheet') && modelKinds.length) {
     want.push(`"worksheet": {"title":"…","tasks":[…],"teacherNote":"цел по Наредба № 5 и отговорите"} — РАБОТЕН ЛИСТ точно с ${modelKinds.length} задачи от тези видове и в този ред: ${modelKinds.join(', ')}.
 Картинките са ЕДНО емоджи всяка (без текст), с дума за учителя. Числата за броене са от 1 до ${COUNT_MAX[req.ageGroup]}. Условията са кратки — учителят ги чете на глас.
+${topicRule(req.topic.trim() || req.game.title)}
 Формата на задачите:
 ${modelKinds.map((k) => `- ${SHEET_KIND_SPECS[k]}`).join('\n')}`);
   }
