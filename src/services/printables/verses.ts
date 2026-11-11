@@ -1,5 +1,5 @@
 import type { AgeGroup } from '../../types';
-import { themeFor } from './themes';
+import { themeFor, themeStems } from './themes';
 import { VERSES_LABELS, type VersesKind, type VersesSheet } from './types';
 
 /**
@@ -30,6 +30,7 @@ const POEMS: Record<string, Poem[]> = {
     { title: 'В двора на баба', lines: ['В двора на баба петлето пее,', 'котката мърка, слънчице грее.', 'Кравата муче: „Мууу, добро утро!“', 'Патето плува — спокойно и мъдро.'] },
   ],
   food: [
+    { title: 'Ябълка', lines: ['Ябълка червена, сочна и голяма,', 'в кошничката слагам — подарък за мама.', 'Мама я разряза — гледам с ококорени очи:', 'звездичка от семки в средата ѝ стои!'] },
     { title: 'Витамини', lines: ['Морковче хрупкаво, ябълка сладка,', 'круша и слива — в чинийка гладка.', 'Хапвам плодове и зеленчуци —', 'силни ще станат моите ръчици!'] },
   ],
   transport: [
@@ -93,6 +94,8 @@ const RIDDLES: Record<string, Riddle[]> = {
     { lines: ['Шията дълга — до клоните стига,', 'листата най-горни с лекота откъсва.'], answer: 'жираф' },
   ],
   food: [
+    { lines: ['Кръгла, червена, на клона виси,', 'сочна и сладка — кажи коя си ти?'], answer: 'ябълка' },
+    { lines: ['Като камбанка жълта виси,', 'сочна и сладка — отгатни я ти!'], answer: 'круша' },
     { lines: ['Оранжев, под земята расте,', 'зайчето най-много го обича.'], answer: 'морков' },
     { lines: ['Жълт и извит, в кората се крие,', 'маймунката с радост го хапва.'], answer: 'банан' },
     { lines: ['Червен и кръгъл, на лехата узрява,', 'в салатата пръв място заема.'], answer: 'домат' },
@@ -119,6 +122,28 @@ const RIDDLES: Record<string, Riddle[]> = {
     { lines: ['С бяла шапка и голяма лъжица', 'вкусна супа готви за всички.'], answer: 'готвач' },
   ],
 };
+
+// Стихчета и гатанки за новите теми — заедно с подходящите от другите теми
+POEMS.forest = POEMS.autumn!.filter((x) => x.title === 'Таралежче');
+POEMS.insects = POEMS.spring!.filter((x) => x.title === 'Пролет');
+RIDDLES.forest = [
+  { lines: ['Дълги уши, бързи крака,', 'скача и бяга из цялата гора.'], answer: 'заек' },
+  { lines: ['Голяма, кафява, мед обича,', 'цяла зима в бърлогата спи и не тича.'], answer: 'мечка' },
+  ...RIDDLES.autumn!.filter((r) => r.answer === 'таралеж' || r.answer === 'катерица'),
+  ...RIDDLES.wild!.filter((r) => r.answer === 'лисица'),
+];
+RIDDLES.insects = [
+  { lines: ['Малка, трудолюбива, в редица върви,', 'къщичка от иглички сама си строи.'], answer: 'мравка' },
+  ...RIDDLES.spring!.filter((r) => ['пчела', 'пеперуда', 'калинка'].includes(r.answer)),
+];
+RIDDLES.birds = [
+  { lines: ['Очи големи, нощем не спи,', '„Ху-ху“ из гората вика и бди.'], answer: 'сова' },
+  ...RIDDLES.farm!.filter((r) => r.answer === 'петел'),
+];
+RIDDLES.body = [
+  { lines: ['Бяла редичка в устата стои,', 'мий я всеки ден — сутрин и вечер ти!'], answer: 'зъби' },
+  { lines: ['Две сестрички — отляво, отдясно,', 'всичко чуват — тихо и ясно.'], answer: 'уши' },
+];
 
 const COUNTING: Poem[] = [
   { title: 'Ябълка червена', lines: ['Ябълка червена', 'в кошница зелена.', 'Който я изяде,', 'вън от кръга да иде!'] },
@@ -156,27 +181,43 @@ function genericPoem(topic: string): Poem {
   };
 }
 
+/** Свързаните с темата първи (споменават предмет от темата), после останалите — разбъркани. */
+function topicFirst<T extends { lines: string[] }>(items: readonly T[], stems: string[]): T[] {
+  const about = (x: T) => stems.some((st) => x.lines.join(' ').toLowerCase().includes(st));
+  const mixed = shuffle(items);
+  return [...mixed.filter(about), ...mixed.filter((x) => !about(x))];
+}
+
 export function buildDemoVerses(age: AgeGroup, kind: VersesKind, topic: string): VersesSheet {
   const t = topic.trim();
   const theme = themeFor(t);
+  const stems = themeStems(theme);
+  const focus = theme.focus?.w.toLowerCase();
   const small = age === '1' || age === '2';
   const base = { type: 'verses' as const, kind, topic: t, ageGroup: age };
   const title = t ? `${VERSES_LABELS[kind]}: ${t}` : VERSES_LABELS[kind];
 
   if (kind === 'riddles') {
-    const own = RIDDLES[theme.id] ?? [];
-    const rest = shuffle(Object.entries(RIDDLES).filter(([id]) => id !== theme.id).flatMap(([, r]) => r));
-    const riddles = [...shuffle(own), ...rest].slice(0, small ? 3 : 5);
+    const own = shuffle(RIDDLES[theme.id] ?? []);
+    // Гатанката за главния предмет („ябълка“) е първа
+    const ordered = focus ? [...own.filter((r) => r.answer === focus), ...own.filter((r) => r.answer !== focus)] : own;
+    // Само гатанки по темата, ако ги има поне две — по-малко, но по темата, вместо чужди
+    const riddles =
+      ordered.length >= 2
+        ? ordered.slice(0, small ? 3 : 5)
+        : [...ordered, ...shuffle(Object.entries(RIDDLES).filter(([id]) => id !== theme.id).flatMap(([, r]) => r))].slice(0, small ? 3 : 5);
     return { ...base, title, pieces: [], riddles, note: 'Прочетете гатанката бавно; отговорите са за учителя.' };
   }
   if (kind === 'counting') {
-    return { ...base, title, pieces: shuffle(COUNTING).slice(0, small ? 2 : 3), riddles: [], note: 'Броилките се казват ритмично, като учителят посочва по едно дете на всяка сричка.' };
+    return { ...base, title, pieces: topicFirst(COUNTING, stems).slice(0, small ? 2 : 3), riddles: [], note: 'Броилките се казват ритмично, като учителят посочва по едно дете на всяка сричка.' };
   }
   if (kind === 'tongue') {
-    return { ...base, title, pieces: shuffle(TONGUE).slice(0, small ? 3 : 5), riddles: [], note: 'Казват се първо бавно, после все по-бързо — упражнение за ясна реч (звукова култура).' };
+    return { ...base, title, pieces: topicFirst(TONGUE, stems).slice(0, small ? 3 : 5), riddles: [], note: 'Казват се първо бавно, после все по-бързо — упражнение за ясна реч (звукова култура).' };
   }
-  const own = POEMS[theme.id] ?? [];
-  const pieces = own.length ? shuffle(own).slice(0, 2) : [genericPoem(t || 'нашата група')];
+  // Стихчето със заглавие главния предмет („Ябълка“) е първо, после тези, които го споменават
+  const ranked = topicFirst(POEMS[theme.id] ?? [], focus ? [focus.slice(0, -1)] : stems);
+  const own = focus ? [...ranked.filter((x) => x.title.toLowerCase().startsWith(focus.slice(0, -1))), ...ranked.filter((x) => !x.title.toLowerCase().startsWith(focus.slice(0, -1)))] : ranked;
+  const pieces = own.length ? own.slice(0, 2) : [genericPoem(t || 'нашата група')];
   if (pieces.length < 2 && t && own.length) pieces.push(genericPoem(t));
   return { ...base, title, pieces, riddles: [], note: 'Подходящо за заучаване, за табло в групата и за празника.' };
 }

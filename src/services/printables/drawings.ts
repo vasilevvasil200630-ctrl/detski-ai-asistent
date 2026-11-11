@@ -94,9 +94,11 @@ export function solveMaze(cols: number, rows: number, walls: string): number[] |
   return path;
 }
 
-export function mazeTask(pics: Pic[], age: AgeGroup): WorksheetTask {
+export function mazeTask(pics: Pic[], age: AgeGroup, focus?: Pic): WorksheetTask {
   const [cols, rows] = MAZE_SIZE[age];
-  const [start, end] = shuffle(pics);
+  // Главният предмет на темата е началото на пътя („от ябълката до …“)
+  const rest = shuffle(focus ? pics.filter((p) => p.e !== focus.e) : pics);
+  const [start, end] = focus ? [focus, rest[0] ?? focus] : rest;
   return {
     kind: 'maze',
     prompt: `Начертай пътя през лабиринта — от ${start!.w} до ${end!.w}, без да минаваш през стена.`,
@@ -122,12 +124,17 @@ export const DIFF_SIZE: Record<AgeGroup, { cols: number; rows: number; count: nu
  * Две „сцени“ от картинките на темата; в дясната има `count` разлики: друга картинка,
  * липсваща, добавена или по-голяма. Разположението е едно и също, за да се сравнява лесно.
  */
-export function differencesTask(pics: Pic[], extra: Pic[], age: AgeGroup): WorksheetTask {
+export function differencesTask(pics: Pic[], extra: Pic[], age: AgeGroup, focus?: Pic): WorksheetTask {
   const { cols, rows, count } = DIFF_SIZE[age];
   const total = cols * rows;
   const pool = shuffle(pics);
   const empty = new Set(shuffle(Array.from({ length: total }, (_, i) => i)).slice(0, Math.floor(total / 4)));
   const left: DiffCell[] = Array.from({ length: total }, (_, i) => (empty.has(i) ? null : { ...pool[i % pool.length]! }));
+  // Главният предмет на темата е в картинката поне два пъти
+  if (focus) {
+    const filled = shuffle(left.map((c, i) => (c ? i : -1)).filter((i) => i >= 0)).slice(0, 2);
+    for (const i of filled) left[i] = { ...focus };
+  }
   const right: DiffCell[] = left.map((c) => (c ? { ...c } : null));
   // Заместващите картинки — все различни, за да не се повтаря една и съща разлика
   const swaps = shuffle([...extra, ...pics]);
@@ -218,10 +225,29 @@ const SHAPES_BY_THEME: Record<string, HalfShapeId[]> = {
   toys: ['rocket', 'car', 'heart'],
 };
 
-export function halfTask(themeId: string, age: AgeGroup, avoid?: HalfShapeId): WorksheetTask {
+/** Рисунката за главния предмет на темата („Ябълка“ → ябълка, „Сова“ → бухал). */
+const SHAPE_FOR_WORD: Record<string, HalfShapeId> = {
+  ябълка: 'apple',
+  гъба: 'mushroom',
+  лале: 'tulip',
+  цвете: 'tulip',
+  маргаритка: 'tulip',
+  пеперуда: 'butterfly',
+  елха: 'tree',
+  дърво: 'tree',
+  къща: 'house',
+  сърце: 'heart',
+  ракета: 'rocket',
+  кола: 'car',
+  сова: 'owl',
+};
+
+export function halfTask(themeId: string, age: AgeGroup, avoid?: HalfShapeId, focus?: Pic): WorksheetTask {
+  const own = focus ? SHAPE_FOR_WORD[focus.w.toLowerCase()] : undefined;
   const ids = (SHAPES_BY_THEME[themeId] ?? (Object.keys(HALF_SHAPES) as HalfShapeId[])).filter((id) => id !== avoid);
   const fit = age === '1' ? ids.filter((id) => HALF_SHAPES[id].simple) : ids;
-  const shape = shuffle(fit.length ? fit : (['heart', 'tree', 'apple'] as HalfShapeId[]).filter((id) => id !== avoid))[0]!;
+  const ownFits = own && own !== avoid && (age !== '1' || HALF_SHAPES[own].simple);
+  const shape = ownFits ? own : shuffle(fit.length ? fit : (['heart', 'tree', 'apple'] as HalfShapeId[]).filter((id) => id !== avoid))[0]!;
   const mode = age === '1' || age === '2' ? 'trace' : 'grid';
   const s = HALF_SHAPES[shape];
   return {
