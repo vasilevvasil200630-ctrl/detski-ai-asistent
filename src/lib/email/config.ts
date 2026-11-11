@@ -1,4 +1,5 @@
 import "server-only";
+import { KG } from "@/config/kindergarten";
 
 /**
  * Настройки на имейлите (Resend). По модела на МатураПлюс (src/lib/email/config.ts).
@@ -8,11 +9,11 @@ import "server-only";
  * - EMAIL_FROM="ДГ „Пролет“ <noreply@вашият-домейн>" — подател от верифициран домейн
  * - RESEND_DOMAIN_VERIFIED="true" — след като домейнът е потвърден в Resend
  * - ADMIN_NOTIFICATION_EMAIL — къде идва обратната връзка
- * - NEXT_PUBLIC_SUPPORT_EMAIL — публичният адрес за помощ
+ * - NEXT_PUBLIC_SUPPORT_EMAIL — публичният адрес за помощ (по подразбиране — официалният имейл на градината)
  */
 export const EMAIL_CONFIG = {
   from: process.env.EMAIL_FROM || "ДГ „Пролет“ — учителски облак <onboarding@resend.dev>",
-  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "vasilevvasil200630@gmail.com",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || KG.email,
   adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL || "vasilevvasil200630@gmail.com",
 } as const;
 
