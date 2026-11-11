@@ -1,5 +1,6 @@
 import type { AgeGroup, GeneratedGame, LessonDirection } from '../types';
 import type { DemoContext } from './demoGames';
+import { topicSteps, topicTitle } from './gameTopic';
 
 /**
  * Вграден генератор на игри ПО НАПРАВЛЕНИЕ (работи и без връзка към модела).
@@ -559,13 +560,14 @@ export function buildDirectionGames(c: DemoContext, direction: LessonDirection):
     const t = pool[(v + i) % pool.length]!;
     return {
       id: `dg-${direction}-${stamp}-${v}-${i}`,
-      title: t.title(kw),
+      title: topicTitle(t.title(kw), c.kw),
       subtitle: `${DIRECTION_TEXT[direction]} · ${c.ageShort} · ${c.locLabel}`,
       tags: [DIRECTION_TEXT[direction], t.core, c.ageRange],
       badgeColor: colors[i]!,
       rhymeTitle: 'Стихче за начало:',
       rhymeLines: t.rhyme,
-      steps: t.steps(kw, c),
+      // Темата с конкретните ѝ предмети и поне в две стъпки
+      steps: topicSteps(t.steps(kw, c), c.kw, direction, t.title(kw)),
       pedagogicalGoal: `${direction === 'bdp' ? 'Околен свят' : DIRECTION_TEXT[direction]} (ядро „${t.core.replace(' (БДП)', '')}“)${direction === 'bdp' ? ', тема по БДП' : ''}: ${t.skills}.`,
       sopAdaptation: t.sop,
       teacherTip: t.tip,

@@ -7,6 +7,7 @@ import { buildDemoContext, buildGamesAiPrompt, finalizeGames } from "@/services/
 import { isValidTask, MAX_TASKS, tasksError } from "@/services/gameTasks";
 import { buildDemoGames } from "@/services/demoGames";
 import { extractJson, normalizeGames } from "@/services/aiValidation";
+import { gameOnTopic } from "@/services/gameTopic";
 
 export const maxDuration = 60;
 
@@ -48,7 +49,10 @@ export async function POST(request: Request) {
 
   try {
     const raw = await askGeminiJson(buildGamesAiPrompt(filters));
-    const games = finalizeGames(normalizeGames(typeof raw === "string" ? extractJson(raw) : raw, demoGames), filters);
+    const fromModel = normalizeGames(typeof raw === "string" ? extractJson(raw) : raw, demoGames);
+    // Игра извън темата се заменя с вградена игра по темата
+    const onTopic = fromModel.map((g, i) => (gameOnTopic(g, filters.customTheme) ? g : (demoGames[i] ?? g)));
+    const games = finalizeGames(onTopic, filters);
     return NextResponse.json({ games, source: "ai" });
   } catch (error) {
     console.warn("[ai/games] fallback to demo:", error instanceof Error ? error.message : error);
