@@ -6,7 +6,7 @@ import { createSession, passwordVersion } from "@/lib/auth/session";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { normalizeJoinCode } from "@/lib/auth/utils";
 import { KG } from "@/config/kindergarten";
-import { NOT_ALLOWED_MESSAGE, allowlistSize } from "@/lib/allowed-emails";
+import { NOT_ALLOWED_MESSAGE, SEATS_FULL_MESSAGE, allowlistSize } from "@/lib/allowed-emails";
 import { firstAdminAllowed, setupCodeConfigured } from "@/lib/auth/setup-code";
 
 // По модела на МатураПлюс (src/app/api/auth/register/route.ts): лимит по IP, Zod, bcrypt,
@@ -37,12 +37,14 @@ export async function GET() {
   const byEmail = members > 0 && listed > 0;
   // Първият профил (директорът) — с тайната дума от настройките на сървъра
   const setup = members === 0;
+  const full = members >= KG.maxMembers;
   return NextResponse.json(
     {
       needsCode: setup || !byEmail,
-      open: setup ? setupCodeConfigured() || process.env.NODE_ENV !== "production" : byEmail || kg.teacherSignupOpen,
+      open: setup ? setupCodeConfigured() || process.env.NODE_ENV !== "production" : !full && (byEmail || kg.teacherSignupOpen),
       byEmail,
       setup,
+      full,
     },
     { headers: { "Cache-Control": "no-store" } },
   );
@@ -80,6 +82,8 @@ export async function POST(request: Request) {
       // Проверката е в транзакцията: двама „първи“ едновременно не стават и двамата администратори
       const members = await tx.user.count({ where: { kindergartenId: kg.id } });
       const isFirst = members === 0;
+      // Таванът: директорът и 8 учители (проверката е в транзакцията — двама едновременно не минават тавана)
+      if (members >= KG.maxMembers) throw new Error("FULL");
       // Само който знае тайната дума от настройките, може да стане първият директор
       if (isFirst && !firstAdminAllowed(data.joinCode)) throw new Error("SETUP");
       if (!isFirst) {
@@ -109,6 +113,9 @@ export async function POST(request: Request) {
       });
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "FULL") {
+      return NextResponse.json({ error: SEATS_FULL_MESSAGE, code: "FULL" }, { status: 403 });
+    }
     if (error instanceof Error && error.message === "SETUP") {
       return NextResponse.json(
         { error: "Първоначалният код не е верен. Той е в настройките на сайта и го знае само директорът.", code: "SETUP" },

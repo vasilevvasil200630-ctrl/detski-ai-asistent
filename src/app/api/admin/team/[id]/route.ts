@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { KG } from "@/config/kindergarten";
+import { SEATS_FULL_MESSAGE } from "@/lib/allowed-emails";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
@@ -52,6 +54,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (body.action === "restore") {
     if (!target || !removedFromTeam) return NextResponse.json(NOT_FOUND, { status: 404 });
+    // Връщането заема място — таванът е директор и 8 учители
+    const members = await prisma.user.count({ where: { kindergartenId: me.kindergartenId } });
+    if (members >= KG.maxMembers) return NextResponse.json({ error: SEATS_FULL_MESSAGE }, { status: 409 });
     const tempPassword = generateTempPassword();
     await prisma.user.update({
       where: { id },

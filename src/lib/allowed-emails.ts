@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { KG } from "@/config/kindergarten";
 
 /**
  * Списък с разрешени имейли: директорът въвежда имейлите на учителите. Докато списъкът е празен,
@@ -29,6 +30,8 @@ export async function userHasAccess(user: { email: string; kgRole: string; kinde
   if (!user.kindergartenId || user.kgRole === "ADMIN") return true;
   return emailHasAccess(user.kindergartenId, user.email);
 }
+
+export const SEATS_FULL_MESSAGE = `Всички ${KG.maxMembers} места в облака са заети (директор и ${KG.maxMembers - 1} учители). Директорът може да освободи място, като премахне профил от „Екип“.`;
 
 export const NOT_ALLOWED_MESSAGE = "Този имейл не е в списъка на градината. Обърнете се към директора.";
 export const ACCESS_STOPPED_MESSAGE = "Достъпът с този имейл е спрян. Обърнете се към директора.";

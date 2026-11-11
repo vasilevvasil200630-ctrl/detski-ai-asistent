@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/team-admin";
 import { normalizeEmail } from "@/lib/allowed-emails";
+import { KG } from "@/config/kindergarten";
 
 /**
  * Списъкът с разрешени имейли — само за директора. Първият добавен имейл включва списъка; тогава в
@@ -24,7 +25,7 @@ async function listView(kindergartenId: string) {
 export async function GET() {
   const auth = await requireAdmin();
   if ("response" in auth) return auth.response;
-  return NextResponse.json({ emails: await listView(auth.me.kindergartenId) }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ emails: await listView(auth.me.kindergartenId), max: KG.maxMembers }, { headers: { "Cache-Control": "no-store" } });
 }
 
 const AddBody = z.object({ emails: z.string().max(5000) });
@@ -44,14 +45,28 @@ export async function POST(request: Request) {
   if (parts.length > 100) return NextResponse.json({ error: "Наведнъж — до 100 имейла." }, { status: 400 });
 
   const kindergartenId = auth.me.kindergartenId;
-  await prisma.$transaction(async (tx) => {
-    // Първият имейл включва списъка: добавят се и всички вече регистрирани, за да не изгубят достъп
-    const empty = (await tx.allowedEmail.count({ where: { kindergartenId } })) === 0;
-    const members = empty ? await tx.user.findMany({ where: { kindergartenId }, select: { email: true } }) : [];
-    const all = [...new Set([...members.map((m) => normalizeEmail(m.email)), ...parts])];
-    await tx.allowedEmail.createMany({ data: all.map((email) => ({ kindergartenId, email })), skipDuplicates: true });
-  });
-  return NextResponse.json({ emails: await listView(kindergartenId) });
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Първият имейл включва списъка: добавят се и всички вече регистрирани, за да не изгубят достъп
+      const current = await tx.allowedEmail.findMany({ where: { kindergartenId }, select: { email: true } });
+      const members = current.length === 0 ? await tx.user.findMany({ where: { kindergartenId }, select: { email: true } }) : [];
+      const all = [...new Set([...members.map((m) => normalizeEmail(m.email)), ...parts])];
+      // Таванът: списъкът са местата — директор и 8 учители
+      const after = new Set([...current.map((c) => c.email), ...all]);
+      if (after.size > KG.maxMembers) throw new Error(`SEATS:${KG.maxMembers - current.length - (current.length === 0 ? members.length : 0)}`);
+      await tx.allowedEmail.createMany({ data: all.map((email) => ({ kindergartenId, email })), skipDuplicates: true });
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith("SEATS:")) {
+      const free = Math.max(0, Number(err.message.slice(6)));
+      return NextResponse.json(
+        { error: `Местата са ${KG.maxMembers} (директор и ${KG.maxMembers - 1} учители). Свободни: ${free}. Махнете имейл, за да освободите място.` },
+        { status: 400 },
+      );
+    }
+    throw err;
+  }
+  return NextResponse.json({ emails: await listView(kindergartenId), max: KG.maxMembers });
 }
 
 /** Маха имейл от списъка: учител с този имейл губи достъп веднага. Своя имейл директорът не може да махне. */
@@ -66,5 +81,5 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Своя имейл не можете да махнете от списъка." }, { status: 400 });
   }
   await prisma.allowedEmail.deleteMany({ where: { kindergartenId: auth.me.kindergartenId, email } });
-  return NextResponse.json({ emails: await listView(auth.me.kindergartenId) });
+  return NextResponse.json({ emails: await listView(auth.me.kindergartenId), max: KG.maxMembers });
 }

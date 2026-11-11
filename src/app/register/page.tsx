@@ -36,6 +36,8 @@ export default function RegisterPage() {
   const [byEmail, setByEmail] = useState(false);
   // Още няма профили: първият е директорът и въвежда първоначалния код от настройките на сайта
   const [setup, setSetup] = useState(false);
+  // Всички места (директор и 8 учители) са заети
+  const [full, setFull] = useState(false);
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,8 +53,9 @@ export default function RegisterPage() {
   useEffect(() => {
     fetch("/api/auth/register")
       .then((r) => r.json())
-      .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean; setup?: boolean }) => {
+      .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean; setup?: boolean; full?: boolean }) => {
         setSetup(d.setup === true);
+        setFull(d.full === true);
         setNeedsCode(d.needsCode !== false);
         setOpen(d.open !== false);
         setByEmail(d.byEmail === true);
@@ -119,7 +122,9 @@ export default function RegisterPage() {
         <div className="space-y-4">
           <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-            {setup
+            {full
+              ? `Всички места за учители в облака на ${KG.name} са заети. Ако сте нов колега, обърнете се към директора — може да освободи място.`
+              : setup
               ? `Облакът на ${KG.name} още не е отворен. Директорът го отваря с първоначалния код от настройките на сайта.`
               : `Регистрацията на нови учители в ${KG.name} е затворена — екипът вече е в облака. Ако сте нов колега, обърнете се към директора — ще я отвори за вас.`}
           </p>
