@@ -23,7 +23,9 @@ import { buildDemoVerses } from '../src/services/printables/verses';
 import { THEMES, themeFor } from '../src/services/printables/themes';
 import { HOLIDAYS } from '../src/services/holidays';
 import { holidaysByWeek, orthodoxEaster, schoolWeeks } from '../src/services/thematicPlan';
-import type { DemoContext } from '../src/services/demoGames';
+import { buildDemoGames, type DemoContext } from '../src/services/demoGames';
+import { buildDemoContext } from '../src/services/aiEngine';
+import { gameOnTopic, gameTopicRule } from '../src/services/gameTopic';
 
 const AGES: AgeGroup[] = ['1', '2', '3', '4'];
 const DIRS: LessonDirection[] = ['bel', 'math', 'world', 'art', 'music', 'construct', 'pe', 'bdp'];
@@ -212,6 +214,39 @@ ok('apple poems start with the apple poem', buildDemoVerses('3', 'poem', 'Ябъ
   const out = normalizePrintable({ title: 'Лист', tasks: [off, on] }, req, fb);
   const firstPics = out.type === 'worksheet' ? picsOf(out.tasks[0]!) : [];
   ok('model sheet: the off-topic task is replaced by an apple task', out.type === 'worksheet' && out.tasks.length === 2 && firstPics.some((x) => x.e === '🍎') && JSON.stringify(picsOf(out.tasks[1]!)) === JSON.stringify(picsOf(on)), firstPics.map((x) => x.w).join(', '));
+}
+
+/* 6д. Игрите са по темата: темата е в заглавието и в стъпките, с конкретните ѝ предмети */
+{
+  const words = (t: string) => t.toLowerCase().split(/[^\p{L}]+/u);
+  for (const topic of ['Ябълка', 'Таралеж', 'Ракета', 'Котката', 'Пеперуда']) {
+    const stem = topic.toLowerCase().slice(0, 4);
+    const has = (t: string) => words(t).some((w) => w.startsWith(stem));
+    const games = [
+      ...(['noisy', 'tired', 'distracted'] as const).flatMap((mood) =>
+        (['none', 'balls', 'music', 'paper_pencils', 'hoops_ribbons'] as const).flatMap((resources) =>
+          [0, 1, 2].flatMap(() => buildDemoGames(buildDemoContext({ ageGroup: '3', mood, location: 'classroom', duration: '15', resources, customTheme: topic, mode: 'theme', direction: 'mixed' } as never))),
+        ),
+      ),
+      ...DIRS.filter((d) => d !== 'bdp').flatMap((d) =>
+        [0, 1, 2].flatMap(() => buildDirectionGames(buildDemoContext({ ageGroup: '2', mood: 'noisy', location: 'classroom', duration: '15', resources: 'none', customTheme: topic, mode: 'theme', direction: d } as never), d)),
+      ),
+    ];
+    for (const g of games) {
+      ok(`game „${g.title}“: topic in the title`, has(g.title));
+      ok(`game „${g.title}“: topic in the steps`, g.steps.some(has), g.steps.join(' | ').slice(0, 120));
+    }
+  }
+  // Проверката на игрите от модела
+  const good = { title: 'Ябълковото влакче', rhymeLines: ['Ябълка червена…'], steps: ['Учителят показва ябълки и круши.', 'Децата броят ябълките.', 'Всяко дете казва дума за ябълка.'] };
+  const once = { title: 'Ябълково замръзване', rhymeLines: ['Тичай, подскачай…'], steps: ['Децата се движат на музика.', 'При стоп замръзват като ябълка.', 'Който помръдне, е помощник.'] };
+  const none = { title: 'Замръзни', rhymeLines: ['Тичай, подскачай…'], steps: ['Децата се движат.', 'При стоп замръзват.', 'Който помръдне, е помощник.'] };
+  ok('model game on topic is kept', gameOnTopic(good, 'Ябълка'));
+  ok('model game with the topic only once is replaced', !gameOnTopic(once, 'Ябълка'));
+  ok('model game without the topic is replaced', !gameOnTopic(none, 'Ябълка'));
+  ok('no topic — any game is fine', gameOnTopic(none, ''));
+  ok('„домакини“ is not „домат“', !gameOnTopic({ title: 'Малки домакини', rhymeLines: [], steps: ['Подреждаме масата.', 'Сгъваме дрехите.'] }, 'Ябълка'));
+  ok('the model gets the topic rule with the objects', /ЗАДЪЛЖИТЕЛНА/.test(gameTopicRule('Ябълка')) && /банан/.test(gameTopicRule('Ябълка')));
 }
 
 /* 7. Празници и календар */

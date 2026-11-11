@@ -15,6 +15,7 @@ import {
 } from './naredba5';
 import { BDP, BDP_NAREDBA5_RESULTS, BDP_THEMES, bdpPromptRules, findBdpTheme } from './bdp';
 import { GAME_MODES, taskLine, tasksPromptBlock } from './gameTasks';
+import { gameTopicRule } from './gameTopic';
 
 export const AGE_GROUP_LABELS: Record<AgeGroup, { short: string; full: string; ageRange: string; dosDuration: string }> = {
   '1': { short: 'I група (3–4 г.)', full: 'Първа възрастова група (3–4 години)', ageRange: '3-4 г.', dosDuration: '15 мин' },
@@ -170,7 +171,7 @@ function directionName(d: LessonDirection): string {
 /** Каква тройка игри да създаде моделът: по направление или смесени (според настроението). */
 function gamesTaskLine(filters: GameFilterState): string {
   const kw = filters.customTheme?.trim();
-  const topicRule = kw ? ` Всички игри затвърждават темата „${kw}“, която групата е взела.` : '';
+  const topicRule = kw ? ` Всички игри затвърждават темата „${kw}“, която групата е взела.\n${gameTopicRule(kw)}` : '';
   if (filters.mode === 'quick') {
     return `Генерирай 3 РАЗЛИЧНИ бързи игри на БЪЛГАРСКИ ЕЗИК: 1) подвижна според настроението, 2) словесна или с гатанка, 3) игра в кръг или по двойки.${topicRule}`;
   }

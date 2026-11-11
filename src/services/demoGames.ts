@@ -1,5 +1,6 @@
 import { AgeGroup, GeneratedGame, GroupMood, LessonDirection, PlayResources } from '../types';
 import { buildDirectionGames } from './directionGames';
+import { topicSteps, topicTitle } from './gameTopic';
 
 /**
  * Вграден демо генератор на ситуационни игри (работи без API ключ и без интернет).
@@ -490,13 +491,14 @@ let rotation = 0;
 function build(t: DemoTemplate, c: DemoContext, meta: { id: string; subtitle: string; tags: string[]; badgeColor: GeneratedGame['badgeColor']; rhymeTitle: string }): GeneratedGame {
   return {
     id: meta.id,
-    title: t.title(c),
+    title: topicTitle(t.title(c), c.kw),
     subtitle: meta.subtitle,
     tags: meta.tags,
     badgeColor: meta.badgeColor,
     rhymeTitle: t.rhymeTitle || meta.rhymeTitle,
     rhymeLines: t.rhyme,
-    steps: [...t.steps(c), AGE_VARIATION[c.ageGroup]],
+    // Темата с конкретните ѝ предмети и поне в две стъпки
+    steps: [...topicSteps(t.steps(c), c.kw, 'mood', t.title(c)), AGE_VARIATION[c.ageGroup]],
     pedagogicalGoal: t.goal(c),
     sopAdaptation: t.sop,
     teacherTip: t.tip,
