@@ -132,6 +132,16 @@ function soundTask(pics: Pic[]): WorksheetTask | null {
 const draw = (prompt: string): WorksheetTask => ({ kind: 'draw', prompt });
 
 /**
+ * „Продължи редицата“ при БДП: светлините в истинския им ред, без разбъркване. I–II група — светофарът
+ * за пешеходци (червено, зелено), III–IV група — за колите (червено, жълто, зелено).
+ */
+function trafficSequence(age: AgeGroup): WorksheetTask {
+  const [red, yellow, green] = PATTERN_PICS.bdp;
+  const pattern = age === '1' || age === '2' ? [red, green] : [red, yellow, green];
+  return { kind: 'sequence', prompt: 'Продължи редицата на светофара — нарисувай коя светлина следва.', pattern, repeat: 2 };
+}
+
+/**
  * „Свържи“ по темата: двойките на направлението, които са свързани с темата (напр. заек — морков
  * при „Зеленчуци“). Ако са малко, „свържи групата с броя“ с картинките на темата.
  */
@@ -179,7 +189,7 @@ function tasksFor(direction: LessonDirection, age: AgeGroup, topic: string): Wor
     case 'pe':
       return [older && coin() ? mazeTask(pics, age, f) : traceTask(pics, age, 'Помогни да стигне до другата картинка — следвай пътечката.', f), sequenceTask(patternFor(theme, PATTERN_PICS.pe), age, f), countTask(pics, age, f), draw('Нарисувай любимата си игра навън.')];
     case 'bdp':
-      return [sequenceTask([...PATTERN_PICS.bdp], age), matchTask(MATCH_PAIRS.bdp, 'Свържи всеки с мястото, където се движи.', older ? 4 : 3), oddTask(themeFor('транспорт').pics, 'transport', 2), draw('Нарисувай светофар и оцвети светлините му в правилния ред.')];
+      return [trafficSequence(age), matchTask(MATCH_PAIRS.bdp, 'Свържи всеки с мястото, където се движи.', older ? 4 : 3), oddTask(themeFor('транспорт').pics, 'transport', 2), draw('Нарисувай светофар и оцвети светлините му в правилния ред.')];
   }
 }
 
@@ -217,6 +227,7 @@ export function kindTask(kind: SheetKind, age: AgeGroup, direction: LessonDirect
     case 'odd':
       return oddTask(pics, theme.id, older ? 3 : 2, f);
     case 'sequence': {
+      if (direction === 'bdp') return trafficSequence(age);
       const own = direction in PATTERN_PICS && !f ? [...PATTERN_PICS[direction as keyof typeof PATTERN_PICS]] : pics;
       return sequenceTask(own, age, f);
     }
