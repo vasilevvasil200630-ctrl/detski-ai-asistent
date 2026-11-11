@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/AppShell";
@@ -8,27 +7,10 @@ import { getBaseAppUrl } from "@/lib/email/config";
 // Копирано от МатураПлюс (src/app/layout.tsx): Geist с кирилица, метаданни, скрипт преди
 // рендериране за щадящия режим (без премигване) и AppShell около всяка страница.
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin", "cyrillic"],
-  display: "swap",
-  preload: true,
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
-
-// Ръкописният шрифт на официалния сайт на градината (dg-yagodovo.com) — за марката и заглавията
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin", "cyrillic"],
-  weight: ["500", "700"],
-  display: "swap",
-});
+// Шрифтовете (Geist и ръкописният Caveat от официалния сайт на градината) са в public/fonts и се
+// описват в globals.css — build-ът не зависи от Google Fonts. Предварително се зареждат тези за
+// кирилицата и латиницата на основния текст и кирилицата на ръкописните заглавия.
+const PRELOAD_FONTS = ["/fonts/geist-cyrillic.woff2", "/fonts/geist-latin.woff2", "/fonts/caveat-cyrillic.woff2"];
 
 const SITE_DESCRIPTION =
   "Учителският облак на ДГ „Пролет“, с. Ягодово: игри, работни листове, стихчета, писма до родителите, грамоти и план-конспекти за печат. Съобразено с Наредба № 5 за предучилищното образование.";
@@ -63,10 +45,13 @@ export default function RootLayout({
     <html
       lang="bg"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <head>
         <meta name="theme-color" content="#ffffff" />
+        {PRELOAD_FONTS.map((href) => (
+          <link key={href} rel="preload" href={href} as="font" type="font/woff2" crossOrigin="anonymous" />
+        ))}
         <script
           dangerouslySetInnerHTML={{
             __html: `

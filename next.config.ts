@@ -51,6 +51,8 @@ const nextConfig: NextConfig = {
       },
       // Service Worker-ът не се кешира, за да стига новата версия веднага
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+      // Шрифтовете не се сменят — браузърът ги пази една година (при нов шрифт — ново име на файла)
+      { source: "/fonts/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       // Лични страници и API — никога в резултатите на търсачките
       ...[...PRIVATE_PAGE_ROUTES, "/api"].flatMap((route) =>
         [route, `${route}/:path*`].map((source) => ({
