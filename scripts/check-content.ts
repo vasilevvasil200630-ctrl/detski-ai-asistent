@@ -208,7 +208,7 @@ ok('apple poems start with the apple poem', buildDemoVerses('3', 'poem', 'Ябъ
   const on: WorksheetTask = { kind: 'count', prompt: 'Преброй.', max: 5, groups: [{ pic: { e: '🍏', w: 'ябълка' }, count: 2 }, { pic: { e: '🍐', w: 'круша' }, count: 3 }, { pic: { e: '🍌', w: 'банан' }, count: 1 }] };
   ok('model task off the topic is detected', !taskOnTopic(off, 'Ябълка'));
   ok('model task on the topic (other apple emoji, same word) is kept', taskOnTopic(on, 'Ябълка'));
-  ok('unknown topics are not second-guessed', taskOnTopic(off, 'Моята група'));
+  ok('unknown topics are not second-guessed', themeFor('Добрината').id === 'default' && taskOnTopic(off, 'Добрината'));
   const req = { type: 'worksheet' as const, ageGroup: '3' as const, direction: 'math' as const, topic: 'Ябълка' };
   const fb = buildDemoPrintable(req);
   const out = normalizePrintable({ title: 'Лист', tasks: [off, on] }, req, fb);
@@ -248,6 +248,17 @@ ok('apple poems start with the apple poem', buildDemoVerses('3', 'poem', 'Ябъ
   ok('„домакини“ is not „домат“', !gameOnTopic({ title: 'Малки домакини', rhymeLines: [], steps: ['Подреждаме масата.', 'Сгъваме дрехите.'] }, 'Ябълка'));
   ok('the model gets the topic rule with the objects', /ЗАДЪЛЖИТЕЛНА/.test(gameTopicRule('Ябълка')) && /банан/.test(gameTopicRule('Ябълка')));
 }
+
+/* 6е. БДП: светофарът в истинския ред; „Моята група“ — картинки от градината */
+for (const a of AGES) {
+  for (const ws of [buildDemoWorksheet(a, 'bdp', 'Безопасно на улицата'), buildWorksheetFromKinds(a, 'bdp', 'Светофар', ['sequence'])]) {
+    const seq = ws.tasks.find((t) => t.kind === 'sequence');
+    const want = a === '1' || a === '2' ? 'червено,зелено' : 'червено,жълто,зелено';
+    ok(`bdp/${a}: traffic light sequence in the real order`, seq?.kind === 'sequence' && seq.pattern.map((x) => x.w).join(',') === want, seq?.kind === 'sequence' ? seq.pattern.map((x) => x.w).join(',') : 'none');
+  }
+}
+for (const t of ['Моята група', 'Аз и моята група']) ok(`„${t}“ uses the kindergarten pictures`, themeFor(t).id === 'toys', themeFor(t).id);
+ok('„Групиране по цвят“ is not „Моята група“', themeFor('Групиране по цвят').id !== 'toys');
 
 /* 7. Празници и календар */
 const easter = (y: number) => orthodoxEaster(y).toISOString().slice(0, 10);
