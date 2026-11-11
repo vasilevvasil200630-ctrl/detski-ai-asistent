@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { getSession } from "@/lib/auth/session";
+import { PARENT_PREVIEW_COOKIE } from "@/lib/parent-preview";
 import { ParentHome } from "@/components/home/ParentHome";
 import { TeacherHome } from "@/components/home/TeacherHome";
 
 export const dynamic = "force-dynamic";
 
+/** Учителят, който гледа сайта като родител („Виж като родител“), получава страницата за родителите. */
+async function teacherView(): Promise<boolean> {
+  if (!(await getSession())) return false;
+  return (await cookies()).get(PARENT_PREVIEW_COOKIE)?.value !== "1";
+}
+
 /** Заглавието за търсачките и родителите; влезлите учители виждат „Начало“. */
 export async function generateMetadata(): Promise<Metadata> {
-  if (await getSession()) return { title: { absolute: "Начало · ДГ „Пролет“" } };
+  if (await teacherView()) return { title: { absolute: "Начало · ДГ „Пролет“" } };
   return {
     title: { absolute: "ДГ „Пролет“, с. Ягодово — какво правим с децата" },
     description:
@@ -17,6 +25,5 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Начало: за родителите и гостите — какво правим с децата; за влезлите учители — таблото. */
 export default async function Home() {
-  const session = await getSession();
-  return session ? <TeacherHome /> : <ParentHome />;
+  return (await teacherView()) ? <TeacherHome /> : <ParentHome />;
 }

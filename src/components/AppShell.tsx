@@ -14,6 +14,8 @@ import { GuestShell } from "./home/GuestShell";
 import { ReminderCenter } from "./notebook/ReminderCenter";
 import { PrintPrefsSync } from "./print/PrintOptions";
 import { SignInGate } from "./home/SignInGate";
+import { ParentPreviewBanner } from "./home/ParentPreviewBanner";
+import { readParentPreview } from "@/lib/parent-preview";
 import Link from "next/link";
 import { KeyRound, Loader2 } from "lucide-react";
 
@@ -31,6 +33,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  // „Виж като родител“: учителят вижда публичната част като гост (само изглед)
+  const [parentPreview, setParentPreview] = useState(false);
+  useEffect(() => {
+    setParentPreview(readParentPreview());
+  }, [pathname]);
 
   useEffect(() => {
     try {
@@ -80,11 +87,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Посетител: само страницата на градината, входът и правните страници; останалото е заключено
-  if (!user) {
+  // Посетител (или учител в „Виж като родител“): само страницата на градината, входът и правните
+  // страници; останалото е заключено
+  if (!user || parentPreview) {
     const isPublic = PUBLIC_PATHS.includes(pathname) || isShowcase;
     return (
       <>
+        {user && parentPreview && <ParentPreviewBanner />}
         <GuestShell footer={pathname === "/" ? "full" : "compact"} variant={isShowcase ? "showcase" : "site"}>{isPublic ? children : <SignInGate path={pathname} />}</GuestShell>
         <PrintPrefsSync />
         <Toaster />

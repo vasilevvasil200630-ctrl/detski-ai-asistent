@@ -15,6 +15,7 @@ import {
   Monitor,
   ShieldCheck,
   MessageSquareText,
+  Eye,
 } from "lucide-react";
 import { LogoIcon, LogoWordmark } from "./Logo";
 import { openFeedback } from "./FeedbackWidget";
@@ -22,6 +23,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { performSignOut } from "@/lib/session-cache";
 import { useMe } from "@/lib/client/useMe";
 import { useAppStore } from "@/store/appStore";
+import { startParentPreview } from "@/lib/parent-preview";
 
 // Копирано от МатураПлюс (src/components/AppTopBar.tsx): лепкава лента с бутони за менюто,
 // лого на мобилни, вход/регистрация за гости и падащо профилно меню. Вместо серия и XP —
@@ -105,6 +107,20 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
             <ShieldCheck className="h-3.5 w-3.5" />
             Демо режим
           </span>
+        )}
+
+        {/* Как изглежда сайтът за родителите и гостите — с един клик, без излизане от профила */}
+        {user && (
+          <button
+            type="button"
+            onClick={startParentPreview}
+            title="Виж сайта като родител"
+            aria-label="Виж сайта като родител"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-slate-200/75 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:min-h-0 sm:min-w-0 sm:px-3 sm:py-1.5"
+          >
+            <Eye className="h-4 w-4 text-[#0a4b82]" aria-hidden />
+            <span className="hidden lg:inline">Виж като родител</span>
+          </button>
         )}
 
         <ThemeToggle />
