@@ -6,11 +6,11 @@ import { toast } from "@/components/Toaster";
 
 type Row = { email: string; addedAt: string; name: string | null; admin: boolean };
 
-async function api(url: string, init: RequestInit = {}): Promise<{ emails: Row[] }> {
+async function api(url: string, init: RequestInit = {}): Promise<{ emails: Row[]; max: number }> {
   const res = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init.headers ?? {}) } });
-  const data = (await res.json().catch(() => ({}))) as { emails?: Row[]; error?: string };
+  const data = (await res.json().catch(() => ({}))) as { emails?: Row[]; max?: number; error?: string };
   if (!res.ok || !data.emails) throw new Error(data.error ?? "Действието не успя. Опитайте пак.");
-  return { emails: data.emails };
+  return { emails: data.emails, max: data.max ?? 9 };
 }
 
 /**
@@ -24,10 +24,13 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState<string | null>(null);
+  // Местата: директор и 8 учители
+  const [max, setMax] = useState(9);
 
   const apply = useCallback(
-    (emails: Row[]) => {
+    (emails: Row[], seats?: number) => {
       setRows(emails);
+      if (seats) setMax(seats);
       onActiveChange(emails.length > 0);
     },
     [onActiveChange],
@@ -35,7 +38,7 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
 
   useEffect(() => {
     api("/api/admin/allowed-emails")
-      .then((d) => apply(d.emails))
+      .then((d) => apply(d.emails, d.max))
       .catch(() => setRows([]));
   }, [apply]);
 
@@ -46,7 +49,7 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
     setBusy(true);
     try {
       const d = await api("/api/admin/allowed-emails", { method: "POST", body: JSON.stringify({ emails: text }) });
-      apply(d.emails);
+      apply(d.emails, d.max);
       setText("");
       toast(wasEmpty ? "Списъкът е включен. Вече се регистрират само имейлите от него." : "Имейлите са добавени.", "success");
     } catch (err) {
@@ -60,7 +63,7 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
     setBusy(true);
     try {
       const d = await api(`/api/admin/allowed-emails?email=${encodeURIComponent(email)}`, { method: "DELETE" });
-      apply(d.emails);
+      apply(d.emails, d.max);
       setConfirm(null);
       toast("Имейлът е махнат. Профил с него вече няма достъп.", "success");
     } catch (err) {
@@ -78,7 +81,7 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
         <MailCheck className="h-4 w-4" aria-hidden /> Разрешени имейли на учителите
       </h2>
       <p className="mt-1.5 text-lg font-bold text-slate-900">
-        {rows === null ? "Зареждане…" : active ? `Включено — ${rows.length} ${rows.length === 1 ? "имейл" : "имейла"} в списъка` : "Изключено — регистрацията е с кода на градината"}
+        {rows === null ? "Зареждане…" : active ? `Включено — заети ${rows.length} от ${max} места` : "Изключено — регистрацията е с кода на градината"}
       </p>
       <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
         {active
@@ -106,7 +109,10 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Plus className="h-4 w-4" aria-hidden />} Добави
         </button>
       </form>
-      <p className="mt-1 text-xs text-slate-500">Може няколко наведнъж — разделени със запетая или на нов ред.</p>
+      <p className="mt-1 text-xs text-slate-500">
+        Може няколко наведнъж — разделени със запетая или на нов ред. Местата са {max}: директор и {max - 1} учители
+        {active && rows ? ` · свободни: ${Math.max(0, max - rows.length)}` : ""}.
+      </p>
 
       {active && rows && (
         <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
