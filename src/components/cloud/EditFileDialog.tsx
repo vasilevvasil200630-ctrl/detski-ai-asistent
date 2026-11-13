@@ -80,7 +80,7 @@ export function EditFileDialog({ file, onClose, onSaved }: { file: CloudFileItem
           maxLength={140}
           required
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20"
+          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20"
         />
         <div className="mt-4">
           <MetaFields value={meta} onChange={setMeta} idPrefix="edit" />
@@ -93,7 +93,7 @@ export function EditFileDialog({ file, onClose, onSaved }: { file: CloudFileItem
           <button
             type="submit"
             disabled={saving || !title.trim()}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />} Запази
           </button>

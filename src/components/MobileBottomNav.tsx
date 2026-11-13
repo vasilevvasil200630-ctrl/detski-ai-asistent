@@ -35,7 +35,7 @@ export function MobileBottomNav() {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={`flex flex-col items-center justify-center min-h-[48px] py-1 px-2 rounded-xl transition-all duration-150 active:scale-95 touch-manipulation ${
-                isActive ? "text-[#0a4b82] font-semibold bg-[#eef5fb]" : "text-slate-500 hover:text-slate-800"
+                isActive ? "text-[#4d7a0a] font-semibold bg-[#f4f9e8]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <div className="relative">

@@ -175,7 +175,7 @@ function NoteEditor({
           <button
             type="submit"
             disabled={empty || saving}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#0a4b82] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-50"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
             {onCancel ? "Запази" : "Добави"}
@@ -364,7 +364,7 @@ export function NotebookModule() {
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${tab === t.id ? "bg-[#eef5fb] text-[#0a4b82]" : "text-slate-600 hover:text-slate-900"}`}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${tab === t.id ? "bg-[#f4f9e8] text-[#4d7a0a]" : "text-slate-600 hover:text-slate-900"}`}
             >
               {t.label} <span className="tabular-nums text-slate-400">{counts[t.id]}</span>
             </button>
@@ -378,7 +378,7 @@ export function NotebookModule() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Търсене в бележките"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20"
           />
           {query && (
             <button type="button" onClick={() => setQuery("")} aria-label="Изчисти" className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700">

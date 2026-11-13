@@ -36,7 +36,7 @@ export function FeedbackWidget() {
 
 const LABEL = "mb-2 block text-sm font-semibold text-slate-800";
 const FIELD =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-150 hover:border-slate-400 focus-visible:border-[#0a4b82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]/20 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-150 hover:border-slate-400 focus-visible:border-[#4d7a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]/20 disabled:cursor-not-allowed disabled:opacity-60";
 
 function FeedbackModal({ page, onClose }: { page: string; onClose: () => void }) {
   const titleId = useId();
@@ -129,7 +129,7 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
             type="button"
             onClick={close}
             aria-label="Затвори"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
@@ -142,7 +142,7 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
             <button
               type="button"
               onClick={onClose}
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-[#0a4b82] px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+              className="mt-6 inline-flex items-center justify-center rounded-lg bg-[#4d7a0a] px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
             >
               Затвори
             </button>
@@ -161,9 +161,9 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
                     type="button"
                     aria-pressed={type === value}
                     onClick={() => setType(value)}
-                    className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
+                    className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] ${
                       type === value
-                        ? "border-[#0a4b82] bg-[#eef5fb] text-[#083861]"
+                        ? "border-[#4d7a0a] bg-[#f4f9e8] text-[#3d6108]"
                         : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
@@ -224,7 +224,7 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
               />
               <p className="mt-1 text-xs text-slate-500">
                 Ползваме го само за да ви отговорим и го пазим до две години.{" "}
-                <a href="/privacy#email" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+                <a href="/privacy#email" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
                   Поверителност
                 </a>
               </p>
@@ -247,7 +247,7 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
             <button
               type="submit"
               disabled={sending}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0a4b82] px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#4d7a0a] px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               {sending ? "Изпращане…" : "Изпрати"}

@@ -106,7 +106,7 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
             <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-800">Споделено</span>
           )}
           {m.tried && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-[#0a4b82]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-[#4d7a0a]">
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Изпитано с деца
             </span>
           )}
@@ -126,7 +126,7 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
         </p>
         {m.tried?.note && (
           <p className="rounded-xl bg-sky-50/70 px-3 py-2 text-sm leading-relaxed text-slate-700">
-            <strong className="font-semibold text-[#0a4b82]">Как мина:</strong> {m.tried.note}
+            <strong className="font-semibold text-[#4d7a0a]">Как мина:</strong> {m.tried.note}
           </p>
         )}
         {triedOpen && (
@@ -148,7 +148,7 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
                 type="button"
                 onClick={() => void saveTried({ note: triedNote })}
                 disabled={busy !== null}
-                className="inline-flex items-center gap-1 rounded-lg bg-[#0a4b82] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#083861] disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-lg bg-[#4d7a0a] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#3d6108] disabled:opacity-60"
               >
                 {busy === "tried" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Запази
               </button>
@@ -215,7 +215,7 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
               disabled={busy !== null}
               aria-expanded={triedOpen}
               className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold disabled:opacity-60 ${
-                m.tried ? "border border-sky-200 bg-sky-50 text-[#0a4b82]" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                m.tried ? "border border-sky-200 bg-sky-50 text-[#4d7a0a]" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
               }`}
             >
               <BadgeCheck className="h-3.5 w-3.5" /> {m.tried ? "Изпитано ✓" : "Изпитах го"}
@@ -224,7 +224,7 @@ export function MaterialCard({ material: m, view, onChange, onDelete }: Props) {
               type="button"
               onClick={() => setProposing(true)}
               disabled={busy !== null || proposed}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#0a4b82]/30 bg-white px-2.5 py-1.5 text-xs font-bold text-[#0a4b82] hover:bg-sky-50 disabled:opacity-60"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#4d7a0a]/30 bg-white px-2.5 py-1.5 text-xs font-bold text-[#4d7a0a] hover:bg-sky-50 disabled:opacity-60"
             >
               {proposed ? <Check className="h-3.5 w-3.5" /> : <Store className="h-3.5 w-3.5" />} {proposed ? "Чака одобрение" : "За витрината"}
             </button>

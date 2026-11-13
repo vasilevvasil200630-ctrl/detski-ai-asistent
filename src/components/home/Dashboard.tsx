@@ -92,7 +92,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
               key={href}
               href={href}
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                i === 0 ? "bg-[#0a4b82] text-white hover:bg-[#083861]" : "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
+                i === 0 ? "bg-[#4d7a0a] text-white hover:bg-[#3d6108]" : "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
               }`}
             >
               <Icon className="h-4 w-4" /> {label}
@@ -106,7 +106,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
           <section aria-labelledby="dash-cloud" className="rounded-2xl border border-slate-200 bg-white">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 id="dash-cloud" className="font-semibold text-slate-900">Ново в общия облак</h2>
-              <Link href="/cloud" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/cloud" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                 Всички файлове <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -133,7 +133,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
                       href={cloudDownloadUrl(f.id)}
                       download={f.fileName}
                       aria-label={`Свали „${f.title}“`}
-                      className="shrink-0 rounded-lg border border-slate-200 p-2 text-[#0a4b82] hover:bg-slate-50"
+                      className="shrink-0 rounded-lg border border-slate-200 p-2 text-[#4d7a0a] hover:bg-slate-50"
                     >
                       <Download className="h-4 w-4" aria-hidden />
                     </a>
@@ -146,7 +146,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
           <section aria-labelledby="dash-mine" className="rounded-2xl border border-slate-200 bg-white">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 id="dash-mine" className="font-semibold text-slate-900">Последно в моята библиотека</h2>
-              <Link href="/library" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/library" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                 Всички <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -160,7 +160,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
           <section aria-labelledby="dash-shared" className="rounded-2xl border border-slate-200 bg-white">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <h2 id="dash-shared" className="font-semibold text-slate-900">Ново от колегите</h2>
-              <Link href="/hub" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/hub" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                 Учителски хъб <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -201,7 +201,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
                 })}
               </ul>
             )}
-            <Link href="/notebook" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+            <Link href="/notebook" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
               Отвори бележника <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </section>
@@ -213,7 +213,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
               <p className="mt-2 font-mono text-2xl font-bold tracking-wide text-slate-900">{user.kindergarten.joinCode}</p>
               <p className="mt-1 text-sm text-slate-600">Дайте го на колега от {user.kindergarten.name}, за да се регистрира в облака.</p>
               {user.kgRole === "ADMIN" && (
-                <Link href="/team" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                <Link href="/team" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                   Управление на екипа <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               )}
@@ -223,7 +223,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
             <h2 id="dash-holiday" className="text-sm font-semibold text-slate-500">Предстоящ празник</h2>
             <p className="mt-2 text-lg font-bold text-slate-900">{holiday.name}</p>
             <p className="text-sm text-slate-600">{holiday.when} · {holiday.about}</p>
-            <Link href="/holidays" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+            <Link href="/holidays" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
               Игри и материали за празника <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </section>
@@ -244,7 +244,7 @@ export function Dashboard({ user }: { user: SessionTeacher }) {
                 ))}
               </tbody>
             </table>
-            <Link href="/naredba5" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+            <Link href="/naredba5" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
               Проверка на разпределението <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </section>

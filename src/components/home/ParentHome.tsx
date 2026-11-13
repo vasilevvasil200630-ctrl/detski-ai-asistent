@@ -36,29 +36,30 @@ export async function ParentHome() {
 
   return (
     <main>
-      <section className="border-b border-slate-200 bg-gradient-to-b from-sky-50/70 to-white">
-        <div className="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
-          <p className="text-sm font-semibold text-[#1a7f45]">
+      {/* Заглавието в средата, оранжево — като на официалния сайт */}
+      <section className="border-b border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 pb-10 pt-8 text-center sm:px-6 sm:pt-10">
+          <p className="text-base font-semibold text-kg-green-ink">
             {KG.fullName} · {KG.village}
           </p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="mx-auto mt-2 max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
             Какво правим с децата в „Пролет“
           </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">
+          <p className="mx-auto mt-4 max-w-2xl text-xl leading-relaxed text-slate-700">
             Игри, дейности и празници от нашите групи — така, както ги показват учителите. Всяка игра може да се отпечата и да се
             изиграе вкъщи, ако детето пожелае.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link
               href="/vitrina"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-6 py-3.5 text-base font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-6 py-3.5 text-base font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
             >
               <Images className="h-5 w-5" aria-hidden /> Всички дейности
             </Link>
             {latestMonth && (
               <Link
                 href={`/vitrina/mesec/${latestMonth.ym}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
               >
                 <Newspaper className="h-5 w-5" aria-hidden /> Бюлетин за {monthLabel(latestMonth.ym)}
               </Link>
@@ -80,13 +81,13 @@ export async function ParentHome() {
                   <Link
                     key={g.id}
                     href={`/grupi/${g.slug}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-[#0a4b82]/40 hover:bg-sky-50/40"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-[#4d7a0a]/40 hover:bg-sky-50/40"
                   >
                     <span className="min-w-0">
                       <span className="block font-bold text-slate-900">{g.label}</span>
                       <span className="block truncate text-sm text-slate-600">{g.teachers.map((t) => t.name).join(", ") || "Учителите скоро"}</span>
                     </span>
-                    <ArrowRight className="h-5 w-5 shrink-0 text-[#0a4b82]" aria-hidden />
+                    <ArrowRight className="h-5 w-5 shrink-0 text-[#4d7a0a]" aria-hidden />
                   </Link>
                 ))}
               </div>
@@ -111,7 +112,7 @@ export async function ParentHome() {
               Последни дейности
             </h2>
             {items.length > 0 && (
-              <Link href="/vitrina" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/vitrina" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                 Всички <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             )}
@@ -172,7 +173,7 @@ export async function ParentHome() {
               <ul className="mt-3 space-y-1.5 text-sm">
                 {months.slice(0, 6).map((m) => (
                   <li key={m.ym}>
-                    <Link href={`/vitrina/mesec/${m.ym}`} className="font-medium text-[#0a4b82] hover:underline">
+                    <Link href={`/vitrina/mesec/${m.ym}`} className="font-medium text-[#4d7a0a] hover:underline">
                       {monthLabel(m.ym)}
                     </Link>{" "}
                     <span className="text-slate-500">· {m.count}</span>
@@ -189,7 +190,7 @@ export async function ParentHome() {
             <p className="mt-2">
               Тук няма снимки на деца — само рисунки, табла и материали. Всичко минава през одобрение от директора. Сайтът не
               събира лични данни на посетителите.{" "}
-              <Link href="/privacy" className="font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/privacy" className="font-semibold text-[#4d7a0a] hover:underline">
                 Поверителност
               </Link>
             </p>

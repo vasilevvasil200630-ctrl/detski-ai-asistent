@@ -18,7 +18,7 @@ export function ParentPreviewBanner() {
         <button
           type="button"
           onClick={stopParentPreview}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#0a4b82] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
         >
           <LogOut className="h-3.5 w-3.5" aria-hidden /> Обратно към облака
         </button>

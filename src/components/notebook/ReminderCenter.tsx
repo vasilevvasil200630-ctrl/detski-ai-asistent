@@ -160,7 +160,7 @@ export function ReminderCenter() {
         })}
       </ul>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <Link href="/notebook" className="font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/notebook" className="font-semibold text-[#4d7a0a] hover:underline">
           {fresh.length > shown.length ? `Още ${fresh.length - shown.length} в бележника` : "Към бележника"}
         </Link>
         <button type="button" onClick={dismiss} className="text-xs text-slate-500 hover:text-slate-800">

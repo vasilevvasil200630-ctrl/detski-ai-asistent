@@ -92,9 +92,9 @@ function QrPoster() {
           {options.map((o) => (
             <label
               key={o.id}
-              className={`flex cursor-pointer items-start gap-2 rounded-xl border p-3 text-sm ${target === o.id ? "border-[#0a4b82] bg-sky-50" : "border-slate-200 hover:bg-slate-50"}`}
+              className={`flex cursor-pointer items-start gap-2 rounded-xl border p-3 text-sm ${target === o.id ? "border-[#4d7a0a] bg-sky-50" : "border-slate-200 hover:bg-slate-50"}`}
             >
-              <input type="radio" name="qr-target" checked={target === o.id} onChange={() => setTarget(o.id)} className="mt-0.5 accent-[#0a4b82]" />
+              <input type="radio" name="qr-target" checked={target === o.id} onChange={() => setTarget(o.id)} className="mt-0.5 accent-[#4d7a0a]" />
               <span>
                 <span className="block font-semibold text-slate-800">{o.label}</span>
                 <span className="block text-xs text-slate-500">{o.hint}</span>
@@ -106,7 +106,7 @@ function QrPoster() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108]"
           >
             <Printer className="h-4 w-4" aria-hidden /> Отпечатай плаката
           </button>
@@ -115,7 +115,7 @@ function QrPoster() {
       </div>
 
       <article className="print-sheet mx-auto mt-6 flex w-full max-w-[210mm] flex-col items-center bg-white px-6 py-12 text-center text-slate-900 shadow-sm ring-1 ring-slate-200 print:mt-0 print:min-h-[230mm] print:justify-center">
-        <p className="text-lg font-semibold text-[#0a4b82]">
+        <p className="text-lg font-semibold text-[#4d7a0a]">
           {KG.fullName}, {KG.village}
         </p>
         <h2 className="mt-2 text-3xl font-bold leading-tight sm:text-4xl">{heading}</h2>

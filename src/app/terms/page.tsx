@@ -109,11 +109,11 @@ export default function TermsPage() {
               </p>
               <p>
                 Въпроси:{" "}
-                <a href={`mailto:${email}`} className="font-semibold text-[#0a4b82] hover:underline">
+                <a href={`mailto:${email}`} className="font-semibold text-[#4d7a0a] hover:underline">
                   {email}
                 </a>
                 . Как пазим данните ви, вижте в{" "}
-                <Link href="/privacy" className="font-semibold text-[#0a4b82] hover:underline">
+                <Link href="/privacy" className="font-semibold text-[#4d7a0a] hover:underline">
                   „Поверителност“
                 </Link>
                 .

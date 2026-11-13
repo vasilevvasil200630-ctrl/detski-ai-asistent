@@ -59,7 +59,7 @@ export function ShowcaseItemBody({
           </ol>
           {game.tasks && game.tasks.length > 0 && (
             <div className="mt-4 rounded-xl bg-sky-50 p-4 text-sm">
-              <p className="font-semibold text-[#0a4b82]">Какво упражнявахме (по Наредба № 5)</p>
+              <p className="font-semibold text-[#4d7a0a]">Какво упражнявахме (по Наредба № 5)</p>
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-slate-700">
                 {game.tasks.map((t) => (
                   <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>
@@ -97,7 +97,7 @@ export function ShowcaseItemBody({
           <button
             type="button"
             onClick={printKit}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108]"
           >
             <Printer className="h-4 w-4" aria-hidden /> {printLabel}
           </button>

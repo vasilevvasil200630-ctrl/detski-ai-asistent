@@ -39,7 +39,7 @@ export function GuestShell({
       <header className="print:hidden">
         <div className="kg-sky">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
-            <Link href="/" className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:gap-4" aria-label={`${KG.siteName} — начало`}>
+            <Link href="/" className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] sm:gap-4" aria-label={`${KG.siteName} — начало`}>
               <LogoIcon className="h-14 w-auto shrink-0 sm:h-20" priority />
               <span className="flex min-w-0 flex-col">
                 <span className="font-hand text-[2rem] leading-none text-kg-green-ink [text-shadow:0_1px_0_rgb(255_255_255/0.9)] sm:text-[2.75rem]">{KG.name}</span>
@@ -48,7 +48,7 @@ export function GuestShell({
             </Link>
             <a
               href={KG.officialSite}
-              className="hidden shrink-0 items-center gap-1.5 rounded-xl bg-white/80 px-3 py-2 text-sm font-semibold text-[#0a4b82] shadow-sm ring-1 ring-slate-200/70 transition-colors hover:bg-white md:inline-flex"
+              className="hidden shrink-0 items-center gap-1.5 rounded-xl bg-white/80 px-3 py-2 text-sm font-semibold text-[#4d7a0a] shadow-sm ring-1 ring-slate-200/70 transition-colors hover:bg-white md:inline-flex"
             >
               Официален сайт <ExternalLink className="h-3.5 w-3.5" aria-hidden />
             </a>
@@ -71,7 +71,10 @@ export function GuestShell({
           </div>
         </nav>
       </header>
-      <div className="flex-1">{children}</div>
+      {/* Като официалния сайт: поляната е фон, съдържанието — в бяла колона */}
+      <div className="kg-page flex-1">
+        <div className="kg-panel">{children}</div>
+      </div>
       <div className="print:hidden">
         <SiteFooter compact={footer === "compact"} guest />
       </div>

@@ -127,7 +127,7 @@ export function GameKitDialog({
         <header className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div className="min-w-0">
             <h2 id={titleId} className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <PackageOpen className="h-5 w-5 shrink-0 text-[#0a4b82]" aria-hidden /> Материали към играта
+              <PackageOpen className="h-5 w-5 shrink-0 text-[#4d7a0a]" aria-hidden /> Материали към играта
             </h2>
             <p className="truncate text-sm text-slate-500">„{game.title}“</p>
           </div>
@@ -145,8 +145,8 @@ export function GameKitDialog({
                   {KIT_PART_ORDER.map((p) => {
                     const on = parts.includes(p);
                     return (
-                      <label key={p} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${on ? 'border-[#0a4b82] bg-sky-50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                        <input type="checkbox" checked={on} onChange={() => togglePart(p)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]" />
+                      <label key={p} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${on ? 'border-[#4d7a0a] bg-sky-50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                        <input type="checkbox" checked={on} onChange={() => togglePart(p)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#4d7a0a]" />
                         <span>
                           <span className="block text-sm font-semibold text-slate-800">{KIT_PART_LABELS[p].label}</span>
                           <span className="block text-xs text-slate-500">{KIT_PART_LABELS[p].hint}</span>
@@ -174,9 +174,9 @@ export function GameKitDialog({
                           aria-pressed={on}
                           disabled={disabled}
                           onClick={() => toggleKind(k)}
-                          className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-[#0a4b82] bg-[#0a4b82] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
+                          className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'border-[#4d7a0a] bg-[#4d7a0a] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
                         >
-                          {on && <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-xs text-[#0a4b82]">{i + 1}</span>}
+                          {on && <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-xs text-[#4d7a0a]">{i + 1}</span>}
                           {SHEET_KIND_LABELS[k]}
                         </button>
                       );
@@ -216,7 +216,7 @@ export function GameKitDialog({
                 type="button"
                 onClick={create}
                 disabled={busy || Boolean(problem)}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <PackageOpen className="h-4 w-4" aria-hidden />}
                 {busy ? 'Приготвям материалите…' : kit ? 'Създай наново' : 'Създай материалите'}
@@ -228,7 +228,7 @@ export function GameKitDialog({
               <button type="button" onClick={() => setEditing(true)} className="mr-auto inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
                 <RefreshCw className="h-4 w-4" aria-hidden /> Промени
               </button>
-              <button type="button" onClick={printKit} className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861]">
+              <button type="button" onClick={printKit} className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108]">
                 <Printer className="h-4 w-4" aria-hidden /> Печат на всичко
               </button>
             </>

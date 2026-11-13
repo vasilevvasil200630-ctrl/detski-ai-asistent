@@ -12,18 +12,18 @@ const LINKS = [
   { title: "Справка", items: [["/privacy", "Поверителност"], ["/terms", "Условия за ползване"]] },
 ] as const;
 
-const FEEDBACK_BUTTON = "cursor-pointer text-left hover:text-slate-800 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
+const FEEDBACK_BUTTON = "cursor-pointer text-left hover:text-slate-800 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]";
 
 /** Долната част на сайта: навигация, нормативна основа, правни страници и обратна връзка. */
 export function SiteFooter({ compact = false, guest = false }: { compact?: boolean; guest?: boolean }) {
   const year = new Date().getFullYear();
-  // За родителите: поляната с цветя и оранжевата линия от официалния сайт
+  // За родителите: поляната с цветя и оранжевата долна част от официалния сайт
   const meadow = guest ? <div aria-hidden className={`kg-meadow ${compact ? "h-14 sm:h-20" : "h-20 sm:h-28"}`} /> : null;
   if (compact) {
     return (
       <>
       {meadow}
-      <footer className={`no-print px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8 ${guest ? "border-t-4 border-kg-orange" : "border-t border-slate-200"}`}>
+      <footer className={`no-print px-4 py-5 text-xs text-slate-500 sm:px-6 lg:px-8 ${guest ? "kg-footer text-sm" : "border-t border-slate-200"}`}>
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <span>© {year} {KG_SIGNATURE} · Учителски облак · Съобразено с Наредба № 5</span>
           <nav aria-label="Връзки в долната част" className="flex flex-wrap gap-4">
@@ -42,7 +42,7 @@ export function SiteFooter({ compact = false, guest = false }: { compact?: boole
   return (
     <>
     {meadow}
-    <footer className={`no-print bg-white ${guest ? "border-t-4 border-kg-orange" : "border-t border-slate-200"}`}>
+    <footer className={`no-print ${guest ? "kg-footer" : "border-t border-slate-200 bg-white"}`}>
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.3fr_repeat(3,1fr)]">
         <div>
           <Link href="/" className="flex items-center gap-2.5">
@@ -60,11 +60,11 @@ export function SiteFooter({ compact = false, guest = false }: { compact?: boole
               {group.items.map(([href, label]) => (
                 <li key={href}>
                   {href.startsWith("http") ? (
-                    <a href={href} className="text-slate-600 hover:text-[#0a4b82]">
+                    <a href={href} className="text-slate-600 hover:text-[#4d7a0a]">
                       {label}
                     </a>
                   ) : (
-                    <Link href={href} className="text-slate-600 hover:text-[#0a4b82]">
+                    <Link href={href} className="text-slate-600 hover:text-[#4d7a0a]">
                       {label}
                     </Link>
                   )}

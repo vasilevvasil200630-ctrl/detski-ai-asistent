@@ -85,7 +85,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+          className="hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
           aria-label={collapsed ? "Разгъни менюто" : "Свий менюто"}
           title={collapsed ? "Разгъни менюто" : "Свий менюто"}
         >
@@ -116,9 +116,9 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
             onClick={startParentPreview}
             title="Виж сайта като родител"
             aria-label="Виж сайта като родител"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-slate-200/75 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:min-h-0 sm:min-w-0 sm:px-3 sm:py-1.5"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-slate-200/75 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] sm:min-h-0 sm:min-w-0 sm:px-3 sm:py-1.5"
           >
-            <Eye className="h-4 w-4 text-[#0a4b82]" aria-hidden />
+            <Eye className="h-4 w-4 text-[#4d7a0a]" aria-hidden />
             <span className="hidden lg:inline">Виж като родител</span>
           </button>
         )}
@@ -134,14 +134,14 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
             <Link
               href="/login"
               aria-label="Вход"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors duration-150 ease-in-out hover:bg-slate-100 active:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] sm:min-h-0 sm:min-w-0 sm:px-3"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors duration-150 ease-in-out hover:bg-slate-100 active:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] sm:min-h-0 sm:min-w-0 sm:px-3"
             >
               <LogIn className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
               <span className="hidden sm:inline">Вход</span>
             </Link>
             <Link
               href="/register"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#0a4b82] px-3 py-1.5 text-xs font-bold text-white shadow-xs transition-colors duration-150 ease-in-out hover:bg-[#083861] active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2 sm:px-3.5"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-3 py-1.5 text-xs font-bold text-white shadow-xs transition-colors duration-150 ease-in-out hover:bg-[#3d6108] active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2 sm:px-3.5"
             >
               <UserPlus className="hidden h-3.5 w-3.5 sm:block" />
               <span>Регистрация</span>
@@ -152,11 +152,11 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
             <button
               type="button"
               onClick={() => setDropdownOpen((prev) => !prev)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200/75 bg-slate-50/70 p-1.5 pr-2.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200/75 bg-slate-50/70 p-1.5 pr-2.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
               aria-expanded={dropdownOpen}
               aria-label="Потребителско меню"
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#eef5fb] text-sm">{user.avatar}</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f4f9e8] text-sm">{user.avatar}</span>
               <span className="hidden font-medium text-slate-800 sm:inline">{firstName}</span>
               <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
             </button>
@@ -167,7 +167,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                   <p className="font-bold text-slate-900 truncate text-sm">{user.name}</p>
                   <p className="mt-0.5 text-xs text-slate-500 truncate">{user.email}</p>
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-[#083861] border border-indigo-200/60">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-[#3d6108] border border-indigo-200/60">
                       {user.kgRole === "ADMIN" ? "Администратор на ДГ" : "Учител"}
                     </span>
                   </div>
@@ -178,7 +178,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                   >
-                    <Building2 className="h-4 w-4 text-[#0a4b82]" />
+                    <Building2 className="h-4 w-4 text-[#4d7a0a]" />
                     <span>{user.kindergarten?.name ?? "Учителски хъб"}</span>
                   </Link>
                   <Link
@@ -201,7 +201,7 @@ export function AppTopBar({ onOpenMobile, onToggleCollapse, collapsed }: Props) 
                     <span className="flex-1 text-left">Режим „Проектор“</span>
                     <span
                       aria-hidden
-                      className={`relative h-4 w-7 rounded-full transition-colors ${projectorMode ? "bg-[#0a4b82]" : "bg-slate-300"}`}
+                      className={`relative h-4 w-7 rounded-full transition-colors ${projectorMode ? "bg-[#4d7a0a]" : "bg-slate-300"}`}
                     >
                       <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${projectorMode ? "left-3.5" : "left-0.5"}`} />
                     </span>

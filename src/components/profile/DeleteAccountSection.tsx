@@ -103,7 +103,7 @@ export function DeleteAccountSection({ isAdmin }: { isAdmin: boolean }) {
                 setError(null);
               }}
               disabled={deleting}
-              className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Отказ
             </button>

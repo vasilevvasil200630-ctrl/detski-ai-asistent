@@ -181,9 +181,9 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
                         onClick={onCloseMobile}
                         title={collapsed ? label : undefined}
                         aria-current={active ? "page" : undefined}
-                        className={`group flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
+                        className={`group flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] ${
                           active
-                            ? "bg-[#0a4b82] text-white shadow-xs"
+                            ? "bg-[#4d7a0a] text-white shadow-xs"
                             : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                         } ${collapsed ? "justify-center px-2" : ""}`}
                       >
@@ -225,7 +225,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
               <>
                 <div
                   title={`${userName}${kgName ? ` (${kgName})` : ""}`}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5fb] text-lg ring-1 ring-slate-200"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f4f9e8] text-lg ring-1 ring-slate-200"
                 >
                   {user?.avatar || "👩‍🏫"}
                 </div>
@@ -244,7 +244,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
                 href="/login"
                 title="Вход с имейл и парола"
                 aria-label="Вход с имейл и парола"
-                className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200/75 bg-white text-[#0a4b82] shadow-2xs transition-colors duration-150 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+                className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200/75 bg-white text-[#4d7a0a] shadow-2xs transition-colors duration-150 hover:bg-slate-50 active:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
               >
                 <Mail className="h-4 w-4" aria-hidden />
               </Link>
@@ -264,7 +264,7 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
 
             {isLoggedIn ? (
               <div className="flex items-center gap-3 rounded-2xl border border-slate-200/75 bg-slate-50/70 p-2.5 shadow-2xs">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef5fb] text-xl ring-1 ring-slate-900/5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f9e8] text-xl ring-1 ring-slate-900/5">
                   {user?.avatar || "👩‍🏫"}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -289,14 +289,14 @@ export function AppSidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
               <div className="space-y-1.5">
                 <Link
                   href="/register"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0a4b82] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs transition-colors duration-150 hover:bg-[#083861] active:bg-[#072d4c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#4d7a0a] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs transition-colors duration-150 hover:bg-[#3d6108] active:bg-[#2b4406] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
                 >
                   <UserPlus className="h-4 w-4 shrink-0" aria-hidden />
                   <span>Регистрирай градината си</span>
                 </Link>
                 <Link
                   href="/login"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold text-[#0a4b82] transition-colors duration-150 hover:bg-slate-100 active:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold text-[#4d7a0a] transition-colors duration-150 hover:bg-slate-100 active:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
                 >
                   <Mail className="h-4 w-4 shrink-0" aria-hidden />
                   <span>Вход с имейл и парола</span>

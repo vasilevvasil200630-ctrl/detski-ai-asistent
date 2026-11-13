@@ -28,7 +28,7 @@ export function AnnouncementsCard({ isAdmin }: { isAdmin: boolean }) {
           <Megaphone className="h-4 w-4" aria-hidden /> Обяви
           {urgent.length > 0 && <span className="rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">{urgent.length} {urgent.length === 1 ? "важна" : "важни"}</span>}
         </h2>
-        <Link href="/announcements" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/announcements" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
           {isAdmin && items.length === 0 ? "Напиши обява" : "Всички"} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>

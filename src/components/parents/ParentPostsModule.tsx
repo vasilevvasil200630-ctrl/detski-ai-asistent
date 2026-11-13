@@ -143,8 +143,8 @@ export function ParentPostsModule() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const input = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20";
-  const tabBtn = (on: boolean) => `rounded-lg px-3 py-1.5 text-sm font-medium ${on ? "bg-[#eef5fb] text-[#0a4b82]" : "text-slate-600 hover:text-slate-900"}`;
+  const input = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20";
+  const tabBtn = (on: boolean) => `rounded-lg px-3 py-1.5 text-sm font-medium ${on ? "bg-[#f4f9e8] text-[#4d7a0a]" : "text-slate-600 hover:text-slate-900"}`;
 
   const list = tab === "mine" ? data?.posts ?? [] : tab === "review" ? pending : published;
 
@@ -204,7 +204,7 @@ export function ParentPostsModule() {
                   aria-checked={draft.kind === k.id}
                   onClick={() => setDraft({ ...draft, kind: k.id })}
                   title={k.hint}
-                  className={`rounded-xl border px-3.5 py-2 text-sm font-semibold ${draft.kind === k.id ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+                  className={`rounded-xl border px-3.5 py-2 text-sm font-semibold ${draft.kind === k.id ? "border-[#4d7a0a] bg-[#4d7a0a] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
                 >
                   {k.label}
                 </button>
@@ -246,7 +246,7 @@ export function ParentPostsModule() {
             <ShieldCheck className="mr-1 inline h-3.5 w-3.5 text-[#1a7f45]" aria-hidden />
             Без имена, снимки или лични данни на деца. Страницата на групата е публична — вижда я всеки с връзката.
           </p>
-          <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60">
+          <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Send className="h-4 w-4" aria-hidden />}
             {editing ? "Запази" : data.isAdmin ? "Публикувай" : "Изпрати за одобрение"}
           </button>
@@ -278,7 +278,7 @@ export function ParentPostsModule() {
               {list.map((p) => (
                 <li key={p.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded-md bg-sky-50 px-2 py-0.5 font-semibold text-[#0a4b82]">{PARENT_POST_LABEL[p.kind]}</span>
+                    <span className="rounded-md bg-sky-50 px-2 py-0.5 font-semibold text-[#4d7a0a]">{PARENT_POST_LABEL[p.kind]}</span>
                     <span className={`rounded-md px-2 py-0.5 font-semibold ${STATUS[p.status].tone}`}>{STATUS[p.status].label}</span>
                     <span className="text-slate-500">{p.groupLabel ?? "Цялата градина"}</span>
                     {!p.mine && (

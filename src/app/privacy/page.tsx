@@ -9,7 +9,7 @@ import { KG } from "@/config/kindergarten";
 export default function PrivacyPage() {
   const email = EMAIL_CONFIG.supportEmail;
   const mail = (
-    <a href={`mailto:${email}`} className="font-semibold text-[#0a4b82] hover:underline">
+    <a href={`mailto:${email}`} className="font-semibold text-[#4d7a0a] hover:underline">
       {email}
     </a>
   );

@@ -41,9 +41,9 @@ export function GameTaskPicker({
   return (
     <fieldset className="space-y-3">
       <legend className="flex flex-wrap items-center gap-2 text-sm sm:text-base font-semibold text-slate-800">
-        <ListChecks className="h-5 w-5 text-[#0a4b82]" aria-hidden />
+        <ListChecks className="h-5 w-5 text-[#4d7a0a]" aria-hidden />
         3. Образователни задачи {required ? '(1–3, задължително)' : '(по желание, до 3)'}
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${tasks.length ? 'bg-[#0a4b82] text-white' : 'bg-slate-100 text-slate-600'}`}>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${tasks.length ? 'bg-[#4d7a0a] text-white' : 'bg-slate-100 text-slate-600'}`}>
           Избрани: {tasks.length} от {MAX_TASKS}
         </span>
       </legend>
@@ -51,10 +51,10 @@ export function GameTaskPicker({
       {tasks.length > 0 && (
         <ul className="space-y-2" aria-label="Избрани задачи">
           {tasks.map((t) => (
-            <li key={`${t.direction}|${t.core}|${t.result}`} className="flex items-start gap-2 rounded-xl border border-[#0a4b82]/20 bg-sky-50 px-3 py-2 text-sm">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#0a4b82]" aria-hidden />
+            <li key={`${t.direction}|${t.core}|${t.result}`} className="flex items-start gap-2 rounded-xl border border-[#4d7a0a]/20 bg-sky-50 px-3 py-2 text-sm">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#4d7a0a]" aria-hidden />
               <span className="min-w-0 flex-1">
-                <span className="block text-xs font-semibold text-[#0a4b82]">
+                <span className="block text-xs font-semibold text-[#4d7a0a]">
                   {taskDirectionLabel(t.direction)} · {t.direction === 'bdp' ? 'тема' : 'ядро'} „{t.core}“
                 </span>
                 <span className="text-slate-800">{t.result}</span>
@@ -96,7 +96,7 @@ export function GameTaskPicker({
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50">
                   <span>
                     {direction === 'bdp' ? 'Тема' : 'Ядро'} „{core}“
-                    {chosenHere > 0 && <span className="ml-2 rounded-full bg-[#0a4b82] px-2 py-0.5 text-[11px] text-white">{chosenHere}</span>}
+                    {chosenHere > 0 && <span className="ml-2 rounded-full bg-[#4d7a0a] px-2 py-0.5 text-[11px] text-white">{chosenHere}</span>}
                   </span>
                   <span className="text-xs font-normal text-slate-500 group-open:hidden">{results.length} {results.length === 1 ? 'резултат' : 'резултата'}</span>
                 </summary>
@@ -113,7 +113,7 @@ export function GameTaskPicker({
                             checked={checked}
                             disabled={disabled}
                             onChange={() => toggle(task)}
-                            className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]"
+                            className="mt-0.5 h-4 w-4 shrink-0 accent-[#4d7a0a]"
                           />
                           <span>{result}</span>
                         </label>

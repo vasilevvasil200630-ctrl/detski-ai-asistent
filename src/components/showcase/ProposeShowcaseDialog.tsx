@@ -144,7 +144,7 @@ export function ProposeShowcaseDialog({
         <header className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div>
             <h2 id={titleId} className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <Store className="h-5 w-5 text-[#0a4b82]" aria-hidden /> {item ? "Промени дейността" : isNewActivity ? "Днес в групата" : "Предложи за витрината"}
+              <Store className="h-5 w-5 text-[#4d7a0a]" aria-hidden /> {item ? "Промени дейността" : isNewActivity ? "Днес в групата" : "Предложи за витрината"}
             </h2>
             <p className="mt-0.5 text-sm text-slate-500">Родителите ще я видят, след като директорът я одобри.</p>
           </div>
@@ -215,7 +215,7 @@ export function ProposeShowcaseDialog({
 
           <fieldset>
             <legend className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-slate-800">
-              <ImageIcon className="h-4 w-4 text-[#0a4b82]" aria-hidden /> Снимки без деца <span className="font-normal text-slate-500">(по желание, до {MAX_IMAGES})</span>
+              <ImageIcon className="h-4 w-4 text-[#4d7a0a]" aria-hidden /> Снимки без деца <span className="font-normal text-slate-500">(по желание, до {MAX_IMAGES})</span>
             </legend>
             <p className="mb-2 text-xs text-slate-500">
               Рисунки, изработени предмети, украсата на групата. Снимайте сега или изберете от снимките, които сте качили в облака.
@@ -234,7 +234,7 @@ export function ProposeShowcaseDialog({
               type="button"
               onClick={() => fileInput.current?.click()}
               disabled={uploading !== null || imageIds.length >= MAX_IMAGES}
-              className="mb-3 inline-flex items-center gap-2 rounded-xl border border-[#0a4b82] bg-white px-4 py-2.5 text-sm font-semibold text-[#0a4b82] hover:bg-sky-50 disabled:opacity-50"
+              className="mb-3 inline-flex items-center gap-2 rounded-xl border border-[#4d7a0a] bg-white px-4 py-2.5 text-sm font-semibold text-[#4d7a0a] hover:bg-sky-50 disabled:opacity-50"
             >
               {uploading !== null ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Camera className="h-4 w-4" aria-hidden />}
               {uploading !== null ? `Качване… ${uploading}%` : "Снимай или качи снимка"}
@@ -255,12 +255,12 @@ export function ProposeShowcaseDialog({
                       aria-pressed={on}
                       disabled={disabled}
                       onClick={() => toggleImage(f.id)}
-                      className={`relative aspect-square overflow-hidden rounded-xl border-2 disabled:opacity-40 ${on ? "border-[#0a4b82]" : "border-transparent"}`}
+                      className={`relative aspect-square overflow-hidden rounded-xl border-2 disabled:opacity-40 ${on ? "border-[#4d7a0a]" : "border-transparent"}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={cloudDownloadUrl(f.id, true)} alt={f.title} className="h-full w-full object-cover" loading="lazy" />
                       {on && (
-                        <span className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-[#0a4b82] text-white">
+                        <span className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-[#4d7a0a] text-white">
                           <Check className="h-4 w-4" aria-hidden />
                         </span>
                       )}
@@ -271,7 +271,7 @@ export function ProposeShowcaseDialog({
             )}
             {imageIds.length > 0 && (
               <label className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
-                <input type="checkbox" checked={noChildren} onChange={(e) => setNoChildren(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]" />
+                <input type="checkbox" checked={noChildren} onChange={(e) => setNoChildren(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#4d7a0a]" />
                 На избраните снимки няма деца, нито техни имена или лица.
               </label>
             )}
@@ -279,7 +279,7 @@ export function ProposeShowcaseDialog({
 
           {!isActivity && (
           <label className="flex items-start gap-2 text-sm text-slate-700">
-            <input type="checkbox" checked={allowPrint} onChange={(e) => setAllowPrint(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]" />
+            <input type="checkbox" checked={allowPrint} onChange={(e) => setAllowPrint(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#4d7a0a]" />
             Родителите могат да отпечатат играта и листовете за игра вкъщи (по желание на семейството)
           </label>
           )}
@@ -300,7 +300,7 @@ export function ProposeShowcaseDialog({
             type="button"
             onClick={submit}
             disabled={busy || Boolean(problem)}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />} Изпрати на директора
           </button>
@@ -311,4 +311,4 @@ export function ProposeShowcaseDialog({
 }
 
 const chip = (on: boolean) =>
-  `rounded-xl border px-3 py-1.5 text-sm font-semibold transition-colors ${on ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`;
+  `rounded-xl border px-3 py-1.5 text-sm font-semibold transition-colors ${on ? "border-[#4d7a0a] bg-[#4d7a0a] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`;
