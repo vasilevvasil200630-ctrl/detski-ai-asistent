@@ -8,7 +8,7 @@ import { AuthShell, FormError, PrimaryButton, TextField } from "@/components/aut
 // Копирано от МатураПлюс (src/app/forgot-password/ForgotPasswordClient.tsx).
 
 const LINK_CLASS =
-  "font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
+  "font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");

@@ -159,20 +159,20 @@ export function ThematicPlanModule() {
       <div className="no-print flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-            <CalendarRange className="h-7 w-7 text-[#0a4b82]" aria-hidden /> Тематично разпределение
+            <CalendarRange className="h-7 w-7 text-[#4d7a0a]" aria-hidden /> Тематично разпределение
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
             Учебните седмици от 15 септември до 31 май, темата на всяка седмица и ситуациите по направления с ядрата и очакваните
             резултати по Наредба № 5. Директорът го утвърждава.
           </p>
         </div>
-        <button type="button" onClick={() => setCreating((v) => !v)} className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]">
+        <button type="button" onClick={() => setCreating((v) => !v)} className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108]">
           <Plus className="h-4 w-4" aria-hidden /> Ново разпределение
         </button>
       </div>
 
       {creating && (
-        <section className="no-print mt-5 flex flex-wrap items-end gap-3 rounded-2xl border border-[#0a4b82]/30 bg-sky-50/40 p-4">
+        <section className="no-print mt-5 flex flex-wrap items-end gap-3 rounded-2xl border border-[#4d7a0a]/30 bg-sky-50/40 p-4">
           <label className="text-sm">
             <span className="mb-1 block font-semibold text-slate-800">Група</span>
             <select value={newGroup} onChange={(e) => setNewGroup(e.target.value as AgeGroup)} className="rounded-lg border border-slate-300 bg-white px-3 py-2">
@@ -193,7 +193,7 @@ export function ThematicPlanModule() {
               ))}
             </select>
           </label>
-          <button type="button" onClick={create} disabled={busy === "create"} className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="button" onClick={create} disabled={busy === "create"} className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
             {busy === "create" && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />} Създай
           </button>
         </section>
@@ -207,7 +207,7 @@ export function ThematicPlanModule() {
               type="button"
               onClick={() => openPlan(p.id)}
               aria-current={plan?.id === p.id}
-              className={`rounded-xl border px-3 py-2 text-left text-sm ${plan?.id === p.id ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+              className={`rounded-xl border px-3 py-2 text-left text-sm ${plan?.id === p.id ? "border-[#4d7a0a] bg-[#4d7a0a] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
             >
               <span className="block font-semibold">
                 {p.groupName || AGE_SHORT[p.ageGroup]} · {schoolYearLabel(p.schoolYear)}

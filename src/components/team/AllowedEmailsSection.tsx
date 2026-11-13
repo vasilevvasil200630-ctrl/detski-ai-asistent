@@ -99,12 +99,12 @@ export function AllowedEmailsSection({ onActiveChange }: { onActiveChange: (acti
           onChange={(e) => setText(e.target.value)}
           rows={2}
           placeholder="petrova@abv.bg, ivanova@gmail.com"
-          className="min-h-[44px] w-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20"
+          className="min-h-[44px] w-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20"
         />
         <button
           type="submit"
           disabled={busy || !text.trim()}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Plus className="h-4 w-4" aria-hidden />} Добави
         </button>

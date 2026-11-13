@@ -7,7 +7,7 @@ export function TeacherCard({ teacher, count }: { teacher: ShowcaseTeacher; coun
   return (
     <Link
       href={`/vitrina/uchitel/${teacher.id}`}
-      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-[#0a4b82]/40 hover:bg-sky-50/40"
+      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-[#4d7a0a]/40 hover:bg-sky-50/40"
     >
       <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-sky-50 text-3xl" aria-hidden>
         {teacher.avatar}
@@ -15,7 +15,7 @@ export function TeacherCard({ teacher, count }: { teacher: ShowcaseTeacher; coun
       <span className="min-w-0">
         <span className="block truncate font-bold text-slate-900">{teacher.name}</span>
         <span className="block truncate text-sm text-slate-600">{teacher.groupName || AGE_SHORT[teacher.ageGroup]}</span>
-        <span className="mt-0.5 block text-xs font-semibold text-[#0a4b82]">
+        <span className="mt-0.5 block text-xs font-semibold text-[#4d7a0a]">
           {count} {count === 1 ? "дейност" : "дейности"}
         </span>
       </span>
@@ -30,7 +30,7 @@ export function ShowcaseCard({ item, showAuthor = true }: { item: ShowcaseItemVi
   return (
     <Link
       href={`/vitrina/${item.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-colors hover:border-[#0a4b82]/40"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-colors hover:border-[#4d7a0a]/40"
     >
       {cover ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -46,7 +46,7 @@ export function ShowcaseCard({ item, showAuthor = true }: { item: ShowcaseItemVi
           {AGE_SHORT[item.ageGroup]}
           {dir ? ` · ${dir}` : ""}
         </p>
-        <h3 className="mt-1 font-bold text-slate-900 group-hover:text-[#0a4b82]">{item.title}</h3>
+        <h3 className="mt-1 font-bold text-slate-900 group-hover:text-[#4d7a0a]">{item.title}</h3>
         <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-slate-600">{item.story}</p>
         {showAuthor && (
           <p className="mt-auto pt-3 text-xs font-semibold text-slate-500">

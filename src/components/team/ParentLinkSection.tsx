@@ -14,7 +14,7 @@ import { QrCode, useAbsoluteUrl } from "@/components/showcase/QrCode";
 export function ParentLinkSection() {
   const url = useAbsoluteUrl("/");
   const [copied, setCopied] = useState<"url" | "html" | null>(null);
-  const html = `<a href="${url}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 20px;border-radius:12px;background:#0a4b82;color:#fff;font-weight:600;text-decoration:none">${KG.name} — за родителите: групите, дейностите и обявите</a>`;
+  const html = `<a href="${url}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 20px;border-radius:12px;background:#4d7a0a;color:#fff;font-weight:600;text-decoration:none">${KG.name} — за родителите: групите, дейностите и обявите</a>`;
 
   async function copy(text: string, what: "url" | "html") {
     try {
@@ -46,7 +46,7 @@ export function ParentLinkSection() {
             </button>
           </div>
           <details className="mt-3">
-            <summary className="cursor-pointer text-sm font-semibold text-[#0a4b82]">Код за бутон на сайта (за човека, който поддържа сайта)</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-[#4d7a0a]">Код за бутон на сайта (за човека, който поддържа сайта)</summary>
             <textarea readOnly value={html} rows={4} onFocus={(e) => e.currentTarget.select()} className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 font-mono text-xs text-slate-700" />
             <button type="button" onClick={() => void copy(html, "html")} className={`${btn} mt-2`}>
               {copied === "html" ? <Check className="h-4 w-4 text-emerald-600" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />} Копирай кода

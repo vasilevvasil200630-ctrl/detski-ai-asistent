@@ -214,9 +214,9 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                   type="button"
                   aria-pressed={active}
                   onClick={() => setMode(id)}
-                  className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors ${active ? 'border-[#0a4b82] bg-[#0a4b82] text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'}`}
+                  className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition-colors ${active ? 'border-[#4d7a0a] bg-[#4d7a0a] text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'}`}
                 >
-                  <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${active ? 'text-amber-200' : 'text-[#0a4b82]'}`} aria-hidden />
+                  <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${active ? 'text-amber-200' : 'text-[#4d7a0a]'}`} aria-hidden />
                   <span>
                     <span className="block font-semibold">{GAME_MODES[id].label}</span>
                     <span className={`mt-0.5 block text-xs leading-relaxed ${active ? 'text-sky-100' : 'text-slate-500'}`}>{GAME_MODES[id].hint}</span>
@@ -243,7 +243,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
 
         <fieldset className="space-y-4">
           <legend className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-800 mb-3">
-            <BookOpen className="w-5 h-5 text-[#0a4b82]" /> {mode === 'quick' ? '2. Тема (по желание):' : '2. Направление и тема, която сте взели:'}
+            <BookOpen className="w-5 h-5 text-[#4d7a0a]" /> {mode === 'quick' ? '2. Тема (по желание):' : '2. Направление и тема, която сте взели:'}
           </legend>
           {mode !== 'quick' && (
           <div className="flex flex-wrap gap-2">
@@ -253,7 +253,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                 type="button"
                 aria-pressed={filters.direction === item.id}
                 onClick={() => setFilters((p) => ({ ...p, direction: item.id }))}
-                className={`rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${filters.direction === item.id ? 'border-[#0a4b82] bg-[#0a4b82] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
+                className={`rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${filters.direction === item.id ? 'border-[#4d7a0a] bg-[#4d7a0a] text-white' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
               >
                 {item.label}
               </button>
@@ -414,7 +414,7 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       </div>
                       {game.tasks && game.tasks.length > 0 && (
                         <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs sm:text-sm">
-                          <p className="flex items-center gap-1.5 font-semibold text-[#0a4b82]"><ListChecks className="w-4 h-4" aria-hidden /> Образователни задачи (Наредба № 5):</p>
+                          <p className="flex items-center gap-1.5 font-semibold text-[#4d7a0a]"><ListChecks className="w-4 h-4" aria-hidden /> Образователни задачи (Наредба № 5):</p>
                           <ul className="mt-1.5 space-y-1 list-disc pl-5 text-slate-700">
                             {game.tasks.map((t) => <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>)}
                           </ul>
@@ -450,12 +450,12 @@ export const MagicGamesModule: React.FC<MagicGamesModuleProps> = ({
                       <button
                         type="button"
                         onClick={() => setKitFor(idx)}
-                        className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#0a4b82] bg-[#0a4b82] text-white hover:bg-[#083861] flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#4d7a0a] bg-[#4d7a0a] text-white hover:bg-[#3d6108] flex items-center justify-center gap-1.5"
                       >
                         <PackageOpen className="w-3.5 h-3.5" aria-hidden /> {game.kit ? 'Материали ✓' : 'Материали към играта'}
                       </button>
                       {game.kit && (
-                        <button type="button" onClick={() => setPrintIdx(idx)} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#0a4b82]/30 bg-white text-[#0a4b82] hover:bg-sky-50 flex items-center justify-center gap-1.5">
+                        <button type="button" onClick={() => setPrintIdx(idx)} className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[#4d7a0a]/30 bg-white text-[#4d7a0a] hover:bg-sky-50 flex items-center justify-center gap-1.5">
                           <Printer className="w-3.5 h-3.5" aria-hidden /> Печат на всичко
                         </button>
                       )}

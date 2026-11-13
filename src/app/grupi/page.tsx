@@ -25,7 +25,7 @@ export default async function GroupsPage() {
             <li key={g.id}>
               <Link
                 href={`/grupi/${g.slug}`}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-[#0a4b82]/40 hover:bg-sky-50/40"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-[#4d7a0a]/40 hover:bg-sky-50/40"
               >
                 <span className="min-w-0">
                   <span className="block text-lg font-bold text-slate-900">{g.label}</span>
@@ -33,7 +33,7 @@ export default async function GroupsPage() {
                     {g.teachers.length ? g.teachers.map((t) => `${t.avatar} ${t.name}`).join(" · ") : "Учителите скоро"}
                   </span>
                 </span>
-                <ArrowRight className="h-5 w-5 shrink-0 text-[#0a4b82]" aria-hidden />
+                <ArrowRight className="h-5 w-5 shrink-0 text-[#4d7a0a]" aria-hidden />
               </Link>
             </li>
           ))}

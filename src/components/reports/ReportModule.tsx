@@ -42,7 +42,7 @@ function TeacherCard({ t, max, open, onToggle }: { t: TeacherReport; max: number
       </div>
       {/* Активността спрямо най-активния колега този месец — една лента, без цветово значение */}
       <div className="mt-3 h-2 w-full rounded-full bg-slate-100" title={`${t.total} дейности през месеца`}>
-        <div className="h-2 rounded-full bg-[#0a4b82]" style={{ width: `${pct}%` }} />
+        <div className="h-2 rounded-full bg-[#4d7a0a]" style={{ width: `${pct}%` }} />
       </div>
       <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
         {METRICS.map((m) => (
@@ -54,7 +54,7 @@ function TeacherCard({ t, max, open, onToggle }: { t: TeacherReport; max: number
       </dl>
       {t.items.length > 0 && (
         <>
-          <button type="button" onClick={onToggle} aria-expanded={open} className="no-print mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+          <button type="button" onClick={onToggle} aria-expanded={open} className="no-print mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
             <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden /> {open ? "Скрий подробностите" : "Подробно"}
           </button>
           <table className={`mt-3 w-full text-left text-sm ${open ? "" : "hidden print:table"}`}>
@@ -135,7 +135,7 @@ export function ReportModule() {
               ))}
             </select>
           </label>
-          <button type="button" onClick={() => window.print()} disabled={!report} className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-50">
+          <button type="button" onClick={() => window.print()} disabled={!report} className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-50">
             <Printer className="h-4 w-4" aria-hidden /> Отпечатай
           </button>
           <PrintOptions className="basis-full justify-end" />

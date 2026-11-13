@@ -440,7 +440,7 @@ export function TeamAdminModule() {
             onClick={() => void setSignup(!data.kindergarten!.teacherSignupOpen)}
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60 ${
               data.kindergarten.teacherSignupOpen
-                ? "bg-[#0a4b82] text-white hover:bg-[#083861]"
+                ? "bg-[#4d7a0a] text-white hover:bg-[#3d6108]"
                 : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
             }`}
           >
@@ -483,7 +483,7 @@ export function TeamAdminModule() {
                       </span>
                     )}
                     {m.role === "ADMIN" && (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-[#eef5fb] px-1.5 py-0.5 text-xs font-medium text-[#0a4b82]">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f9e8] px-1.5 py-0.5 text-xs font-medium text-[#4d7a0a]">
                         <ShieldCheck className="h-3.5 w-3.5" aria-hidden />{" "}
                         Администратор
                       </span>
@@ -668,7 +668,7 @@ export function TeamAdminModule() {
               type="button"
               data-autofocus
               onClick={() => setDialog(null)}
-              className="rounded-lg bg-[#0a4b82] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#083861]"
+              className="rounded-lg bg-[#4d7a0a] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#3d6108]"
             >
               Готово
             </button>
@@ -812,7 +812,7 @@ function ConfirmRow({
         data-autofocus
         disabled={busy}
         onClick={onConfirm}
-        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${danger ? "bg-rose-700 hover:bg-rose-800" : "bg-[#0a4b82] hover:bg-[#083861]"}`}
+        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${danger ? "bg-rose-700 hover:bg-rose-800" : "bg-[#4d7a0a] hover:bg-[#3d6108]"}`}
       >
         {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}{" "}
         {label}
@@ -844,7 +844,7 @@ function EditMemberDialog({
   const [ageGroup, setAgeGroup] = useState(member.ageGroup);
   const [groupId, setGroupId] = useState(member.groupId ?? "");
   const field =
-    "mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20";
+    "mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20";
   return (
     <Modal title={`${member.name}: длъжност и група`} onClose={onClose}>
       <form
@@ -925,7 +925,7 @@ function EditMemberDialog({
           <button
             type="submit"
             disabled={busy || jobTitle.trim().length < 2}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}{" "}
             Запази

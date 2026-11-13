@@ -19,11 +19,11 @@ export function buildResetEmailHtml(options: { name?: string | null; url: string
       <p style="font-size:15px;line-height:1.6;margin:0 0 12px 0;">${greeting}</p>
       <p style="font-size:15px;line-height:1.6;margin:0 0 16px 0;">Получихме заявка за нова парола за профила ви в учителския облак на ДГ „Пролет“. Натиснете бутона и изберете нова парола.</p>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${options.url}" style="display:inline-block;background:#0a4b82;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 32px;border-radius:10px;">Изберете нова парола</a>
+        <a href="${options.url}" style="display:inline-block;background:#4d7a0a;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 32px;border-radius:10px;">Изберете нова парола</a>
       </div>
       <p style="font-size:13px;line-height:1.6;color:#64748b;margin:0 0 12px 0;">
         Ако бутонът не работи, копирайте този адрес в браузъра:<br>
-        <span style="word-break:break-all;color:#0a4b82;">${options.url}</span>
+        <span style="word-break:break-all;color:#4d7a0a;">${options.url}</span>
       </p>
       <p style="font-size:13px;line-height:1.6;color:#64748b;margin:0;">Линкът важи 1 час и може да се ползва само веднъж. Ако не сте заявявали нова парола, не правете нищо — паролата ви остава същата.</p>
     </td></tr>

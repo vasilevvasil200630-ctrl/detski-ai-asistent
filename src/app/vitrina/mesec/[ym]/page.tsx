@@ -48,7 +48,7 @@ export default async function BulletinPage({ params }: { params: Promise<{ ym: s
 
       <article className="print-sheet mx-auto w-full max-w-[210mm] bg-white p-6 text-slate-900 shadow-sm ring-1 ring-slate-200 sm:p-10">
         <header className="border-b-2 border-slate-900 pb-4 text-center">
-          <p className="text-sm font-semibold text-[#0a4b82]">
+          <p className="text-sm font-semibold text-[#4d7a0a]">
             {KG.fullName}, {KG.village}
           </p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight">Какво правихме през {monthLabel(ym)}</h1>
@@ -59,7 +59,7 @@ export default async function BulletinPage({ params }: { params: Promise<{ ym: s
         ) : (
           groups.map(({ g, items: list }) => (
             <section key={g} className="mt-6">
-              <h2 className="text-xl font-bold text-[#0a4b82]">{AGE_SHORT[g]}</h2>
+              <h2 className="text-xl font-bold text-[#4d7a0a]">{AGE_SHORT[g]}</h2>
               <div className="mt-3 space-y-4">
                 {list.map((item) => (
                   <BulletinEntry key={item.id} item={item} />
@@ -90,7 +90,7 @@ function BulletinEntry({ item }: { item: ShowcaseItemView }) {
           {dir ? ` · ${dir}` : ""} · {item.author.name}
         </p>
         <h3 className="mt-0.5 font-bold">
-          <Link href={`/vitrina/${item.id}`} className="hover:text-[#0a4b82]">
+          <Link href={`/vitrina/${item.id}`} className="hover:text-[#4d7a0a]">
             {item.title}
           </Link>
         </h3>

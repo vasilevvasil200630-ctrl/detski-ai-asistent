@@ -76,7 +76,7 @@ export function WeekEditor({
   };
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[#0a4b82]/25 bg-sky-50/30 p-4">
+    <div className="space-y-4 rounded-2xl border border-[#4d7a0a]/25 bg-sky-50/30 p-4">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <label className="block">
           <span className="mb-1 block text-sm font-semibold text-slate-800">Тема на седмицата</span>
@@ -95,7 +95,7 @@ export function WeekEditor({
           type="button"
           onClick={suggest}
           disabled={busy !== null}
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#0a4b82] bg-white px-4 py-2 text-sm font-semibold text-[#0a4b82] hover:bg-sky-50 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#4d7a0a] bg-white px-4 py-2 text-sm font-semibold text-[#4d7a0a] hover:bg-sky-50 disabled:opacity-50"
         >
           {busy === "suggest" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />} Предложи ситуациите
         </button>
@@ -175,7 +175,7 @@ export function WeekEditor({
                                     checked={on}
                                     disabled={disabled}
                                     onChange={() => update(i, { results: on ? r.results.filter((x) => x !== res) : [...r.results, res] })}
-                                    className="mt-0.5 h-4 w-4 shrink-0 accent-[#0a4b82]"
+                                    className="mt-0.5 h-4 w-4 shrink-0 accent-[#4d7a0a]"
                                   />
                                   {res}
                                 </label>
@@ -189,7 +189,7 @@ export function WeekEditor({
                   </div>
                 );
               })}
-              <button type="button" onClick={() => addRow(direction)} className="inline-flex items-center gap-1 text-xs font-semibold text-[#0a4b82] hover:underline">
+              <button type="button" onClick={() => addRow(direction)} className="inline-flex items-center gap-1 text-xs font-semibold text-[#4d7a0a] hover:underline">
                 <Plus className="h-3.5 w-3.5" aria-hidden /> Още една ситуация
               </button>
             </div>
@@ -219,7 +219,7 @@ export function WeekEditor({
           type="button"
           onClick={save}
           disabled={busy !== null || !dirty}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-50"
         >
           {busy === "save" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Save className="h-4 w-4" aria-hidden />} Запази седмицата
         </button>

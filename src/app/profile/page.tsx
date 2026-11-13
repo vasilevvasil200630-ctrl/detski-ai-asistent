@@ -21,8 +21,8 @@ const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
 ];
 
 const chip = (active: boolean) =>
-  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
-    active ? "border-[#0a4b82] bg-[#eef5fb] text-[#083861]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] ${
+    active ? "border-[#4d7a0a] bg-[#f4f9e8] text-[#3d6108]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 
 export default function ProfilePage() {
@@ -74,7 +74,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#4d7a0a]" aria-label="Зареждане" />
       </main>
     );
   }
@@ -86,7 +86,7 @@ export default function ProfilePage() {
         <p className="mt-3 leading-relaxed text-slate-600">Влезте, за да редактирате профила си и групата, за която генераторът се настройва.</p>
         <Link
           href="/login?callbackUrl=/profile"
-          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#4d7a0a] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
         >
           Вход
         </Link>

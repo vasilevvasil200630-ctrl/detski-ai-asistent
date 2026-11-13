@@ -58,7 +58,7 @@ export function ChangePasswordSection() {
   return (
     <section ref={sectionRef} id="change-password" aria-labelledby="change-password-title" className="mt-8 scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <h2 id="change-password-title" className="flex items-center gap-2 text-lg font-bold text-slate-900">
-        <KeyRound className="h-5 w-5 text-[#0a4b82]" aria-hidden /> Смяна на паролата
+        <KeyRound className="h-5 w-5 text-[#4d7a0a]" aria-hidden /> Смяна на паролата
       </h2>
       <p className="mt-1 text-sm leading-relaxed text-slate-600">След смяната входовете на други устройства спират да важат.</p>
       <form onSubmit={submit} className="mt-5 space-y-4" noValidate>

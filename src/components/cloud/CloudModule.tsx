@@ -225,7 +225,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
           >
             <CloudUpload className="h-5 w-5" aria-hidden /> Качи файлове
           </button>
@@ -277,7 +277,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
                       aria-current={active ? "true" : undefined}
                       className={`flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm transition-colors duration-150 xl:whitespace-normal ${
                         active
-                          ? "bg-[#0a4b82] font-semibold text-white"
+                          ? "bg-[#4d7a0a] font-semibold text-white"
                           : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 xl:border-transparent xl:bg-transparent"
                       }`}
                     >
@@ -305,7 +305,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
                   aria-selected={scope === s.id}
                   onClick={() => setScope(s.id)}
                   className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm sm:px-3 font-medium transition-colors duration-150 ${
-                    scope === s.id ? "bg-[#eef5fb] text-[#0a4b82]" : "text-slate-600 hover:text-slate-900"
+                    scope === s.id ? "bg-[#f4f9e8] text-[#4d7a0a]" : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   {s.label}
@@ -321,7 +321,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Търсене по име, описание, колега"
-                  className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20"
+                  className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20"
                 />
               </label>
               <label>
@@ -329,7 +329,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
                 <select
                   value={ageGroup}
                   onChange={(e) => setAgeGroup(e.target.value)}
-                  className="h-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#0a4b82] focus:outline-none"
+                  className="h-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#4d7a0a] focus:outline-none"
                 >
                   <option value="">Всички групи</option>
                   {Object.entries(AGE_SHORT).map(([id, label]) => (
@@ -343,7 +343,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
           </div>
 
           {dragging && (
-            <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#0a4b82] bg-[#eef5fb] py-10 text-[#0a4b82]">
+            <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#4d7a0a] bg-[#f4f9e8] py-10 text-[#4d7a0a]">
               <CloudUpload className="h-6 w-6" aria-hidden /> Пуснете файловете тук
             </div>
           )}
@@ -358,7 +358,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="mt-4 flex w-full flex-col items-center rounded-2xl border-2 border-dashed border-slate-200 bg-white px-6 py-14 text-center transition-colors duration-150 hover:border-[#0a4b82]/40 hover:bg-slate-50"
+              className="mt-4 flex w-full flex-col items-center rounded-2xl border-2 border-dashed border-slate-200 bg-white px-6 py-14 text-center transition-colors duration-150 hover:border-[#4d7a0a]/40 hover:bg-slate-50"
             >
               <CloudUpload className="h-8 w-8 text-slate-400" aria-hidden />
               <span className="mt-3 font-semibold text-slate-900">
@@ -431,7 +431,7 @@ export function CloudModule({ user }: { user: SessionTeacher }) {
                     <a
                       href={cloudDownloadUrl(f.id)}
                       download={f.fileName}
-                      className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-[#0a4b82] px-3 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#083861]"
+                      className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-3 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#3d6108]"
                     >
                       <Download className="h-4 w-4" aria-hidden /> Свали
                     </a>

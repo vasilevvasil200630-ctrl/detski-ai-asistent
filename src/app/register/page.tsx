@@ -22,11 +22,11 @@ const AGE_GROUPS: { id: AgeGroup; label: string }[] = [
 ];
 
 const chip = (active: boolean) =>
-  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
-    active ? "border-[#0a4b82] bg-[#eef5fb] text-[#083861]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+  `rounded-lg border px-3 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] ${
+    active ? "border-[#4d7a0a] bg-[#f4f9e8] text-[#3d6108]" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 
-const LINK = "font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
+const LINK = "font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -116,7 +116,7 @@ export default function RegisterPage() {
     >
       {needsCode === null ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
+          <Loader2 className="h-6 w-6 animate-spin text-[#4d7a0a]" aria-label="Зареждане" />
         </div>
       ) : !open ? (
         <div className="space-y-4">
@@ -206,7 +206,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
                 >
                   Назад
                 </button>
@@ -216,11 +216,11 @@ export default function RegisterPage() {
               </div>
               <p className="text-xs leading-relaxed text-slate-500">
                 Със създаването на профила приемате{" "}
-                <Link href="/terms" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+                <Link href="/terms" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
                   условията за ползване
                 </Link>
                 . Как обработваме данните ви, включително имейл адреса, е описано в{" "}
-                <Link href="/privacy" target="_blank" className="font-semibold text-[#0a4b82] hover:underline">
+                <Link href="/privacy" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
                   политиката за поверителност
                 </Link>
                 .

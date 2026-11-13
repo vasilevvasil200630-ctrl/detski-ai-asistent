@@ -66,7 +66,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] font-sans tracking-tight bg-app-ambient selection:bg-[#0a4b82]/15 selection:text-[#072d4c] transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)] font-sans tracking-tight bg-app-ambient selection:bg-[#4d7a0a]/15 selection:text-[#2b4406] transition-colors duration-200">
         <AppShell>{children}</AppShell>
         {/* Vercel Analytics: без бисквитки и без лични данни — брои само посещенията на страниците */}
         {/* Само в production: там скриптът е на същия домейн; в dev е от чужд домейн и CSP го спира */}

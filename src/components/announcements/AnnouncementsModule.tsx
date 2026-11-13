@@ -101,7 +101,7 @@ export function AnnouncementsModule() {
       <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-            <Megaphone className="h-7 w-7 text-[#0a4b82]" aria-hidden /> Обяви
+            <Megaphone className="h-7 w-7 text-[#4d7a0a]" aria-hidden /> Обяви
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             {isAdmin
@@ -113,7 +113,7 @@ export function AnnouncementsModule() {
           <button
             type="button"
             onClick={() => setEditing({ id: null, draft: EMPTY })}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108]"
           >
             <Plus className="h-4 w-4" aria-hidden /> Нова обява
           </button>
@@ -121,7 +121,7 @@ export function AnnouncementsModule() {
       </div>
 
       {editing && d && (
-        <section aria-label={editing.id ? "Промяна на обява" : "Нова обява"} className="mt-5 space-y-4 rounded-2xl border border-[#0a4b82]/30 bg-sky-50/40 p-4 sm:p-5">
+        <section aria-label={editing.id ? "Промяна на обява" : "Нова обява"} className="mt-5 space-y-4 rounded-2xl border border-[#4d7a0a]/30 bg-sky-50/40 p-4 sm:p-5">
           <label className="block">
             <span className="mb-1.5 block text-sm font-semibold text-slate-800">Заглавие</span>
             <input
@@ -154,11 +154,11 @@ export function AnnouncementsModule() {
               <input type="date" value={d.eventDate} onChange={(e) => setD({ eventDate: e.target.value })} className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm" />
             </label>
             <label className="flex items-center gap-2 text-sm text-slate-700">
-              <input type="checkbox" checked={d.important} onChange={(e) => setD({ important: e.target.checked })} className="h-4 w-4 accent-[#0a4b82]" />
+              <input type="checkbox" checked={d.important} onChange={(e) => setD({ important: e.target.checked })} className="h-4 w-4 accent-[#4d7a0a]" />
               Важно — учителите потвърждават, че са прочели
             </label>
             <label className="flex items-center gap-2 text-sm text-slate-700">
-              <input type="checkbox" checked={d.pinned} onChange={(e) => setD({ pinned: e.target.checked })} className="h-4 w-4 accent-[#0a4b82]" />
+              <input type="checkbox" checked={d.pinned} onChange={(e) => setD({ pinned: e.target.checked })} className="h-4 w-4 accent-[#4d7a0a]" />
               Закачи най-горе
             </label>
           </div>
@@ -171,7 +171,7 @@ export function AnnouncementsModule() {
               type="button"
               onClick={save}
               disabled={busy || Boolean(problem)}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-50"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />} {editing.id ? "Запази" : "Публикувай"}
             </button>
@@ -205,7 +205,7 @@ export function AnnouncementsModule() {
                     </span>
                   )}
                   {item.eventDate && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-[#0a4b82]">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-[#4d7a0a]">
                       <CalendarDays className="h-3.5 w-3.5" aria-hidden /> {eventBg(item.eventDate)}
                     </span>
                   )}

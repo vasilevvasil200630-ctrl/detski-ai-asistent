@@ -152,7 +152,7 @@ export default async function GroupPage({ params }: { params: Promise<{ slug: st
               ))}
             </ul>
           </section>
-          <Link href="/vitrina" className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 font-semibold text-[#0a4b82] hover:bg-sky-50/40">
+          <Link href="/vitrina" className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 font-semibold text-[#4d7a0a] hover:bg-sky-50/40">
             <Images className="h-5 w-5" aria-hidden /> Дейностите с децата
           </Link>
         </aside>

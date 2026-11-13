@@ -118,7 +118,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         onCloseMobile={() => setMobileOpen(false)}
       />
       {/* min-w-0: колоната не бива да расте по най-широкото си съдържание (карусели, табове) */}
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      {/* kg-app: ръкописните заглавия на официалния сайт и в облака (globals.css) */}
+      <div className="kg-app flex min-h-screen min-w-0 flex-1 flex-col">
         <AppTopBar
           onOpenMobile={() => setMobileOpen(true)}
           onToggleCollapse={toggleCollapsed}

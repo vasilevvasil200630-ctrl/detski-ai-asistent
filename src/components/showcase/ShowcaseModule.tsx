@@ -102,7 +102,7 @@ export function ShowcaseModule() {
       <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-            <Store className="h-7 w-7 text-[#0a4b82]" aria-hidden /> Витрина за родители
+            <Store className="h-7 w-7 text-[#4d7a0a]" aria-hidden /> Витрина за родители
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
             Най-хубавото, което сте правили с децата, може да се покаже на родителите. Снимайте рисунките и изработеното с „Днес в групата“
@@ -114,14 +114,14 @@ export function ShowcaseModule() {
           <button
             type="button"
             onClick={() => setNewActivity(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108]"
           >
             <Camera className="h-4 w-4" aria-hidden /> Днес в групата
           </button>
           <Link
             href="/vitrina"
             target="_blank"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#0a4b82] hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#4d7a0a] hover:bg-slate-50"
           >
             Публичната витрина <ExternalLink className="h-4 w-4" aria-hidden />
           </Link>
@@ -150,7 +150,7 @@ export function ShowcaseModule() {
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold ${tab === t ? "bg-[#0a4b82] text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold ${tab === t ? "bg-[#4d7a0a] text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
             >
               {t === "mine" ? "Моите предложения" : `За одобрение${pendingCount ? ` · ${pendingCount}` : ""}`}
             </button>
@@ -165,7 +165,7 @@ export function ShowcaseModule() {
           ) : mine.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">
               <p>Още не сте предложили нищо за витрината.</p>
-              <Link href="/library" className="mt-3 inline-block font-semibold text-[#0a4b82] hover:underline">
+              <Link href="/library" className="mt-3 inline-block font-semibold text-[#4d7a0a] hover:underline">
                 Към моята библиотека →
               </Link>
             </div>
@@ -293,7 +293,7 @@ function ItemRow({ item, showAuthor = false, open = false, children }: { item: S
         </div>
         <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLE[item.status]}`}>{SHOWCASE_STATUS_LABELS[item.status]}</span>
       </div>
-      <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82]">
+      <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a]">
         <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} aria-hidden /> {expanded ? "Скрий" : "Виж какво ще видят родителите"}
       </button>
       {expanded && (
