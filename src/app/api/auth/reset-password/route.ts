@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const parsed = ResetPasswordSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Моля, проверете въведените данни." }, { status: 400 });
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Моля, проверете въведените данни." }, { status: 400 });
   }
 
   const passwordHash = await hashPassword(parsed.data.password);
