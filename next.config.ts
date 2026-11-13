@@ -51,6 +51,12 @@ const nextConfig: NextConfig = {
       },
       // Service Worker-ът не се кешира, за да стига новата версия веднага
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }] },
+      // Публичните страници: небето в горната част е най-големият елемент на екрана — браузърът го
+      // тегли още от заглавката на отговора, преди HTML-а (по-бързо зареждане на телефон)
+      ...["/", "/grupi", "/grupi/:path*", "/vitrina", "/vitrina/:path*", "/login", "/register", "/forgot-password", "/privacy", "/terms"].map((source) => ({
+        source,
+        headers: [{ key: "Link", value: "</brand/sky.webp>; rel=preload; as=image; fetchpriority=high" }],
+      })),
       // Шрифтовете не се сменят — браузърът ги пази една година (при нов шрифт — ново име на файла)
       { source: "/fonts/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       // Лични страници и API — никога в резултатите на търсачките

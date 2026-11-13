@@ -15,14 +15,14 @@ const TYPE_LABELS = { praise: "Харесва ми", idea: "Идея или пр
 const TYPE_DB = { praise: "PRAISE", idea: "IDEA", bug: "BUG" } as const;
 
 const feedbackSchema = z.object({
-  type: z.enum(["praise", "idea", "bug"], { errorMap: () => ({ message: "Изберете за какво пишете." }) }),
+  type: z.enum(["praise", "idea", "bug"], { error: "Изберете за какво пишете." }),
   rating: z
-    .number({ required_error: "Изберете оценка от 1 до 5 звезди.", invalid_type_error: "Изберете оценка от 1 до 5 звезди." })
+    .number({ error: "Изберете оценка от 1 до 5 звезди." })
     .int()
     .min(1, "Изберете оценка от 1 до 5 звезди.")
     .max(5, "Изберете оценка от 1 до 5 звезди."),
   message: z
-    .string({ required_error: "Напишете съобщението си." })
+    .string({ error: "Напишете съобщението си." })
     .trim()
     .min(5, "Съобщението трябва да е поне 5 символа.")
     .max(2000, "Съобщението не може да е над 2000 символа."),

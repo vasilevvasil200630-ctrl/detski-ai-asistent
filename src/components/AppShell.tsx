@@ -71,11 +71,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Витрината се рисува веднага (за родителите и търсачките): съдържанието е в HTML-а,
   // а липсваща дейност връща истински код 404. Учителят после вижда менюто си.
-  if (loading && isShowcase) {
-    return <GuestShell variant="showcase">{children}</GuestShell>;
-  }
-  if (loading && pathname === "/") {
-    return <GuestShell footer="full">{children}</GuestShell>;
+  // Същата структура като гостовия изглед по-долу (празно място за лентата, после рамката): след
+  // проверката за вход React запазва вече изрисуваната страница, вместо да я рисува наново —
+  // иначе най-големият елемент (небето) се „появява“ чак след проверката и страницата изглежда бавна.
+  if (loading && (isShowcase || pathname === "/")) {
+    return (
+      <>
+        {null}
+        <GuestShell footer={pathname === "/" ? "full" : "compact"} variant={isShowcase ? "showcase" : "site"}>
+          {children}
+        </GuestShell>
+      </>
+    );
   }
 
   // Докато не знаем дали има вход — без рамка, за да не премигва менюто
