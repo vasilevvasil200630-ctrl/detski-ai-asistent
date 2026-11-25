@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   const [emailReady, setEmailReady] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/forgot-password")
+    fetch("/api/auth/forgot-password", { cache: "no-store" })
       .then((r) => r.json())
       .then((d: { emailReady?: boolean }) => setEmailReady(Boolean(d.emailReady)))
       .catch(() => setEmailReady(null));
@@ -89,10 +89,10 @@ export default function ForgotPasswordPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="petrova@abv.bg"
-            disabled={loading}
+            disabled={loading || emailReady === false}
           />
           <FormError message={error} />
-          <PrimaryButton type="submit" loading={loading} disabled={!email.trim()}>
+          <PrimaryButton type="submit" loading={loading} disabled={!email.trim() || emailReady === false}>
             Изпрати линк
           </PrimaryButton>
         </form>

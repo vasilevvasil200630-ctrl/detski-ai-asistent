@@ -5,6 +5,7 @@ import { consumeEmailToken, peekEmailToken, revokeEmailTokens } from "@/lib/auth
 import { hashPassword } from "@/lib/auth/password";
 import { createSession, passwordVersion } from "@/lib/auth/session";
 import { clearFailedLogins } from "@/lib/auth/rate-limit";
+import { ACCESS_STOPPED_MESSAGE, userHasAccess } from "@/lib/allowed-emails";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Копирано от МатураПлюс (src/app/api/auth/reset-password/route.ts).
@@ -35,8 +36,15 @@ export async function POST(request: Request) {
   const userId = await consumeEmailToken("reset", parsed.data.token);
   if (!userId) return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
 
-  const exists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
-  if (!exists) return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, kgRole: true, kindergartenId: true, removedAt: true },
+  });
+  if (!existing) return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
+  if (existing.removedAt || !(await userHasAccess(existing))) {
+    await revokeEmailTokens("reset", existing.id);
+    return NextResponse.json({ error: ACCESS_STOPPED_MESSAGE }, { status: 403 });
+  }
 
   // Новата парола анулира всички стари сесии (отпечатъкът на паролата в тях вече не съвпада)
   const user = await prisma.user.update({

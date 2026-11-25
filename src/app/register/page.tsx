@@ -51,6 +51,8 @@ export default function RegisterPage() {
   const [groupName, setGroupName] = useState("");
 
   useEffect(() => {
+    const prefilled = new URLSearchParams(window.location.search).get("email")?.trim();
+    if (prefilled) setEmail(prefilled);
     fetch("/api/auth/register")
       .then((r) => r.json())
       .then((d: { needsCode?: boolean; open?: boolean; byEmail?: boolean; setup?: boolean; full?: boolean }) => {

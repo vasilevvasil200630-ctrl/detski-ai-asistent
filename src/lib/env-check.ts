@@ -29,6 +29,13 @@ const RULES: EnvRule[] = [
   { names: ["UPSTASH_REDIS_REST_TOKEN"], effect: "лимитите на заявките се броят отделно във всяка инстанция (по-слабо)", required: false },
   { names: ["SETUP_CODE"], effect: "първият профил (директорът) не може да се създаде — регистрацията чака първоначалния код", required: false },
   { names: ["RESEND_API_KEY"], effect: "писма не се изпращат — „Забравена парола“ не работи, обратната връзка се пази само в базата", required: false },
+  {
+    names: ["EMAIL_FROM"],
+    effect: "в production писмата за „Забравена парола“ са спрени, докато подателят е тестовият onboarding@resend.dev — задайте адрес от потвърден домейн в Resend",
+    required: false,
+    valid: (v) => !v.toLowerCase().includes("resend.dev"),
+    invalidHint: "не трябва да е тестовият onboarding@resend.dev",
+  },
 ];
 
 export type EnvProblem = { names: string[]; effect: string; required: boolean; hint?: string };
