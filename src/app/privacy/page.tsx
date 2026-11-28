@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
 import { EMAIL_CONFIG } from "@/lib/email/config";
 import { KG } from "@/config/kindergarten";
+
+export const metadata: Metadata = {
+  title: "Политика за поверителност",
+  description: "Как ДГ „Пролет“, с. Ягодово обработва и защитава личните данни в платформата съгласно GDPR.",
+};
 
 // Информацията по чл. 13 от Регламент (ЕС) 2016/679 (GDPR): администратор, цели и правни основания,
 // получатели, предаване извън ЕИП, срокове, права, жалба, задължително ли е предоставянето и

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession, deleteSession } from "@/lib/auth/session";
 import { deleteUserAccount } from "@/lib/account-deletion";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { AUTH_REQUIRED } from "@/lib/teacher";
 
 // Копирано от МатураПлюс (src/app/api/account/route.ts), без бисквитките на NextAuth.
@@ -14,6 +15,11 @@ const CONFIRM_WORD = "ИЗТРИЙ";
 export async function DELETE(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json(AUTH_REQUIRED, { status: 401 });
+
+  const rate = await checkRateLimit(`account-delete:${session.userId}:${getClientIp(request)}`, 5);
+  if (!rate.allowed) {
+    return NextResponse.json({ error: "Твърде много опити. Опитайте пак след минута." }, { status: 429 });
+  }
 
   const body = (await request.json().catch(() => ({}))) as { confirm?: unknown };
   if (typeof body.confirm !== "string" || body.confirm.trim().toLocaleUpperCase("bg-BG") !== CONFIRM_WORD) {

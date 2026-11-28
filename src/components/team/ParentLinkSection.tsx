@@ -56,7 +56,7 @@ export function ParentLinkSection() {
             <Link href="/showcase/qr" className={btn}>
               <QrIcon className="h-4 w-4" aria-hidden /> QR плакат за входа
             </Link>
-            <Link href="/" target="_blank" className={btn}>
+            <Link href="/" target="_blank" rel="noopener noreferrer" className={btn}>
               <ExternalLink className="h-4 w-4" aria-hidden /> Вижте страницата като родител
             </Link>
           </div>

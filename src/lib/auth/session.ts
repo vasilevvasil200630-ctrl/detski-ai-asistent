@@ -96,21 +96,25 @@ export async function getSession(): Promise<SessionPayload | null> {
   const decrypted = await decryptSession(token);
   if (!decrypted) return null;
 
-  // Изтрит профил или сменена парола → сесията вече не важи.
+  // Изтрит/премахнат профил или сменена парола → сесията вече не важи.
   try {
     const { prisma } = await import("@/lib/prisma");
     const dbUser = await prisma.user.findUnique({
       where: { id: decrypted.userId },
-      select: { email: true, name: true, passwordHash: true, kgRole: true, kindergartenId: true },
+      select: { email: true, name: true, passwordHash: true, kgRole: true, kindergartenId: true, removedAt: true },
     });
-    if (!dbUser) return null;
-    if (decrypted.pv && decrypted.pv !== passwordVersion(dbUser.passwordHash)) return null;
+    if (!dbUser || dbUser.removedAt) return null;
+    if (!decrypted.pv || decrypted.pv !== passwordVersion(dbUser.passwordHash)) return null;
     // Директорът е махнал имейла от списъка с разрешени → сесията спира веднага
     const { userHasAccess } = await import("@/lib/allowed-emails");
     if (!(await userHasAccess(dbUser))) return null;
     return { userId: decrypted.userId, email: dbUser.email, name: dbUser.name };
-  } catch {
-    // Базата е недостъпна — подписаният токен остава валиден (по-добре от изхвърляне от профила)
+  } catch (err) {
+    // В production не допускаме fail-open, за да не остане влязъл премахнат или блокиран профил
+    if (process.env.NODE_ENV === "production") {
+      console.error("[auth] getSession DB verification failed:", err instanceof Error ? err.message : err);
+      return null;
+    }
     return decrypted;
   }
 }

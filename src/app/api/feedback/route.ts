@@ -73,19 +73,28 @@ export async function POST(request: Request) {
     const html = `
 <!DOCTYPE html>
 <html lang="bg">
-<body style="margin:0;padding:24px;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a;">
-  <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
-    <p style="margin:0 0 4px;font-size:12px;color:#475569;">Обратна връзка · Учителски облак на ДГ „Пролет“</p>
-    <h1 style="margin:0 0 16px;font-size:20px;">${escapeHtml(TYPE_LABELS[type])} · <span style="color:#b45309;">${stars}</span></h1>
+<body style="margin:0;padding:24px;background:#fffef4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#2e2e2e;">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e6cf67;border-top:4px solid #faca04;border-radius:12px;padding:24px;">
+    <p style="margin:0 0 4px;font-size:12px;color:#4d7a0a;font-weight:700;">Обратна връзка · Учителски облак на ДГ „Пролет“</p>
+    <h1 style="margin:0 0 16px;font-size:20px;color:#c43d00;">${escapeHtml(TYPE_LABELS[type])} · <span style="color:#b45309;">${stars}</span></h1>
     <table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:16px;">
-      <tr><td style="padding:4px 0;color:#475569;width:120px;">Подател</td><td>${escapeHtml(sender)}</td></tr>
-      <tr><td style="padding:4px 0;color:#475569;">Имейл</td><td>${email ? escapeHtml(email) : "—"}</td></tr>
-      <tr><td style="padding:4px 0;color:#475569;">Страница</td><td>${page ? escapeHtml(page) : "—"}</td></tr>
+      <tr><td style="padding:4px 0;color:#57534e;width:120px;">Подател</td><td>${escapeHtml(sender)}</td></tr>
+      <tr><td style="padding:4px 0;color:#57534e;">Имейл</td><td>${email ? escapeHtml(email) : "—"}</td></tr>
+      <tr><td style="padding:4px 0;color:#57534e;">Страница</td><td>${page ? escapeHtml(page) : "—"}</td></tr>
     </table>
-    <div style="white-space:pre-wrap;font-size:14px;line-height:1.6;background:#f1f5f9;border-radius:8px;padding:16px;">${escapeHtml(message)}</div>
+    <div style="white-space:pre-wrap;font-size:14px;line-height:1.6;background:#fffeea;border:1px solid #f2dd77;border-radius:8px;padding:16px;">${escapeHtml(message)}</div>
   </div>
 </body>
 </html>`.trim();
+    const text = [
+      `Обратна връзка · Учителски облак на ДГ „Пролет“`,
+      `${TYPE_LABELS[type]} · ${rating}/5 (${stars})`,
+      `Подател: ${sender}`,
+      `Имейл: ${email || "—"}`,
+      `Страница: ${page || "—"}`,
+      "",
+      message,
+    ].join("\n");
     try {
       const { error } = await new Resend(apiKey).emails.send({
         from: EMAIL_CONFIG.from,
@@ -93,6 +102,7 @@ export async function POST(request: Request) {
         ...(email ? { replyTo: email } : {}),
         subject: `[ДГ „Пролет“] ${TYPE_LABELS[type]} · ${rating}/5`,
         html,
+        text,
       });
       if (error) console.warn("[feedback] Resend грешка:", error);
     } catch (err) {

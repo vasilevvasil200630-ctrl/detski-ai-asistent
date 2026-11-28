@@ -54,21 +54,31 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (body.action === "restore") {
     if (!target || !removedFromTeam) return NextResponse.json(NOT_FOUND, { status: 404 });
-    // Връщането заема място — таванът е директор и 8 учители
-    const members = await prisma.user.count({ where: { kindergartenId: me.kindergartenId } });
-    if (members >= KG.maxMembers) return NextResponse.json({ error: SEATS_FULL_MESSAGE }, { status: 409 });
+    // Връщането заема място — таванът е директор и 8 учители (проверка в транзакция срещу race condition)
     const tempPassword = generateTempPassword();
-    await prisma.user.update({
-      where: { id },
-      data: {
-        kindergartenId: me.kindergartenId,
-        kgRole: "TEACHER",
-        removedAt: null,
-        removedFromKindergartenId: null,
-        passwordHash: await hashPassword(tempPassword),
-        mustChangePassword: true,
-      },
-    });
+    const passwordHash = await hashPassword(tempPassword);
+    try {
+      await prisma.$transaction(async (tx) => {
+        const members = await tx.user.count({ where: { kindergartenId: me.kindergartenId } });
+        if (members >= KG.maxMembers) throw new Error("FULL");
+        await tx.user.update({
+          where: { id },
+          data: {
+            kindergartenId: me.kindergartenId,
+            kgRole: "TEACHER",
+            removedAt: null,
+            removedFromKindergartenId: null,
+            passwordHash,
+            mustChangePassword: true,
+          },
+        });
+      });
+    } catch (err) {
+      if (err instanceof Error && err.message === "FULL") {
+        return NextResponse.json({ error: SEATS_FULL_MESSAGE }, { status: 409 });
+      }
+      throw err;
+    }
     return NextResponse.json({ ok: true, tempPassword });
   }
 
@@ -121,6 +131,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           removedFromKindergartenId: me.kindergartenId,
           passwordHash: await hashPassword(unusablePassword()),
           mustChangePassword: false,
+          calendarToken: null,
         },
       });
       await revokeEmailTokens("reset", id);
@@ -133,6 +144,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const auth = await requireAdmin();
   if ("response" in auth) return auth.response;
   const { me } = auth;
+  const rate = await checkRateLimit(`team-admin-delete:${me.id}`, 15);
+  if (!rate.allowed) return NextResponse.json({ error: "Твърде много действия за минута." }, { status: 429 });
   const { id } = await params;
 
   const target = await prisma.user.findUnique({ where: { id }, select: { kindergartenId: true, removedFromKindergartenId: true } });

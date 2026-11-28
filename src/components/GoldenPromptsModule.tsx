@@ -189,15 +189,23 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       window.print();
       return;
     }
+    const escapeHtml = (s: string) =>
+      s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
     const cardsHtml = GOLDEN_PROMPTS.map((p, idx) => {
       const val = customInputs[p.id] || p.defaultPlaceholderValue;
       const promptText = p.buildPromptText(ageLabel, val);
       return `
         <div class="card">
-          <div class="cat">${p.categoryLabel} • Спестява ~${p.savedMinutes} мин.</div>
-          <h2>${idx + 1}. ${p.title}</h2>
-          <div class="prompt-box">${promptText.replace(/\n/g, '<br/>')}</div>
-          <div class="why"><strong>Защо работи този шаблон:</strong> ${p.whyItWorks}</div>
+          <div class="cat">${escapeHtml(p.categoryLabel)} • Спестява ~${p.savedMinutes} мин.</div>
+          <h2>${idx + 1}. ${escapeHtml(p.title)}</h2>
+          <div class="prompt-box">${escapeHtml(promptText).replace(/\n/g, '<br/>')}</div>
+          <div class="why"><strong>Защо работи този шаблон:</strong> ${escapeHtml(p.whyItWorks)}</div>
         </div>
       `;
     }).join('');
@@ -221,7 +229,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       </head>
       <body>
         <h1>Наръчник със „Златни промптове“ за детския учител</h1>
-        <div class="sub">Практическа квалификация: „Изкуственият интелект в работата на учителя в детската градина“ (${ageLabel})</div>
+        <div class="sub">Практическа квалификация: „Изкуственият интелект в работата на учителя в детската градина“ (${escapeHtml(ageLabel)})</div>
         ${cardsHtml}
         <script>window.onload = () => { window.print(); }</script>
       </body>

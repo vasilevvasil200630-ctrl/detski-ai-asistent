@@ -28,6 +28,7 @@ const failedLogins =
 
 type Attempts = number[];
 const attemptsByKey = new Map<string, Attempts>();
+const MAX_ATTEMPT_KEYS = 5000;
 
 function keyFor(ip: string, email: string): string {
   return `${ip}:${email.toLowerCase()}`;
@@ -38,6 +39,20 @@ function pruneOld(list: Attempts, now: number): Attempts {
   let firstFresh = 0;
   while (firstFresh < list.length && list[firstFresh]! < cutoff) firstFresh++;
   return firstFresh === 0 ? list : list.slice(firstFresh);
+}
+
+function pruneAttemptMap(now: number): void {
+  if (attemptsByKey.size <= MAX_ATTEMPT_KEYS) return;
+  for (const [k, list] of attemptsByKey) {
+    const fresh = pruneOld(list, now);
+    if (fresh.length === 0) attemptsByKey.delete(k);
+    else attemptsByKey.set(k, fresh);
+  }
+  while (attemptsByKey.size > MAX_ATTEMPT_KEYS) {
+    const oldestKey = attemptsByKey.keys().next().value;
+    if (oldestKey === undefined) break;
+    attemptsByKey.delete(oldestKey);
+  }
 }
 
 export type LoginRateLimitResult = {
@@ -67,7 +82,8 @@ export async function checkLoginRateLimit(
   }
 
   const pruned = pruneOld(attemptsByKey.get(key) ?? [], now);
-  attemptsByKey.set(key, pruned);
+  if (pruned.length === 0) attemptsByKey.delete(key);
+  else attemptsByKey.set(key, pruned);
 
   if (pruned.length >= MAX_ATTEMPTS) {
     const oldest = pruned[0]!;
@@ -103,6 +119,7 @@ export async function recordFailedLogin(ip: string, email: string): Promise<void
   const pruned = pruneOld(attemptsByKey.get(key) ?? [], now);
   pruned.push(now);
   attemptsByKey.set(key, pruned);
+  pruneAttemptMap(now);
 }
 
 /**

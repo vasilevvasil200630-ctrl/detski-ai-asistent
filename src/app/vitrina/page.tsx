@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { KG } from "@/config/kindergarten";
@@ -8,6 +9,11 @@ import { DIRECTION_ORDER } from "@/services/naredba5";
 import type { LessonDirection } from "@/types";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Какво правим в „Пролет“",
+  description: "Одобрени игри, работни листове, дейности и месечен бюлетин от групите на ДГ „Пролет“, с. Ягодово.",
+};
 
 const AGES = ["1", "2", "3", "4"] as const;
 const DIRS: LessonDirection[] = [...DIRECTION_ORDER, "bdp"];

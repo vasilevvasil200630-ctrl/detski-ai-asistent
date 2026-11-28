@@ -224,7 +224,7 @@ function FeedbackModal({ page, onClose }: { page: string; onClose: () => void })
               />
               <p className="mt-1 text-xs text-slate-500">
                 Ползваме го само за да ви отговорим и го пазим до две години.{" "}
-                <a href="/privacy#email" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
+                <a href="/privacy#email" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4d7a0a] hover:underline">
                   Поверителност
                 </a>
               </p>

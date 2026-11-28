@@ -158,7 +158,7 @@ export function ParentPostsModule() {
           </p>
         </div>
         {data?.group && (
-          <Link href={`/grupi/${data.group.slug}`} target="_blank" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+          <Link href={`/grupi/${data.group.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
             <ExternalLink className="h-4 w-4" aria-hidden /> Страницата на {data.group.label}
           </Link>
         )}

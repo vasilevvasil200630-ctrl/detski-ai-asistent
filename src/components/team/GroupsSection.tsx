@@ -91,7 +91,7 @@ export function GroupsSection({ groups, onChange }: { groups: GroupView[]; onCha
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                <Link href={`/grupi/${g.slug}`} target="_blank" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
+                <Link href={`/grupi/${g.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                   <ExternalLink className="h-3.5 w-3.5" aria-hidden /> Страницата за родителите
                 </Link>
                 <Link href={`/showcase/qr?grupa=${g.slug}&ime=${encodeURIComponent(g.label)}`} className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">

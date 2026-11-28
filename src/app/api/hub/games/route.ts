@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     where: {
       kind: "GAME",
       shared: true,
-      ...(q.data.scope === "kg" ? { kindergartenId: me.kindergartenId ?? "__none__" } : {}),
+      kindergartenId: me.kindergartenId ?? "__none__",
       ...(q.data.ageGroup ? { ageGroup: q.data.ageGroup } : {}),
     },
     include: BANK_GAME_INCLUDE,

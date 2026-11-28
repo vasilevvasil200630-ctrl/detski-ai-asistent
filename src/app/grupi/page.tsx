@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { KG } from "@/config/kindergarten";
 import { publicGroups } from "@/lib/parents";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Нашите групи",
+  description: "Групите на ДГ „Пролет“, с. Ягодово — тема на седмицата, обяви, покани и стихчета за родителите.",
+};
 
 /** Групите на градината — за родителите: всяка води към своята страница. */
 export default async function GroupsPage() {

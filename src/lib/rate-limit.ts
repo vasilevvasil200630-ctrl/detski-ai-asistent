@@ -64,7 +64,7 @@ function minuteLimiter(limit: number): Ratelimit | null {
     limiter = new Ratelimit({
       redis: upstashRedis(),
       limiter: Ratelimit.slidingWindow(limit, WINDOW),
-      prefix: `matura-ai:m${limit}`,
+      prefix: `detski-ai:m${limit}`,
       timeout: UPSTASH_TIMEOUT_MS,
     });
     minuteLimiters.set(limit, limiter);
@@ -116,6 +116,22 @@ type LongWindow = "1 h" | "1 d";
 const WINDOW_MS: Record<LongWindow, number> = { "1 h": 60 * 60 * 1000, "1 d": 24 * 60 * 60 * 1000 };
 const windowedLimiters = new Map<string, Ratelimit>();
 const memoryHits = new Map<string, number[]>();
+const MAX_MEMORY_BUCKETS = 5000;
+
+function pruneMemoryBuckets(now: number, maxAgeMs: number): void {
+  if (memoryHits.size <= MAX_MEMORY_BUCKETS) return;
+  for (const [k, list] of memoryHits) {
+    if (list.length === 0 || list[list.length - 1]! <= now - maxAgeMs) {
+      memoryHits.delete(k);
+    }
+  }
+  // Ако все още надвишава тавана (напр. при бот атака), махаме най-старите записи (FIFO)
+  while (memoryHits.size > MAX_MEMORY_BUCKETS) {
+    const oldestKey = memoryHits.keys().next().value;
+    if (oldestKey === undefined) break;
+    memoryHits.delete(oldestKey);
+  }
+}
 
 /**
  * Лимит с по-дълъг прозорец (напр. „3 имейла на ден“) — за действия, които
@@ -134,7 +150,7 @@ export async function checkWindowedLimit(
       limiter = new Ratelimit({
         redis: upstashRedis(),
         limiter: Ratelimit.slidingWindow(limit, window),
-        prefix: `matura-ai:w:${id}`,
+        prefix: `detski-ai:w:${id}`,
         timeout: UPSTASH_TIMEOUT_MS,
       });
       windowedLimiters.set(id, limiter);
@@ -171,6 +187,7 @@ function memoryLimit(bucket: string, limit: number, windowMs: number): RateLimit
   }
   hits.push(now);
   memoryHits.set(bucket, hits);
+  pruneMemoryBuckets(now, windowMs);
   return { allowed: true, remaining: limit - hits.length, resetInSeconds: Math.ceil(windowMs / 1000) };
 }
 

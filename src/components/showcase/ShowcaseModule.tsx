@@ -121,6 +121,7 @@ export function ShowcaseModule() {
           <Link
             href="/vitrina"
             target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#4d7a0a] hover:bg-slate-50"
           >
             Публичната витрина <ExternalLink className="h-4 w-4" aria-hidden />
@@ -128,6 +129,7 @@ export function ShowcaseModule() {
           <Link
             href={`/vitrina/mesec/${new Date().toISOString().slice(0, 7)}`}
             target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <CalendarDays className="h-4 w-4" aria-hidden /> Бюлетин за месеца
@@ -180,7 +182,7 @@ export function ShowcaseModule() {
                   )}
                   <div className="flex flex-wrap gap-2">
                     {item.status === "APPROVED" && (
-                      <Link href={`/vitrina/${item.id}`} target="_blank" className={BTN}>
+                      <Link href={`/vitrina/${item.id}`} target="_blank" rel="noopener noreferrer" className={BTN}>
                         <ExternalLink className="h-4 w-4" aria-hidden /> Виж на витрината
                       </Link>
                     )}
@@ -232,7 +234,7 @@ export function ShowcaseModule() {
                 {review?.published.map((item) => (
                   <ItemRow key={item.id} item={item} showAuthor>
                     <div className="flex flex-wrap gap-2">
-                      <Link href={`/vitrina/${item.id}`} target="_blank" className={BTN}>
+                      <Link href={`/vitrina/${item.id}`} target="_blank" rel="noopener noreferrer" className={BTN}>
                         <ExternalLink className="h-4 w-4" aria-hidden /> Виж
                       </Link>
                       <button type="button" onClick={() => decide(item, "return")} className={`${BTN} text-rose-700`}>

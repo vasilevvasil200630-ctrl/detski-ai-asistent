@@ -218,11 +218,11 @@ export default function RegisterPage() {
               </div>
               <p className="text-xs leading-relaxed text-slate-500">
                 Със създаването на профила приемате{" "}
-                <Link href="/terms" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
+                <Link href="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4d7a0a] hover:underline">
                   условията за ползване
                 </Link>
                 . Как обработваме данните ви, включително имейл адреса, е описано в{" "}
-                <Link href="/privacy" target="_blank" className="font-semibold text-[#4d7a0a] hover:underline">
+                <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4d7a0a] hover:underline">
                   политиката за поверителност
                 </Link>
                 .

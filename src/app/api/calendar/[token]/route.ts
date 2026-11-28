@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { userHasAccess } from "@/lib/allowed-emails";
 import { toNoteItem } from "@/lib/notes";
 import { addDaysIso, todayInSofia } from "@/lib/notes-shared";
 import { buildCalendar, ICS_HEADERS } from "@/lib/ics";
@@ -9,6 +10,7 @@ import { getBaseAppUrl } from "@/lib/email/config";
 /**
  * Абонамент за календара на телефона: неизпълнените задачи от бележника с напомнянията.
  * Без вход — достъпът е с тайния адрес, който учителят може да смени или изключи.
+ * Премахнат или спрян от директора профил губи достъп веднага.
  */
 export async function GET(_request: Request, { params }: { params: Promise<{ token: string }> }) {
   const token = (await params).token.replace(/\.ics$/i, "");
@@ -16,8 +18,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   const rate = await checkRateLimit(`calendar-feed:${token}`, 30);
   if (!rate.allowed) return new NextResponse("Too many requests", { status: 429 });
 
-  const user = await prisma.user.findUnique({ where: { calendarToken: token }, select: { id: true } });
-  if (!user) return new NextResponse("Not found", { status: 404, headers: { "X-Robots-Tag": "noindex" } });
+  const user = await prisma.user.findUnique({
+    where: { calendarToken: token },
+    select: { id: true, email: true, kgRole: true, kindergartenId: true, removedAt: true },
+  });
+  if (!user || user.removedAt || !(await userHasAccess(user))) {
+    return new NextResponse("Not found", { status: 404, headers: { "X-Robots-Tag": "noindex" } });
+  }
 
   // Закъснелите до месец назад остават, докато не се отметнат
   const from = new Date(`${addDaysIso(todayInSofia(), -30)}T00:00:00.000Z`);

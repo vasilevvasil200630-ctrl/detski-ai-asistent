@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   // Само след вярна парола — иначе би се разбрало кой имейл е в списъка
-  if (!(await userHasAccess(user))) {
+  if (user.removedAt || !(await userHasAccess(user))) {
     return NextResponse.json({ error: ACCESS_STOPPED_MESSAGE }, { status: 403 });
   }
 

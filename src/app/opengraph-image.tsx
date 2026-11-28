@@ -17,8 +17,8 @@ const MUTED = "#334155";
 
 export default async function OpengraphImage() {
   const [regular, bold, logo] = await Promise.all([
-    readFile(join(process.cwd(), "public/fonts/NotoSans.ttf")),
-    readFile(join(process.cwd(), "public/fonts/NotoSans-Bold.ttf")),
+    readFile(join(process.cwd(), "src/assets/fonts/NotoSans.ttf")),
+    readFile(join(process.cwd(), "src/assets/fonts/NotoSans-Bold.ttf")),
     // Логото от официалния сайт на градината
     readFile(join(process.cwd(), "public/brand/prolet-logo.png")),
   ]);

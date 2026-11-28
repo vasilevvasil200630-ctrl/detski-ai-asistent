@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage } from "@/components/LegalPage";
 import { EMAIL_CONFIG } from "@/lib/email/config";
+
+export const metadata: Metadata = {
+  title: "Условия за ползване",
+  description: "Условия за ползване на учителския облак и публичните страници на ДГ „Пролет“, с. Ягодово.",
+};
 
 // По модела на правните страници на МатураПлюс (src/app/terms), за учителите в детската градина.
 
