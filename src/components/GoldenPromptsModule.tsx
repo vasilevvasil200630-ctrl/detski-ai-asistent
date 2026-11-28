@@ -91,7 +91,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
       margin: 2,
       width: 320,
       color: {
-        dark: '#1e1b4b',
+        dark: '#2b4406',
         light: '#ffffff',
       },
     })
@@ -213,7 +213,7 @@ export const GoldenPromptsModule: React.FC<GoldenPromptsModuleProps> = ({
           h1 { font-size: 24px; color: #0f172a; margin-bottom: 4px; }
           .sub { color: #475569; font-size: 14px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
           .card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px 20px; margin-bottom: 18px; page-break-inside: avoid; }
-          .cat { font-size: 12px; font-weight: 700; color: #4338ca; margin-bottom: 4px; }
+          .cat { font-size: 12px; font-weight: 700; color: #4d7a0a; margin-bottom: 4px; }
           h2 { font-size: 17px; margin: 4px 0 10px 0; color: #0f172a; }
           .prompt-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 13.5px; line-height: 1.55; margin-bottom: 10px; }
           .why { font-size: 12.5px; color: #475569; }

@@ -85,7 +85,7 @@ export function ReminderSettings() {
           ) : url === null ? (
             <div className="mt-2 space-y-2">
               <p>Календарът (Google, iPhone, Samsung) показва задачите ви и звъни с напомнянето. Обновява се сам, щом добавите или отметнете задача.</p>
-              <button type="button" onClick={() => void call("POST")} disabled={busy} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0a4b82] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60">
+              <button type="button" onClick={() => void call("POST")} disabled={busy} className="inline-flex items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <CalendarPlus className="h-4 w-4" aria-hidden />} Включи календара
               </button>
             </div>
@@ -98,7 +98,7 @@ export function ReminderSettings() {
                   {copied ? <Check className="h-4 w-4 text-emerald-600" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />} Копирай
                 </button>
               </div>
-              <a href={url.replace(/^https?:/, "webcal:")} className="inline-flex items-center gap-1.5 rounded-lg border border-[#0a4b82] bg-white px-3 py-1.5 text-sm font-semibold text-[#0a4b82] hover:bg-[#eef5fb]">
+              <a href={url.replace(/^https?:/, "webcal:")} className="inline-flex items-center gap-1.5 rounded-lg border border-[#4d7a0a] bg-white px-3 py-1.5 text-sm font-semibold text-[#4d7a0a] hover:bg-[#f4f9e8]">
                 <CalendarPlus className="h-4 w-4" aria-hidden /> Добави в календара на това устройство
               </a>
               <ul className="list-disc space-y-1 pl-5 text-slate-600">

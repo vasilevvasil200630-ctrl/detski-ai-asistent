@@ -41,7 +41,7 @@ export default async function ShowcaseTeacherPage({ params }: { params: Promise<
         <ArrowLeft className="h-4 w-4" aria-hidden /> Витрината
       </Link>
       <header className="mt-5 flex items-center gap-4">
-        <span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-sky-50 text-5xl" aria-hidden>
+        <span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-[#f4f9e8] text-5xl" aria-hidden>
           {teacher.avatar}
         </span>
         <div className="min-w-0">

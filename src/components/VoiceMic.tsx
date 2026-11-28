@@ -92,7 +92,7 @@ export function VoiceMic({ onTranscript, disabled, className }: Props) {
         aria-label={label}
         aria-pressed={recording}
         title={label}
-        className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] disabled:cursor-not-allowed disabled:opacity-50 ${
           recording ? "border-rose-600 bg-rose-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
         }`}
       >

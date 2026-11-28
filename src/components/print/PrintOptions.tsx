@@ -70,7 +70,7 @@ export function PrintPrefsSync() {
 /** Двете отметки до бутона „Принтирай“. */
 export function PrintOptions({ className = "" }: { className?: string }) {
   const p = usePrintPrefs();
-  const box = "h-4 w-4 accent-[#0a4b82]";
+  const box = "h-4 w-4 accent-[#4d7a0a]";
   return (
     <div className={`no-print flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-slate-600 ${className}`}>
       <label className="flex items-center gap-1.5" title="Черно-бяло, без фонове и цветни плочки; картинките са в светлосиво и децата ги оцветяват">

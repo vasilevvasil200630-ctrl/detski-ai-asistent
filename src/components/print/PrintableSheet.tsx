@@ -256,8 +256,8 @@ function VersesView({ v }: { v: VersesSheet }) {
 function LetterView({ l }: { l: ParentLetter }) {
   return (
     <>
-      <header className="border-b-2 border-[#0a4b82] pb-3">
-        <p className="text-lg font-bold text-[#0a4b82]">{KG.fullName}</p>
+      <header className="border-b-2 border-[#4d7a0a] pb-3">
+        <p className="text-lg font-bold text-[#4d7a0a]">{KG.fullName}</p>
         <p className="text-sm text-slate-600">{KG.village}</p>
       </header>
       <h2 className="mt-8 text-center text-2xl font-bold">{l.title}</h2>

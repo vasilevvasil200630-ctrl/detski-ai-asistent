@@ -52,8 +52,8 @@ const DIRECTIONS: { id: LessonDirection; label: string }[] = [
 ];
 
 const chip = (active: boolean) =>
-  `rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] ${
-    active ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+  `rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] ${
+    active ? "border-[#4d7a0a] bg-[#4d7a0a] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
   }`;
 const LABEL = "mb-2 block text-sm font-semibold text-slate-800";
 
@@ -64,7 +64,7 @@ const STYLE_HINTS: Record<WorksheetStyle, string> = {
   differences: "Две двойки картинки с 2–5 разлики според групата. Отговорите са за учителя.",
   half: "Симетрични рисунки: по пунктира за I–II група, по точките в мрежа за III–IV група.",
 };
-const INPUT = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-[#0a4b82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]/20";
+const INPUT = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-[#4d7a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]/20";
 
 /** Сървърът (Gemini с проверка), а без връзка — вграденият двигател в браузъра. */
 async function generatePrintable(req: PrintableRequest): Promise<{ item: Printable; source: "ai" | "demo" }> {
@@ -283,7 +283,7 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
               type="button"
               onClick={generate}
               disabled={busy}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2 disabled:opacity-60"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : item ? <RefreshCw className="h-4 w-4" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
               {busy ? "Създаване…" : item ? "Нов вариант" : "Създай"}
@@ -350,7 +350,7 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-6 py-3 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
           >
             <Printer className="h-4 w-4" aria-hidden />
             {certNames.length > 1 ? `Принтирай всички (${certNames.length})` : "Принтирай"}
@@ -372,13 +372,13 @@ export function PrintablesModule({ teacher }: { teacher: SessionTeacher | null }
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition-colors duration-150 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
             >
               <Printer className="h-4 w-4" aria-hidden /> Принтирай
             </button>
             {(item.type === "worksheet" || item.type === "verses") && (
               <label className="flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox" checked={hideTeacherNote} onChange={(e) => setHideTeacherNote(e.target.checked)} className="h-4 w-4 accent-[#0a4b82]" />
+                <input type="checkbox" checked={hideTeacherNote} onChange={(e) => setHideTeacherNote(e.target.checked)} className="h-4 w-4 accent-[#4d7a0a]" />
                 Без бележката за учителя при печат
               </label>
             )}

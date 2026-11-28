@@ -15,7 +15,7 @@ export type MetaState = {
 };
 
 const FIELD =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20";
 
 /** Папка, група, направление, описание и „за всички / само за мен“ — общи за качване и редакция. */
 export function MetaFields({ value, onChange, idPrefix }: { value: MetaState; onChange: (v: MetaState) => void; idPrefix: string }) {
@@ -87,7 +87,7 @@ export function MetaFields({ value, onChange, idPrefix }: { value: MetaState; on
             <label
               key={String(o.shared)}
               className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors duration-150 ${
-                value.shared === o.shared ? "border-[#0a4b82] bg-[#eef5fb]" : "border-slate-200 bg-white hover:bg-slate-50"
+                value.shared === o.shared ? "border-[#4d7a0a] bg-[#f4f9e8]" : "border-slate-200 bg-white hover:bg-slate-50"
               }`}
             >
               <input
@@ -95,7 +95,7 @@ export function MetaFields({ value, onChange, idPrefix }: { value: MetaState; on
                 name={`${idPrefix}-shared`}
                 checked={value.shared === o.shared}
                 onChange={() => set("shared", o.shared)}
-                className="mt-1 accent-[#0a4b82]"
+                className="mt-1 accent-[#4d7a0a]"
               />
               <span>
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">

@@ -382,7 +382,7 @@ export const TeacherHubModule: React.FC<TeacherHubModuleProps> = ({
                   <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs sm:text-sm space-y-1.5">
                     {item.game.tasks && item.game.tasks.length > 0 && (
                       <div>
-                        <strong className="font-semibold text-[#0a4b82]">Образователни задачи (Наредба № 5):</strong>
+                        <strong className="font-semibold text-[#4d7a0a]">Образователни задачи (Наредба № 5):</strong>
                         <ul className="mt-1 list-disc space-y-0.5 pl-5 text-slate-700">
                           {item.game.tasks.map((t) => <li key={`${t.core}|${t.result}`}>{taskLine(t)}</li>)}
                         </ul>

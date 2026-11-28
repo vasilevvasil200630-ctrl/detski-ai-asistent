@@ -54,7 +54,7 @@ export default async function GroupPage({ params }: { params: Promise<{ slug: st
           {group.teachers.map((t) => (
             <li key={t.id}>
               <Link href={`/vitrina/uchitel/${t.id}`} className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 text-sm hover:bg-slate-50">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-sky-50 text-lg" aria-hidden>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-[#f4f9e8] text-lg" aria-hidden>
                   {t.avatar}
                 </span>
                 <span>
@@ -152,7 +152,7 @@ export default async function GroupPage({ params }: { params: Promise<{ slug: st
               ))}
             </ul>
           </section>
-          <Link href="/vitrina" className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 font-semibold text-[#0a4b82] hover:bg-sky-50/40">
+          <Link href="/vitrina" className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 font-semibold text-[#4d7a0a] hover:bg-[#f4f9e8]">
             <Images className="h-5 w-5" aria-hidden /> Дейностите с децата
           </Link>
         </aside>

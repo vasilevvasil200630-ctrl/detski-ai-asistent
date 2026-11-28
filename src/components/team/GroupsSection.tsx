@@ -13,7 +13,7 @@ async function api<T>(url: string, init: RequestInit): Promise<T> {
   return data;
 }
 
-const field = "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#0a4b82] focus:outline-none focus:ring-2 focus:ring-[#0a4b82]/20";
+const field = "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#4d7a0a] focus:outline-none focus:ring-2 focus:ring-[#4d7a0a]/20";
 
 /**
  * Групите на градината: директорът ги създава, а учителите слага в тях от „Длъжност и група“.
@@ -91,10 +91,10 @@ export function GroupsSection({ groups, onChange }: { groups: GroupView[]; onCha
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                <Link href={`/grupi/${g.slug}`} target="_blank" className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                <Link href={`/grupi/${g.slug}`} target="_blank" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                   <ExternalLink className="h-3.5 w-3.5" aria-hidden /> Страницата за родителите
                 </Link>
-                <Link href={`/showcase/qr?grupa=${g.slug}&ime=${encodeURIComponent(g.label)}`} className="inline-flex items-center gap-1 text-sm font-semibold text-[#0a4b82] hover:underline">
+                <Link href={`/showcase/qr?grupa=${g.slug}&ime=${encodeURIComponent(g.label)}`} className="inline-flex items-center gap-1 text-sm font-semibold text-[#4d7a0a] hover:underline">
                   <QrCode className="h-3.5 w-3.5" aria-hidden /> QR за групата
                 </Link>
               </div>
@@ -123,7 +123,7 @@ export function GroupsSection({ groups, onChange }: { groups: GroupView[]; onCha
             ))}
           </select>
         </label>
-        <button type="submit" disabled={busy || name.trim().length < 2} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60">
+        <button type="submit" disabled={busy || name.trim().length < 2} className="inline-flex items-center gap-1.5 rounded-lg bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60">
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Plus className="h-4 w-4" aria-hidden />} Създай
         </button>
       </form>

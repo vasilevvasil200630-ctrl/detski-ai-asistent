@@ -34,7 +34,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
     return (
       <main className="mx-auto max-w-xl px-4 py-16 text-center">
         <p className="text-slate-700">{error}</p>
-        <Link href="/library" className="mt-4 inline-block font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/library" className="mt-4 inline-block font-semibold text-[#4d7a0a] hover:underline">
           Към библиотеката
         </Link>
       </main>
@@ -70,7 +70,7 @@ export default function PrintMaterialPage({ params }: { params: Promise<{ id: st
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
         >
           <Printer className="h-4 w-4" aria-hidden /> {material.kind === "GAME" && content?.kit ? "Печат на всичко" : "Принтирай"}
         </button>

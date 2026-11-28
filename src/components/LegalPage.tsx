@@ -23,7 +23,7 @@ export function LegalPage({
         <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-600">
           {sections.map((s) => (
             <li key={s.id}>
-              <a href={`#${s.id}`} className="hover:text-[#0a4b82] hover:underline">
+              <a href={`#${s.id}`} className="hover:text-[#4d7a0a] hover:underline">
                 {s.heading}
               </a>
             </li>
@@ -44,11 +44,11 @@ export function LegalPage({
 
       <p className="mt-12 border-t border-slate-200 pt-6 text-sm text-slate-500">
         Вижте също:{" "}
-        <Link href="/privacy" className="font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/privacy" className="font-semibold text-[#4d7a0a] hover:underline">
           Поверителност
         </Link>{" "}
         ·{" "}
-        <Link href="/terms" className="font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/terms" className="font-semibold text-[#4d7a0a] hover:underline">
           Условия за ползване
         </Link>
       </p>

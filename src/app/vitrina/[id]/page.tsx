@@ -31,7 +31,7 @@ export default async function ShowcaseItemPage({ params }: { params: Promise<{ i
       <Link href="/vitrina" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900">
         <ArrowLeft className="h-4 w-4" aria-hidden /> Витрината
       </Link>
-      <p className="mt-5 text-sm font-semibold text-[#0a4b82]">
+      <p className="mt-5 text-sm font-semibold text-[#4d7a0a]">
         {showcaseKind(item).label} · {AGE_SHORT[item.ageGroup]}
         {dir ? ` · ${dir}` : ""}
       </p>

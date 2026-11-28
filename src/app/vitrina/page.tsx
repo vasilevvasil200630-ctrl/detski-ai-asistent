@@ -33,12 +33,12 @@ export default async function ShowcasePublicPage({ searchParams }: { searchParam
     return qs ? `/vitrina?${qs}` : "/vitrina";
   };
   const chip = (on: boolean) =>
-    `rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${on ? "border-[#0a4b82] bg-[#0a4b82] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`;
+    `rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${on ? "border-[#4d7a0a] bg-[#4d7a0a] text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <header className="max-w-3xl">
-        <p className="text-sm font-semibold text-[#0a4b82]">
+        <p className="text-sm font-semibold text-[#4d7a0a]">
           {KG.fullName}, {KG.village}
         </p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Какво правим в „Пролет“</h1>

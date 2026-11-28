@@ -19,7 +19,7 @@ export function TeacherHome() {
     return (
       <main className="mx-auto max-w-md px-4 py-20 text-center">
         <p className="text-slate-700">Сесията ви е изтекла.</p>
-        <Link href="/login" className="mt-4 inline-block font-semibold text-[#0a4b82] hover:underline">
+        <Link href="/login" className="mt-4 inline-block font-semibold text-[#4d7a0a] hover:underline">
           Влезте отново
         </Link>
       </main>

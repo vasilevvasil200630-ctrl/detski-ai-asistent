@@ -39,7 +39,7 @@ export function PortfolioModule() {
       <div className="no-print flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-            <BookOpenCheck className="h-7 w-7 text-[#0a4b82]" aria-hidden /> Моето портфолио
+            <BookOpenCheck className="h-7 w-7 text-[#4d7a0a]" aria-hidden /> Моето портфолио
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
             Всичко, което сте създали, споделили, изпитали с децата и показали на родителите през учебната година. Отпечатайте го за
@@ -66,7 +66,7 @@ export function PortfolioModule() {
             type="button"
             onClick={() => window.print()}
             disabled={!data}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-50"
           >
             <Printer className="h-4 w-4" aria-hidden /> Отпечатай
           </button>
@@ -142,7 +142,7 @@ function PortfolioSheet({ data }: { data: PortfolioData }) {
           {data.tried.length > 0 && (
             <section className="mt-6">
               <h3 className="flex items-center gap-2 text-lg font-bold">
-                <BadgeCheck className="h-5 w-5 text-[#0a4b82]" aria-hidden /> Изпитано с децата
+                <BadgeCheck className="h-5 w-5 text-[#4d7a0a]" aria-hidden /> Изпитано с децата
               </h3>
               <ol className="mt-2 space-y-2 text-sm leading-relaxed">
                 {data.tried.map((m) => (
@@ -161,12 +161,12 @@ function PortfolioSheet({ data }: { data: PortfolioData }) {
           {data.showcase.length > 0 && (
             <section className="mt-6">
               <h3 className="flex items-center gap-2 text-lg font-bold">
-                <Store className="h-5 w-5 text-[#0a4b82]" aria-hidden /> Показано на родителите
+                <Store className="h-5 w-5 text-[#4d7a0a]" aria-hidden /> Показано на родителите
               </h3>
               <ul className="mt-2 space-y-1 text-sm">
                 {data.showcase.map((s) => (
                   <li key={s.id} className="flex flex-wrap justify-between gap-2 border-b border-dashed border-slate-200 py-1">
-                    <Link href={`/vitrina/${s.id}`} className="font-semibold text-[#0a4b82] hover:underline print:text-slate-900">
+                    <Link href={`/vitrina/${s.id}`} className="font-semibold text-[#4d7a0a] hover:underline print:text-slate-900">
                       {s.title}
                     </Link>
                     <span className="text-slate-600">
@@ -208,7 +208,7 @@ function PortfolioSheet({ data }: { data: PortfolioData }) {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border border-slate-200 p-3 text-center">
-      <dd className="text-2xl font-bold text-[#0a4b82]">{value}</dd>
+      <dd className="text-2xl font-bold text-[#4d7a0a]">{value}</dd>
       <dt className="mt-0.5 text-xs text-slate-600">{label}</dt>
     </div>
   );

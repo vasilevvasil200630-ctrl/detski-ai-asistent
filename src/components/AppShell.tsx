@@ -88,8 +88,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Докато не знаем дали има вход — без рамка, за да не премигва менюто
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <Loader2 className="h-7 w-7 animate-spin text-slate-400" aria-label="Зареждане" />
+      <div className="kg-page flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#4d7a0a]" aria-label="Зареждане" />
       </div>
     );
   }
@@ -111,14 +111,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--background)] text-[var(--foreground)] bg-app-ambient transition-colors duration-200">
+    <div className="kg-app-bg flex min-h-screen text-[var(--foreground)] transition-colors duration-200">
       <AppSidebar
         collapsed={hydrated ? collapsed : false}
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
       />
       {/* min-w-0: колоната не бива да расте по най-широкото си съдържание (карусели, табове) */}
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      {/* kg-app: ръкописните заглавия, жълтите линии и кремавите карти на официалния сайт и в облака */}
+      <div className="kg-app flex min-h-screen min-w-0 flex-1 flex-col">
         <AppTopBar
           onOpenMobile={() => setMobileOpen(true)}
           onToggleCollapse={toggleCollapsed}
@@ -126,17 +127,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
         <div className="flex flex-1 flex-col pb-16 md:pb-0 print:pb-0">
           {user.mustChangePassword && (
-            <div role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 sm:px-6">
-              <p className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 text-sm text-amber-900">
-                <KeyRound className="h-4 w-4 shrink-0" aria-hidden />
+            <div role="status" className="border-b border-[#e6cf67] bg-[#fffeea] px-4 py-2.5 sm:px-6">
+              <p className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#3d2f00]">
+                <KeyRound className="h-4 w-4 shrink-0 text-[#c43d00]" aria-hidden />
                 Влезли сте с временна парола от директора. Сложете си своя, за да е профилът ви защитен.
-                <Link href="/profile#change-password" className="font-semibold underline underline-offset-2 hover:text-amber-950">
+                <Link href="/profile#change-password" className="font-semibold text-[#c43d00] underline underline-offset-2 hover:text-[#9e3100]">
                   Смени паролата
                 </Link>
               </p>
             </div>
           )}
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 px-2.5 py-3 sm:px-4 sm:py-5 lg:px-6 print:p-0">
+            <div className="kg-app-panel mx-auto w-full max-w-7xl">{children}</div>
+          </div>
           <SiteFooter compact />
         </div>
       </div>

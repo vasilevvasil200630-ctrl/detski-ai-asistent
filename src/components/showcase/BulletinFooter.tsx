@@ -11,7 +11,7 @@ export function PrintButton({ label = "Отпечатай за таблото" }
       <button
         type="button"
         onClick={() => window.print()}
-        className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-4 py-2 text-sm font-semibold text-white hover:bg-[#083861]"
+        className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#3d6108]"
       >
         <Printer className="h-4 w-4" aria-hidden /> {label}
       </button>

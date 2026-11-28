@@ -101,7 +101,7 @@ export function UploadPanel({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 id="upload-title" className="flex items-center gap-2 text-lg font-bold text-slate-900">
-            <CloudUpload className="h-5 w-5 text-[#0a4b82]" aria-hidden /> Качване в облака
+            <CloudUpload className="h-5 w-5 text-[#4d7a0a]" aria-hidden /> Качване в облака
           </h2>
           <p className="mt-0.5 text-sm text-slate-500">
             До {formatBytes(usage.maxFileSize)} на файл · PDF, Word, Excel, PowerPoint, снимки, аудио, видео, ZIP
@@ -131,7 +131,7 @@ export function UploadPanel({
                   ) : r.status === "error" || pre ? (
                     <AlertCircle className="h-5 w-5 text-rose-600" />
                   ) : r.status === "uploading" ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-[#0a4b82]" />
+                    <Loader2 className="h-5 w-5 animate-spin text-[#4d7a0a]" />
                   ) : (
                     <CloudUpload className="h-5 w-5 text-slate-400" />
                   )}
@@ -146,7 +146,7 @@ export function UploadPanel({
                     disabled={busy || r.status === "done"}
                     maxLength={140}
                     onChange={(e) => patch(i, { title: e.target.value })}
-                    className="w-full rounded-md border border-transparent px-1.5 py-0.5 font-semibold text-slate-900 hover:border-slate-200 focus:border-[#0a4b82] focus:outline-none disabled:bg-transparent"
+                    className="w-full rounded-md border border-transparent px-1.5 py-0.5 font-semibold text-slate-900 hover:border-slate-200 focus:border-[#4d7a0a] focus:outline-none disabled:bg-transparent"
                   />
                   <p className="truncate px-1.5 text-xs text-slate-500">
                     {file.name} · {formatBytes(file.size)}
@@ -165,7 +165,7 @@ export function UploadPanel({
               </div>
               {r.status === "uploading" && (
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuenow={r.progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Качване на ${file.name}`}>
-                  <div className="h-full rounded-full bg-[#0a4b82] transition-[width] duration-200" style={{ width: `${Math.max(r.progress, 3)}%` }} />
+                  <div className="h-full rounded-full bg-[#4d7a0a] transition-[width] duration-200" style={{ width: `${Math.max(r.progress, 3)}%` }} />
                 </div>
               )}
               {(r.error || pre) && <p className="mt-1.5 px-1.5 text-sm text-rose-700">{r.error ?? pre}</p>}
@@ -191,7 +191,7 @@ export function UploadPanel({
           type="button"
           onClick={() => void start()}
           disabled={busy || remaining === 0}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#0a4b82] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#083861] disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#4d7a0a] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3d6108] disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <CloudUpload className="h-4 w-4" aria-hidden />}
           {busy ? "Качване…" : remaining === 1 ? "Качи файла" : `Качи ${remaining} файла`}

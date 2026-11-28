@@ -81,7 +81,7 @@ export function CloudSaveButton({
             onClick={() => save(true)}
             className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-50"
           >
-            <Users className="mt-0.5 h-4 w-4 shrink-0 text-[#0a4b82]" aria-hidden />
+            <Users className="mt-0.5 h-4 w-4 shrink-0 text-[#4d7a0a]" aria-hidden />
             <span>
               <span className="block font-semibold text-slate-800">Сподели с колегите</span>
               <span className="block text-xs text-slate-500">Вижда се в общия облак</span>

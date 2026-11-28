@@ -10,7 +10,7 @@ import { invalidateMe } from "@/lib/client/me";
 // Копирано от МатураПлюс (src/app/reset-password/ResetPasswordClient.tsx).
 
 const LINK_CLASS =
-  "font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]";
+  "font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]";
 
 type View = { kind: "checking" } | { kind: "invalid"; message: string } | { kind: "form" };
 
@@ -96,7 +96,7 @@ function ResetPasswordForm() {
           <FormError message={view.message} />
           <Link
             href="/forgot-password"
-            className="flex w-full items-center justify-center rounded-lg bg-[#0a4b82] px-4 py-3 text-base font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#083861] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+            className="flex w-full items-center justify-center rounded-lg bg-[#4d7a0a] px-4 py-3 text-base font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[#3d6108] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
           >
             Заявете нов линк
           </Link>

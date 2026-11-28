@@ -66,7 +66,7 @@ function LoginForm() {
   if (checkingAuth) {
     return (
       <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#ffffff]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0a4b82]" aria-label="Зареждане" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#4d7a0a]" aria-label="Зареждане" />
       </main>
     );
   }
@@ -81,7 +81,7 @@ function LoginForm() {
             Нов колега?{" "}
             <Link
               href="/register"
-              className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+              className="font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
             >
               Регистрация с кода на градината
             </Link>
@@ -91,7 +91,7 @@ function LoginForm() {
             Родител или гост?{" "}
             <Link
               href="/"
-              className="font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+              className="font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
             >
               Вижте какво правим с децата
             </Link>
@@ -125,13 +125,13 @@ function LoginForm() {
               type="checkbox"
               checked={remember}
               onChange={(e) => setRemember(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 accent-[#0a4b82] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82] focus-visible:ring-offset-2"
+              className="h-4 w-4 rounded border-slate-300 accent-[#4d7a0a] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a] focus-visible:ring-offset-2"
             />
             Запомни ме
           </label>
           <Link
             href="/forgot-password"
-            className="text-sm font-semibold text-[#0a4b82] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a4b82]"
+            className="text-sm font-semibold text-[#4d7a0a] underline-offset-4 transition-colors duration-150 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4d7a0a]"
           >
             Забравена парола?
           </Link>

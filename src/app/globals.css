@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
-/* Структурата и цветовете са копирани от МатураПлюс (src/app/globals.css): токени на :root,
-   @theme inline, щадящ зрението режим, повърхности, бутони и фон. Сапфир + изумруд + slate. */
+/*
+ * Официална визуална тема на ДГ „Пролет“, с. Ягодово (https://dg-yagodovo.com):
+ * небе с облаци (.kg-sky), слънчево жълто меню (#faca04), тревисто зелено (#74a710 / #4d7a0a),
+ * топло оранжево (#ff5300 / #c43d00), кремави карти (#fffeea), поляна с цветя (/brand/meadow-page.webp
+ * и /brand/meadow.webp) и ръкописният шрифт Caveat за марката, менюто и заглавията.
+ */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Шрифтовете са в самия сайт (public/fonts) — при build не се тегли нищо от Google Fonts, което
- * понякога не отговаря и проваля build-а. Geist, Geist Mono и Caveat (лиценз OFL), само латиница и
- * кирилица; Geist и Caveat са променливи (едно изображение за всички дебелини).
+ * Шрифтовете са в самия сайт (public/fonts) — при build не се тегли нищо от Google Fonts.
+ * Geist, Geist Mono и Caveat (лиценз OFL), латиница и кирилица.
  */
 @font-face {
   font-family: "Geist";
@@ -71,44 +74,56 @@
 @source "../services/**/*.{js,ts,jsx,tsx,mdx}";
 
 :root {
-  /* Чисто бял фон и деликатни сиви повърхности (както в МатураПлюс) */
-  --background: #ffffff;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --surface-subtle: #f8fafc;
-  --surface-muted: #f1f5f9;
-  --border: #e2e8f0;
+  color-scheme: light;
 
-  /* Основен бранд: сапфирено синьо на МатураПлюс */
-  --brand-primary: #0a4b82;
-  --brand-primary-dark: #083861;
-  --brand-primary-light: #0e5e9e;
-  --brand-primary-soft: #eef5fb;
+  /* Повърхности и текст в духа на dg-yagodovo.com (#2e2e2e върху топъл бял/кремав лист) */
+  --background: #fffef9;
+  --foreground: #2e2e2e;
+  --card: #fffeea;
+  --card-foreground: #2e2e2e;
+  --surface-subtle: #fffef4;
+  --surface-muted: #faf4da;
+  --border: #e6cf67;
+  --input-border: #8b8368;
 
-  /* Втори бранд: изумрудено зелено на МатураПлюс */
+  /* Основен бранд: зеленото на ДГ „Пролет“ (контраст > 5.1:1 спрямо бяло и кремаво) */
+  --brand-primary: #4d7a0a;
+  --brand-primary-dark: #3d6108;
+  --brand-primary-light: #74a710;
+  --brand-primary-soft: #f4f9e8;
+
+  /* Втори зелен тон за акценти и значки */
   --brand-leaf: #1ea858;
   --brand-leaf-dark: #168a46;
   --brand-leaf-light: #28be67;
   --brand-leaf-soft: #edf9f2;
 
-  /* Слънчев акцент (капакът на кутията в логото, награди) */
-  --brand-sun: #f59e0b;
+  /* Слънчев акцент */
+  --brand-sun: #faca04;
 
-  /* Цветовете на официалния сайт на ДГ „Пролет“ (dg-yagodovo.com): жълтото меню, зеленото
-     заглавие и оранжевите акценти. За текст са по-тъмните „ink“ варианти (контраст поне 4.5:1). */
+  /* Точната палитра на dg-yagodovo.com + достъпни „ink“ варианти (контраст >= 4.5:1) */
+  --kg-sky-bg: #cfe9f8;
   --kg-yellow: #faca04;
+  --kg-yellow-border: #e6cf67;
   --kg-yellow-ink: #3d2f00;
   --kg-green: #74a710;
+  --kg-green-bright: #00a200;
   --kg-green-ink: #4d7a0a;
   --kg-orange: #ff5300;
   --kg-orange-ink: #c43d00;
+  --kg-orange-soft: #fff3eb;
   --kg-cream: #fffeea;
+  --kg-ink: #2e2e2e;
 
-  --primary: #0a4b82;
+  --primary: #4d7a0a;
   --primary-foreground: #ffffff;
-  --accent-rose: #e11d48;
-  --accent-amber: #d97706;
+  --accent-rose: #c43d00;
+  --accent-amber: #b45309;
+}
+
+.dark {
+  color-scheme: dark;
+  --brand-primary: #8fc23a;
 }
 
 @theme inline {
@@ -140,18 +155,18 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
 
-  /* Както в МатураПлюс: indigo-* сочи към сапфира, emerald-* към изумруда */
-  --color-indigo-50: #eef5fb;
-  --color-indigo-100: #d8e8f6;
-  --color-indigo-200: #b5d5ef;
-  --color-indigo-300: #86bbe4;
-  --color-indigo-400: #499cd5;
-  --color-indigo-500: #2083c4;
-  --color-indigo-600: #0a4b82;
-  --color-indigo-700: #083d6b;
-  --color-indigo-800: #07345b;
-  --color-indigo-900: #072d4c;
-  --color-indigo-950: #041d33;
+  /* indigo-* сочи към зеленото на градината, emerald-* — към свежото листо */
+  --color-indigo-50: #f4f9e8;
+  --color-indigo-100: #e6f2cc;
+  --color-indigo-200: #cfe69e;
+  --color-indigo-300: #b0d567;
+  --color-indigo-400: #8fc23a;
+  --color-indigo-500: #74a710;
+  --color-indigo-600: #4d7a0a;
+  --color-indigo-700: #406608;
+  --color-indigo-800: #355407;
+  --color-indigo-900: #2b4406;
+  --color-indigo-950: #192803;
   --color-emerald-50: #eefbf4;
   --color-emerald-100: #d8f5e4;
   --color-emerald-200: #b5eccb;
@@ -164,31 +179,31 @@
   --color-emerald-900: #135631;
   --color-emerald-950: #06301a;
 
-  /* Пастелните палитри на модулите, приведени към сапфир/изумруд; слънце и корал остават за децата */
+  /* Пастелните палитри на модулите — към зелено, слънце и топъл корал/оранжево */
   --color-mint-50: #eefbf4;
   --color-mint-100: #d8f5e4;
   --color-mint-200: #b5eccb;
   --color-mint-500: #23ad63;
   --color-mint-600: #1ea858;
-  --color-lavender-50: #eef5fb;
-  --color-lavender-100: #d8e8f6;
-  --color-lavender-200: #b5d5ef;
-  --color-lavender-500: #2083c4;
-  --color-lavender-600: #0a4b82;
-  --color-sunshine-50: #fefce8;
+  --color-lavender-50: #f4f9e8;
+  --color-lavender-100: #e6f2cc;
+  --color-lavender-200: #cfe69e;
+  --color-lavender-500: #74a710;
+  --color-lavender-600: #4d7a0a;
+  --color-sunshine-50: #fffeea;
   --color-sunshine-100: #fef9c3;
   --color-sunshine-200: #fef08a;
-  --color-sunshine-500: #eab308;
+  --color-sunshine-500: #faca04;
   --color-sunshine-600: #ca8a04;
-  --color-coral-50: #fff1f2;
-  --color-coral-100: #ffe4e6;
-  --color-coral-200: #fecdd3;
-  --color-coral-500: #f43f5e;
-  --color-coral-600: #e11d48;
+  --color-coral-50: #fff3eb;
+  --color-coral-100: #ffe4d1;
+  --color-coral-200: #ffc9a3;
+  --color-coral-500: #ff5300;
+  --color-coral-600: #c43d00;
 
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* Ръкописният шрифт на официалния сайт — за марката и заглавията */
+  --font-display: var(--font-caveat), "Segoe Print", "Comic Sans MS", cursive;
+  /* Ръкописният шрифт на официалния сайт — за марката, менюто и заглавията */
   --font-hand: var(--font-caveat), "Segoe Print", "Comic Sans MS", cursive;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
@@ -207,23 +222,26 @@
 }
 
 /* ============================================================ */
-/* ЩАДЯЩ ЗРЕНИЕТО РЕЖИМ (EYE-CARE) — копирано от МатураПлюс      */
+/* ЩАДЯЩ ЗРЕНИЕТО РЕЖИМ (EYE-CARE)                               */
 /* ============================================================ */
 html.eye-care {
-  --background: #fbf9f6;
+  --background: #fbf9f2;
   --foreground: #2d3748;
   color-scheme: light;
   filter: sepia(0.08) brightness(0.99) contrast(0.98);
   transition: filter 0.25s ease;
 }
 
-html.eye-care body {
+html.eye-care body,
+html.eye-care .kg-page,
+html.eye-care .kg-app-bg {
   background-color: var(--background) !important;
+  background-image: none !important;
   color: var(--foreground) !important;
 }
 
 html.eye-care ::selection {
-  background-color: rgba(217, 119, 6, 0.2) !important;
+  background-color: rgba(217, 119, 6, 0.22) !important;
   color: #78350f !important;
 }
 
@@ -238,25 +256,108 @@ html.eye-care ::selection {
   }
 }
 
+/* ============================================================ */
+/* Браузърен интерфейс, скролбар и форми                         */
+/* ============================================================ */
+html {
+  scrollbar-color: #6b7d47 #f7f4e4;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  accent-color: var(--brand-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: rgba(10, 75, 130, 0.15);
-  color: #072d4c;
+  background-color: rgba(116, 167, 16, 0.25);
+  color: #2b4406;
 }
 
-/* Повърхности (Linear/Stripe стил) — копирано от МатураПлюс */
+textarea {
+  resize: vertical;
+}
+
+/* Валидация само след взаимодействие от потребителя (:user-invalid), без range плъзгачи */
+input:not([type="range"]):user-invalid,
+textarea:user-invalid,
+select:user-invalid {
+  border-color: #dc2626;
+}
+
+/* Резервен стил за стари браузъри без поддръжка на accent-color */
+@supports not (accent-color: #4d7a0a) {
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    background: #d6d3c4;
+    border-radius: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--brand-primary, #4d7a0a);
+    cursor: pointer;
+    margin-top: -4px;
+  }
+  input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    background: #d6d3c4;
+    border-radius: 4px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--brand-primary, #4d7a0a);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-progress {
+    background-color: var(--brand-primary, #4d7a0a);
+    height: 8px;
+    border-radius: 4px;
+  }
+  progress {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    background: #d6d3c4;
+    height: 8px;
+    border-radius: 4px;
+  }
+  progress::-webkit-progress-bar {
+    background-color: #d6d3c4;
+    border-radius: 4px;
+  }
+  progress::-webkit-progress-value {
+    background-color: var(--brand-primary, #4d7a0a);
+    border-radius: 4px;
+  }
+  progress::-moz-progress-bar {
+    background-color: var(--brand-primary, #4d7a0a);
+    border-radius: 4px;
+  }
+}
+
 .surface-card {
   background-color: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.02);
+  border-radius: 7px;
+  box-shadow: 0 1px 3px 0 rgb(61 47 0 / 0.05);
 }
 
 .surface-card-hover {
@@ -264,24 +365,8 @@ body {
 }
 
 .surface-card-hover:hover {
-  border-color: rgba(10, 75, 130, 0.35);
-  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.03);
-}
-
-/* Фина лента за превъртане */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(168, 162, 158, 0.4);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 162, 158, 0.7);
+  border-color: var(--kg-green);
+  box-shadow: 0 2px 6px -1px rgb(77 122 10 / 0.12);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -304,33 +389,54 @@ textarea,
 }
 
 /* ============================================================ */
-/* ОФИЦИАЛНИЯТ САЙТ НА ГРАДИНАТА: ръкописен шрифт, небе и поляна */
+/* ОФИЦИАЛЕН СТИЛ НА ДГ „ПРОЛЕТ“ (https://dg-yagodovo.com)       */
 /* ============================================================ */
 
-/* Caveat е по-дребен от Geist при същия размер — font-size-adjust изравнява височината на буквите */
+/* Caveat е по-дребен от Geist при същия размер — font-size-adjust изравнява височината */
 .font-hand,
 .kg-site h1,
 .kg-site h2.text-2xl,
-.kg-site h2.text-xl {
+.kg-site h2.text-xl,
+.kg-site h2.text-lg {
   font-family: var(--font-hand);
   font-size-adjust: 0.5;
   font-weight: 700;
   letter-spacing: 0;
 }
 
-/* Заглавията на страниците за родителите — оранжеви, като на официалния сайт */
-.kg-site h1 {
-  color: var(--kg-orange-ink);
-}
-
-/* Небето с облаци от официалния сайт зад горната част, с бял воал за четимост */
+/* Небето с облаци зад шапката на сайта и на страничното меню (.top_bg от официалния сайт) */
 .kg-sky {
   background-color: #dff1fb;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
+    linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.68)),
     url("/brand/sky.webp");
   background-size: cover;
   background-position: center top;
+}
+
+/* Жълтата лента с менюто (.t_menu_all от официалния сайт: #faca04, зелено при посочване, оранжево за активната страница) */
+.kg-menubar {
+  background-color: var(--kg-yellow);
+  border-bottom: 1px solid #d9ab00;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.kg-menu-link {
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+  font-weight: 700;
+  color: var(--kg-yellow-ink);
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.kg-menu-link:hover {
+  background-color: var(--kg-green-ink);
+  color: #ffffff;
+}
+.kg-menu-link[aria-current="page"],
+.kg-menu-link-active {
+  background-color: var(--kg-orange-ink);
+  color: #ffffff;
 }
 
 /* Поляната с цветя над долната част на сайта */
@@ -345,54 +451,234 @@ textarea,
   color: #9bd33a;
 }
 
-/* Фон на приложението — като bg-shield-ambient в МатураПлюс, но с топло слънчево осветяване */
-.bg-app-ambient {
-  background-color: #ffffff;
-  background-image:
-    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(10, 75, 130, 0.06), transparent 65%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(22, 163, 74, 0.04), transparent 70%);
-  background-attachment: fixed;
+/* Пълният фон с небе и поляна от официалния сайт — както в публичната част, така и в учителския облак */
+.kg-page,
+.kg-app-bg {
+  background: var(--kg-sky-bg) url("/brand/meadow-page.webp") center bottom / cover no-repeat fixed;
+}
+.kg-page {
+  padding: 1.25rem 0.75rem 0;
+}
+@media (max-width: 767px) {
+  /* На телефон фиксираният фон тежи — превърта се плавно със страницата */
+  .kg-page,
+  .kg-app-bg {
+    background-attachment: scroll;
+    background-position: center top;
+  }
+  .kg-page {
+    padding: 0.75rem 0.5rem 0;
+  }
 }
 
-/* Главен CTA бутон — плътна теракота (по модела на .btn-shield-cta) */
+/* Бялата полупрозрачна колона за съдържанието (.text_table от dg-yagodovo.com, ширина 1170px) */
+.kg-panel {
+  margin: 0 auto;
+  max-width: 73.125rem;
+  min-height: 60vh;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--kg-yellow-border);
+  border-radius: 7px;
+  box-shadow: 0 2px 10px rgba(61, 47, 0, 0.08);
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+  color: var(--kg-ink);
+}
+
+/* Полетата за писане и кодът остават с Geist — за ясна четимост при писане на пароли, имейли и теми */
+.kg-panel :is(input, textarea, select, code, pre, kbd) {
+  font-family: var(--font-sans);
+  font-size-adjust: none;
+}
+
+/* Оранжеви заглавия на страниците (.p-title от официалния сайт) */
+.kg-site h1,
+.kg-panel h1 {
+  color: var(--kg-orange-ink);
+}
+
+/* Зелени заглавни ленти за разделите (.news_title от официалния сайт — бял текст върху плътно зелено) */
+.kg-panel :is(h2.text-2xl, h2.text-xl, h2.text-lg) {
+  background-color: var(--kg-green-ink);
+  color: #ffffff;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.kg-panel :is(h2.text-2xl, h2.text-xl, h2.text-lg) svg {
+  color: var(--kg-yellow);
+}
+
+/* Заглавията в страничната колона (.rv_title / .contacts_title от официалния сайт) */
+.kg-panel aside h2 {
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--kg-orange-ink);
+  border-bottom: 2px solid var(--kg-yellow);
+  padding-bottom: 0.35rem;
+}
+.kg-panel aside h2 svg {
+  color: var(--kg-green-ink);
+}
+
+/* Кремави карти с жълта рамка (.alt_news_table и .rv_tbl от официалния сайт) */
+.kg-panel :is(.bg-white, .bg-slate-50):not(input, textarea, select, button) {
+  background-color: var(--kg-cream);
+}
+.kg-panel :is(.border-slate-100, .border-slate-200, .border-slate-300):not(input, textarea, select) {
+  border-color: var(--kg-yellow-border);
+}
+.kg-panel :is(input, textarea, select) {
+  border-color: var(--input-border);
+}
+.kg-panel .border-b {
+  border-bottom-color: var(--kg-yellow);
+}
+.kg-panel h3 {
+  color: var(--kg-green-ink);
+}
+
+/*
+ * Учителският облак (.kg-app и .kg-app-panel): същата бяла колона върху поляната с цветя,
+ * оранжеви ръкописни заглавия на страниците, зелени ръкописни подзаглавия, жълти разделители
+ * и кремави карти. Листовете за печат (.print-sheet, .certificate-sheet) остават чисто бели за A4!
+ */
+.kg-app-panel {
+  min-height: calc(100vh - 9.5rem);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--kg-yellow-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(61, 47, 0, 0.08);
+}
+
+.kg-app :is(h1, h2.font-display, h2, h3):not(.print-sheet *, .certificate-sheet *, .print-card *, [role="dialog"] *) {
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.kg-app :is(h1, h2.font-display):not(.print-sheet *, .certificate-sheet *, .print-card *) {
+  color: var(--kg-orange-ink);
+}
+.kg-app :is(h2:not(.font-display), h3):not(.print-sheet *, .certificate-sheet *, .print-card *, [role="dialog"] *) {
+  color: var(--kg-green-ink);
+}
+
+/* Жълта разделителна линия под заглавието на всеки модул (.text_table_line от dg-yagodovo.com) */
+.kg-app :is(header.border-b, div.border-b.pb-6, div.border-b.pb-5):not(.print-sheet *, .certificate-sheet *) {
+  border-bottom-color: var(--kg-yellow);
+  border-bottom-width: 2px;
+}
+
+/* Топли кремави карти и рамки в модулите на учителите (без да пипаме A4 листовете и входните полета) */
+.kg-app :is(section, article, aside > section, li):is(.bg-white, .bg-slate-50):not(.print-sheet, .print-sheet *, .certificate-sheet, .certificate-sheet *, .print-card) {
+  background-color: var(--kg-cream);
+}
+.kg-app :is(.border-slate-100, .border-slate-200):not(input, textarea, select, .print-sheet, .print-sheet *, .certificate-sheet, .certificate-sheet *, .print-card, .print-card *) {
+  border-color: var(--kg-yellow-border);
+}
+.kg-app :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select):not(.print-sheet *, .certificate-sheet *) {
+  border-color: var(--input-border);
+}
+
+/* Форма на бутоните с „листо“ скосяване (.block-file a и .home-section от theme.css на dg-yagodovo.com) */
+.kg-leaf {
+  border-radius: 2px 9px 2px 9px;
+}
+
+/* Долната част (.footer от dg-yagodovo.com) — плътно оранжева с бял ръкописен шрифт */
+.kg-footer {
+  background: var(--kg-orange-ink);
+  color: #ffffff;
+  border-top: 3px solid var(--kg-yellow);
+  font-family: var(--font-hand);
+  font-size-adjust: 0.5;
+}
+.kg-footer :is(a, button, p, span, li) {
+  color: #ffffff;
+}
+.kg-footer :is(a, button):hover {
+  color: #fffeea;
+  text-decoration: underline;
+}
+.kg-footer .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.kg-footer .kg-wordmark {
+  color: #ffffff;
+}
+
+/* Резервен фон за елементи със стар клас bg-app-ambient */
+.bg-app-ambient {
+  background-color: var(--background);
+}
+
+/* Главен и второстепенен бранд бутон (зелено -> оранжево като в dg-yagodovo.com) */
 .btn-brand-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  background-color: var(--brand-primary);
+  background-color: var(--kg-green-ink);
   color: #ffffff;
   border: 1px solid var(--brand-primary-dark);
-  box-shadow: 0 1px 2px rgba(8, 56, 97, 0.12);
+  border-radius: 2px 9px 2px 9px;
+  box-shadow: 0 1px 2px rgba(43, 68, 6, 0.18);
   letter-spacing: -0.01em;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 .btn-brand-cta:hover {
-  background-color: var(--brand-primary-dark);
+  background-color: var(--kg-orange-ink);
+  border-color: #9e3100;
 }
 .btn-brand-cta:active {
-  background-color: #072d4c;
+  background-color: #2b4406;
 }
 
-/* Второстепенен бутон */
 .btn-brand-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  background-color: #ffffff;
-  border: 1px solid rgba(10, 75, 130, 0.2);
-  color: #292524;
+  background-color: var(--kg-cream);
+  border: 1px solid var(--kg-yellow-border);
+  border-radius: 2px 9px 2px 9px;
+  color: var(--kg-ink);
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-brand-secondary:hover {
   background-color: var(--brand-primary-soft);
-  border-color: rgba(10, 75, 130, 0.45);
-  color: var(--brand-primary);
+  border-color: var(--kg-green-ink);
+  color: var(--kg-green-ink);
 }
 
 /* ============================================================ */
-/* Модални прозорци и печат — от досегашния детски сайт           */
+/* Windows High Contrast / Forced Colors Mode                    */
+/* ============================================================ */
+@media (forced-colors: active) {
+  .kg-page,
+  .kg-app-bg,
+  .kg-sky,
+  .kg-meadow {
+    background-image: none;
+  }
+  .kg-panel,
+  .kg-app-panel,
+  .kg-menubar,
+  .kg-footer {
+    border: 1px solid CanvasText;
+  }
+  .kg-menu-link[aria-current="page"],
+  .kg-menu-link-active {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
+/* ============================================================ */
+/* Модални прозорци и печат                                      */
 /* ============================================================ */
 dialog:modal {
   overscroll-behavior: contain;
@@ -453,10 +739,19 @@ html.projector-mode {
 }
 
 @media print {
-  body {
+  body,
+  .kg-page,
+  .kg-app-bg,
+  .kg-panel,
+  .kg-app-panel {
     background: #ffffff !important;
     background-image: none !important;
     color: #000000 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
   }
   .no-print,
   [data-app-sidebar],
@@ -466,11 +761,13 @@ html.projector-mode {
   }
   .print-card {
     break-inside: avoid;
+    background: #ffffff !important;
     box-shadow: none !important;
     border: 1px solid #cbd5e1 !important;
   }
   /* Материали за печат: всеки лист — отделна страница A4, без рамката на екрана */
   .print-sheet {
+    background: #ffffff !important;
     box-shadow: none !important;
     max-width: none !important;
     padding: 0 !important;
@@ -483,6 +780,7 @@ html.projector-mode {
     break-inside: avoid;
   }
   .certificate-sheet {
+    background: #ffffff !important;
     aspect-ratio: auto !important;
     height: 270mm;
   }
@@ -512,10 +810,7 @@ html.projector-mode {
 }
 
 /*
- * „Пестелив печат“ (html.print-eco): черно-бяло, без фонове и цветни плочки, по-светли рамки;
- * картинките (емоджи) в светлосиво — по-малко мастило, а децата могат да ги оцветят.
- * „Едър шрифт“ (html.print-large): по-едри условия, стихчета и текстове в листовете.
- * Настройват се с отметките до „Принтирай“ (PrintOptions) и важат само на хартия.
+ * „Пестелив печат“ (html.print-eco) и „Едър шрифт“ (html.print-large) — важат само на хартия.
  */
 @media print {
   html.print-eco body,
